@@ -215,5 +215,42 @@ CREATE TABLE Lluiten (
 
 -- IMPLEMENTACIÓ DEL MÒDUL 4:
 
+-- Creació de la taula Batallen
+CREATE TABLE Batallen (
+	ID_jugador INTEGER,
+	ID_batalla INTEGER,
+	PRIMARY KEY (ID_jugador, ID_batalla),
+	FOREIGN KEY (ID_jugador) REFERENCES Jugador (ID_jugador),
+	FOREIGN KEY (ID_batalla) REFERENCES Batalla (ID_batalla)
+);
 
+-- Creació de la taula Insignia
+CREATE TABLE Insignia (
+	ID_insignia INTEGER,
+	imatge VARCHER(255), --Es correcte que Imatge sigui VARCHAR?
+	titol VARCHAR(255),
+	PRIMARY KEY (ID_insignia),
+	FOREIGN KEY (ID_insignia) REFERENCES Insignia (ID_insignia)
+);
 
+-- Creació de la taula Participen
+CREATE TABLE Participen (
+	ID_temporada INTEGER,
+	ID_jugador INTEGER,
+	num_victories INTEGER,
+	num_derrotes INTEGER,
+	punts INTEGER,	
+	PRIMARY KEY (ID_jugador, ID_temporada),
+	FOREIGN KEY (ID_jugador) REFERENCES Jugador (ID_jugador)
+	FOREIGN KEY (ID_temporada) REFERENCES Temporada (ID_temporada)
+);
+
+-- Creació de la taula Temporada
+CREATE TABLE Temporada (
+	ID_temporada INTEGER,
+	data_inici DATE,
+	data_fi DATE,
+	PRIMARY KEY (ID_temporada),
+	FOREIGN KEY (ID_jugador) REFERENCES Jugador (ID_jugador)
+	FOREIGN KEY (ID_temporada) REFERENCES Temporada (ID_temporada)
+);
