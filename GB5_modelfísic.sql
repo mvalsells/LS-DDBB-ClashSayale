@@ -1,11 +1,61 @@
 -- BBDD GB5 - Marc Valsells, Marc Geremias, Irina Aynes i Albert Tomas
 -- Model físic
 
+-- DROP TABLES
+-- Módul 1
+DROP TABLE IF EXISTS Raresa CASCADE;
+DROP TABLE IF EXISTS Carta CASCADE;
+DROP TABLE IF EXISTS Edifici CASCADE;
+DROP TABLE IF EXISTS Tropa CASCADE;
+DROP TABLE IF EXISTS Encanteri CASCADE;
+DROP TABLE IF EXISTS Pertany CASCADE;
+DROP TABLE IF EXISTS Formen CASCADE;
+DROP TABLE IF EXISTS Pila CASCADE;
+DROP TABLE IF EXISTS Comparteixen CASCADE;
+DROP TABLE IF EXISTS Modifiquen CASCADE;
+-- Módul 2
+DROP TABLE IF EXISTS Jugador CASCADE;
+DROP TABLE IF EXISTS targeta_credit CASCADE;
+DROP TABLE IF EXISTS article CASCADE;
+DROP TABLE IF EXISTS Emoticones CASCADE;
+DROP TABLE IF EXISTS Bundle CASCADE;
+DROP TABLE IF EXISTS Cofre CASCADE;
+DROP TABLE IF EXISTS Arena CASCADE;
+DROP TABLE IF EXISTS cofre_carta CASCADE;
+DROP TABLE IF EXISTS Missatge CASCADE;
+DROP TABLE IF EXISTS Conversen CASCADE;
+-- Módul 3
+DROP TABLE IF EXISTS Millora CASCADE;
+DROP TABLE IF EXISTS Tecnologia CASCADE;
+DROP TABLE IF EXISTS Estructura CASCADE;
+DROP TABLE IF EXISTS Requereixen CASCADE;
+DROP TABLE IF EXISTS Tenen CASCADE;
+DROP TABLE IF EXISTS Caln CASCADE;
+DROP TABLE IF EXISTS Envia CASCADE;
+DROP TABLE IF EXISTS Pertany CASCADE;
+DROP TABLE IF EXISTS Donacio CASCADE;
+DROP TABLE IF EXISTS Rol CASCADE;
+DROP TABLE IF EXISTS Lluiten CASCADE;
+-- Módul 4
+DROP TABLE IF EXISTS Completen CASCADE;
+DROP TABLE IF EXISTS Missio CASCADE;
+DROP TABLE IF EXISTS Depen CASCADE;
+DROP TABLE IF EXISTS Arena CASCADE;
+DROP TABLE IF EXISTS Assoliment CASCADE;
+DROP TABLE IF EXISTS Desbloquegen CASCADE;
+DROP TABLE IF EXISTS Aconsegueix CASCADE;
+DROP TABLE IF EXISTS Amics CASCADE;
+DROP TABLE IF EXISTS Batallen CASCADE;
+DROP TABLE IF EXISTS Batalla CASCADE;
+DROP TABLE IF EXISTS Insignia CASCADE;
+DROP TABLE IF EXISTS Participen CASCADE;
+DROP TABLE IF EXISTS Temporada CASCADE;
+
+
 -- IMPLEMENTACIÓ DEL MÒDUL 1:
 
 -- Creació de la taula Raresa
 
-DROP TABLE IF EXISTS Raresa CASCADE;
 CREATE TABLE Raresa (
 	grau VARCHAR (255),
 	cost_pujar_nivell INTEGER,
@@ -14,7 +64,6 @@ CREATE TABLE Raresa (
 );
 
 -- Creació de la taula Carta
-DROP TABLE IF EXISTS Carta CASCADE;
 CREATE TABLE Carta (
 	nom VARCHAR (255),
 	dany INTEGER,
@@ -27,7 +76,6 @@ CREATE TABLE Carta (
 
 -- Generalitzacions de l'entitat Carta
 -- Creació de la taula Edifici
-DROP TABLE IF EXISTS Edifici CASCADE;
 CREATE TABLE Edifici (
 	vida INTEGER,
 	ID_edifici INTEGER,
@@ -36,7 +84,6 @@ CREATE TABLE Edifici (
 );
 
 -- Creació de la taula Tropa
-DROP TABLE IF EXISTS Tropa CASCADE;
 CREATE TABLE Tropa (
 	dany_aparicio INTEGER,
 	ID_tropa INTEGER,
@@ -45,7 +92,6 @@ CREATE TABLE Tropa (
 );
 
 -- Creació de la taula Encanteri
-DROP TABLE IF EXISTS Encanteri CASCADE;
 CREATE TABLE Encanteri (
 	radi INTEGER,
 	ID_encanteri INTEGER,
@@ -56,7 +102,6 @@ CREATE TABLE Encanteri (
 -- Resta de taules (no formen part de la generalització de Carta)
 
 -- Creació de la taula Pertany
-DROP TABLE IF EXISTS Pertany CASCADE;
 CREATE TABLE Pertany (
 	quantitat INTEGER,
 	data_desbolqueig DATE,
@@ -69,7 +114,6 @@ CREATE TABLE Pertany (
 );
 
 -- Creació de la taula Formen
-DROP TABLE IF EXISTS Formen CASCADE;
 CREATE TABLE Formen (
 	ID_carta INTEGER,
 	ID_pila INTEGER,
@@ -79,7 +123,6 @@ CREATE TABLE Formen (
 );
 
 -- Creació de la taula Pila
-DROP TABLE IF EXISTS Pila CASCADE;
 CREATE TABLE Pila (
 	nom VARCHAR (255),
 	descripcio VARCHAR (255),
@@ -91,7 +134,6 @@ CREATE TABLE Pila (
 );
 
 -- Creació de la taula Comparteixen
-DROP TABLE IF EXISTS Comparteixen CASCADE;
 CREATE TABLE Comparteixen (
 	ID_pila INTEGER,
 	ID_jugador INTEGER,
@@ -101,12 +143,11 @@ CREATE TABLE Comparteixen (
 );
 
 -- Creació de la taula Modifiquen
-DROP TABLE IF EXISTS Modifiquen CASCADE;
 CREATE TABLE Modifiquen (
 	ID_millores INTEGER,
 	ID_carta INTEGER,
 	PRIMARY KEY (ID_millores, ID_carta),
-	FOREIGN KEY (ID_millores) REFERENCES Millora (ID_millores),
+	FOREIGN KEY (ID_millores) REFERENCES Millora (ID_millora),
 	FOREIGN KEY (ID_carta) REFERENCES Carta (ID_carta)
 );
 
@@ -115,7 +156,6 @@ CREATE TABLE Modifiquen (
 -- IMPLEMENTACIÓ DEL MÒDUL 2:
 
 -- Taula Jugador
-DROP TABLE IF EXISTS Jugador CASCADE;
 CREATE TABLE Jugador(
 	ID_jugador INTEGER,
 	nom VARCHAR(255),
@@ -126,7 +166,6 @@ CREATE TABLE Jugador(
 );
 
 -- Taula Targeta de credit
-DROP TABLE IF EXISTS targeta_credit CASCADE;
 CREATE TABLE targeta_credit(
 	ID_targeta INTEGER,
 	numero INTEGER,
@@ -138,7 +177,6 @@ CREATE TABLE targeta_credit(
 );
 
 -- Generalització article
-DROP TABLE IF EXISTS article CASCADE;
 CREATE TABLE Article (
 	ID_article INTEGER,
 	Nom VARCHAR(255),
@@ -154,7 +192,6 @@ CREATE TABLE Article (
 );
 
 -- Article: Emoticones
-DROP TABLE IF EXISTS Emoticones CASCADE;
 CREATE TABLE Emoticones (
 	ID_emoticones INTEGER,
 	imatge_animada VARCHAR(255),
@@ -163,7 +200,6 @@ CREATE TABLE Emoticones (
 );
 
 -- Article: Bundle
-DROP TABLE IF EXISTS Bundle CASCADE;
 CREATE TABLE Bundle(
     ID_bundle INTEGER,
     Or_ INTEGER,
@@ -173,7 +209,6 @@ CREATE TABLE Bundle(
 );
 
 -- Article: Cofre
-DROP TABLE IF EXISTS Cofre CASCADE;
 CREATE TABLE Cofre (
     ID_cofre INTEGER,
     Raresa VARCHAR(255),
@@ -184,7 +219,6 @@ CREATE TABLE Cofre (
 );
 
 -- Article: Arena
-DROP TABLE IF EXISTS Arena CASCADE;
 CREATE TABLE Arena(
     ID_Arena INTEGER,
     Nivell INTEGER,
@@ -194,7 +228,6 @@ CREATE TABLE Arena(
 );
 
 -- Relació Cofre - Carta
-DROP TABLE IF EXISTS cofre_carta CASCADE;
 CREATE TABLE cofre_carta(
     ID_Arena INTEGER,
     ID_Carta INTEGER,
@@ -204,7 +237,6 @@ CREATE TABLE cofre_carta(
 );
 
 -- Taula Missatge
-DROP TABLE IF EXISTS Missatge CASCADE;
 CREATE TABLE Missatge (
   ID_Missatge INTEGER,
   Titol VARCHAR(255),
@@ -214,7 +246,6 @@ CREATE TABLE Missatge (
 );
 
 -- Conversen (Relació missatge - jugador)
-DROP TABLE IF EXISTS Conversen CASCADE;
 CREATE TABLE Conversen(
     ID_envia INTEGER,
     ID_rep INTEGER,
@@ -230,18 +261,16 @@ CREATE TABLE Conversen(
 -- IMPLEMENTACIÓ DEL MÒDUL 3:
 
 -- Creació de la taula millores
-DROP TABLE IF EXISTS Millora CASCADE;
 CREATE TABLE Millora (
 	nom VARCHAR (255),
 	descripcio VARCHAR (255),
 	cost INTEGER,
-	ID_millores INTEGER,
-	PRIMARY KEY (ID_millores)
+	ID_millora INTEGER,
+	PRIMARY KEY (ID_millora)
 );
 -- Generalització de l'entitat millores
 
 -- Creació taula tecnologies
-DROP TABLE IF EXISTS Tecnologia CASCADE;
 CREATE TABLE Tecnologia (
 	nivell_maxim INTEGER,
 	ID_tecnologies INTEGER,
@@ -250,7 +279,6 @@ CREATE TABLE Tecnologia (
 );
 
 -- Creació de la taula estrcutura
-DROP TABLE IF EXISTS Estructura CASCADE;
 CREATE TABLE Estructura (
 	minim_trofeus INTEGER,
 	ID_estructures INTEGER,
@@ -259,28 +287,25 @@ CREATE TABLE Estructura (
 );
 
 -- Creació de la taula requereixen
-DROP TABLE IF EXISTS Requereixen CASCADE;
 CREATE TABLE Requereixen (
 	nivell INTEGER,
 	ID_millora_nova INTEGER,
 	ID_millora_requerida INTEGER,
 	PRIMARY KEY (ID_millora_nova,ID_millora_requerida),
-	FOREIGN KEY (ID_millora_nova) REFERENCES Millora (ID_millora_nova),
-	FOREIGN KEY (ID_millora_requerida) REFERENCES Millora (ID_millora_requerida)
+	FOREIGN KEY (ID_millora_nova) REFERENCES Millora (ID_millora),
+	FOREIGN KEY (ID_millora_requerida) REFERENCES Millora (ID_millora)
 );
 
 -- Creació de la taula tenen
-DROP TABLE IF EXISTS Tenen CASCADE;
 CREATE TABLE Tenen (
 	ID_millores INTEGER,
 	ID_clan INTEGER,
 	PRIMARY KEY (ID_millores, ID_clan),
-	FOREIGN KEY (ID_millores) REFERENCES Millora (ID_millores),
+	FOREIGN KEY (ID_millores) REFERENCES Millora (ID_millora),
 	FOREIGN KEY (ID_clan) REFERENCES Clan (ID_clan)
 );
 
 -- Creació de la taula Clan
-DROP TABLE IF EXISTS Caln CASCADE;
 CREATE TABLE Clan (
 	descripcio VARCHAR (255),
 	nombre_trofeus INTEGER,
@@ -291,7 +316,6 @@ CREATE TABLE Clan (
 );
 
 --Creació de la taula envia
-DROP TABLE IF EXISTS Envia CASCADE;
 CREATE TABLE Envia (
 	ID_missatge INTEGER,
 	ID_clan INTEGER,
@@ -303,7 +327,6 @@ CREATE TABLE Envia (
 );
 
 -- Creació de la taula Pertany
-DROP TABLE IF EXISTS Pertany CASCADE;
 CREATE TABLE Pertany (
 	creador_del_clan VARCHAR (255),
 	data DATE, 
@@ -320,7 +343,6 @@ CREATE TABLE Pertany (
 );
 
 -- Creació taula donació
-DROP TABLE IF EXISTS Donacio CASCADE;
 CREATE TABLE Donacio (
 	quantitat INTEGER, 
 	data DATE,
@@ -329,7 +351,6 @@ CREATE TABLE Donacio (
 );
 
 -- Creació taula rol
-DROP TABLE IF EXISTS Rol CASCADE;
 CREATE TABLE Rol (
 	descripcio VARCHAR (255),
 	ID_rol INTEGER,
@@ -337,7 +358,6 @@ CREATE TABLE Rol (
 );
 
 -- Creació taula lluiten
-DROP TABLE IF EXISTS Lluiten CASCADE;
 CREATE TABLE Lluiten (
 	ID_clan INTEGER,
 	ID_batalla INTEGER,
@@ -351,7 +371,6 @@ CREATE TABLE Lluiten (
 -- IMPLEMENTACIÓ DEL MÒDUL 4:
 
 -- Creació de la taula Completen
-DROP TABLE IF EXISTS Completen CASCADE;
 CREATE TABLE Completen (
 	ID_jugador INTEGER,
 	ID_missio INTEGER,
@@ -366,17 +385,15 @@ CREATE TABLE Completen (
 );
 
 -- Creació de la taula Missio
-DROP TABLE IF EXISTS Missio CASCADE;
 CREATE TABLE Missio (
 	ID_missio INTEGER,
-	tasques VARCHER(255),
+	tasques VARCHAR(255),
 	recompenses INTEGER,
-	titol VARCHER(255),
+	titol VARCHAR(255),
 	PRIMARY KEY (ID_missio)
 );
 
 -- Creació de la taula Depen
-DROP TABLE IF EXISTS Depen CASCADE;
 CREATE TABLE Depen (
 	ID_missio1 INTEGER,
 	ID_missio2 INTEGER,
@@ -386,27 +403,24 @@ CREATE TABLE Depen (
 );
 
 -- Creació de la taula Arena
-DROP TABLE IF EXISTS Arena CASCADE;
 CREATE TABLE Arena (
 	ID_arena INTEGER,
-	titol VARCHER(255),
+	titol VARCHAR(255),
 	nombre_min INTEGER,
 	recompenses VARCHAR(255),
 	PRIMARY KEY (ID_arena)
 );
 
 -- Creació de la taula Assoliment
-DROP TABLE IF EXISTS Assoliment CASCADE;
 CREATE TABLE Assoliment (
 	ID_assoliment INTEGER,
-	titol VARCHER(255),
+	titol VARCHAR(255),
 	recompensa_gemmes INTEGER,
 	PRIMARY KEY (ID_assoliment),
 	FOREIGN KEY (ID_assoliment) REFERENCES Assoliment (ID_assoliment)
 );
 
 -- Creació de la taula Desbloquegen
-DROP TABLE IF EXISTS Desbloquegen CASCADE;
 CREATE TABLE Desbloquegen (
 	ID_desbloquegen INTEGER,
 	ID_arena INTEGER,
@@ -416,7 +430,6 @@ CREATE TABLE Desbloquegen (
 );
 
 -- Creació de la taula Aconsegueix
-DROP TABLE IF EXISTS Aconsegueix CASCADE;
 CREATE TABLE Aconsegueix (
 	ID_jugador INTEGER,
 	ID_assoliment INTEGER,
@@ -428,7 +441,6 @@ CREATE TABLE Aconsegueix (
 );
 
 -- Creació de la taula Amics
-DROP TABLE IF EXISTS Amics CASCADE;
 CREATE TABLE Amics (
 	ID_jugador1 INTEGER,
 	ID_jugador2 INTEGER,
@@ -438,7 +450,6 @@ CREATE TABLE Amics (
 );
 
 -- Creació de la taula Batallen
-DROP TABLE IF EXISTS Batallen CASCADE;
 CREATE TABLE Batallen (
 	ID_jugador INTEGER,
 	ID_batalla INTEGER,
@@ -448,7 +459,6 @@ CREATE TABLE Batallen (
 );
 
 -- Creació de la taula Batallen
-DROP TABLE IF EXISTS Batalla CASCADE;
 CREATE TABLE Batalla (
 	ID_batalla INTEGER,
 	data_ DATE,
@@ -462,17 +472,15 @@ CREATE TABLE Batalla (
 
 
 -- Creació de la taula Insignia
-DROP TABLE IF EXISTS Insignia CASCADE;
 CREATE TABLE Insignia (
 	ID_insignia INTEGER,
-	imatge VARCHER(255), --Es correcte que Imatge sigui VARCHAR?
+	imatge VARCHAR(255), --Es correcte que Imatge sigui VARCHAR?
 	titol VARCHAR(255),
 	PRIMARY KEY (ID_insignia),
 	FOREIGN KEY (ID_insignia) REFERENCES Insignia (ID_insignia)
 );
 
 -- Creació de la taula Participen
-DROP TABLE IF EXISTS Participen CASCADE;
 CREATE TABLE Participen (
 	ID_temporada INTEGER,
 	ID_jugador INTEGER,
@@ -485,7 +493,6 @@ CREATE TABLE Participen (
 );
 
 -- Creació de la taula Temporada
-DROP TABLE IF EXISTS Temporada CASCADE;
 CREATE TABLE Temporada (
 	ID_temporada INTEGER,
 	data_inici DATE,
