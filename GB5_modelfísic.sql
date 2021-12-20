@@ -1,7 +1,6 @@
 -- BBDD GB5 - Marc Valsells, Marc Geremias, Irina Aynes i Albert Tomas
 -- Model físic
 
-
 -- IMPLEMENTACIÓ DEL MÒDUL 1:
 
 -- Creació de la taula Raresa
@@ -111,10 +110,122 @@ CREATE TABLE Modifiquen (
 	FOREIGN KEY (ID_carta) REFERENCES Carta (ID_carta)
 );
 
-
+-- ----------------------------------------------------------------
 
 -- IMPLEMENTACIÓ DEL MÒDUL 2:
 
+-- Taula Jugador
+DROP TABLE IF EXISTS Jugador CASCADE;
+CREATE TABLE Jugador(
+	ID_jugador INTEGER,
+	nom VARCHAR(255),
+	experiencia INTEGER,
+	trofeus INTEGER,
+	targeta_credit INTEGER,
+	PRIMARY KEY (ID_Jugador)
+);
+
+-- Taula Targeta de credit
+DROP TABLE IF EXISTS targeta_credit CASCADE;
+CREATE TABLE targeta_credit(
+	ID_targeta INTEGER,
+	numero INTEGER,
+	caducitat DATE,
+	CVV INTEGER,
+	ID_jugador INTEGER,
+	PRIMARY KEY (ID_targeta),
+	FOREIGN KEY (ID_Jugador) REFERENCES Jugador(ID_Jugador)
+);
+
+-- Generalització article
+DROP TABLE IF EXISTS article CASCADE;
+CREATE TABLE Article (
+	ID_article INTEGER,
+	Nom VARCHAR(255),
+	Preu INTEGER,
+	ID_targeta INTEGER,
+	ID_jugador INTEGER,
+	Data_ DATE,
+	Quantiatat INTEGER,
+	Descompte INTEGER,
+	PRIMARY KEY (ID_article),
+	FOREIGN KEY (ID_targeta) REFERENCES targeta_credit(ID_targeta),
+	FOREIGN KEY (ID_jugador) REFERENCES Jugador(ID_jugador)
+);
+
+-- Article: Emoticones
+DROP TABLE IF EXISTS Emoticones CASCADE;
+CREATE TABLE Emoticones (
+	ID_emoticones INTEGER,
+	imatge_animada VARCHAR(255),
+	PRIMARY KEY(ID_emoticones),
+	FOREIGN KEY (ID_emoticones) REFERENCES Article(ID_article)
+);
+
+-- Article: Bundle
+DROP TABLE IF EXISTS Bundle CASCADE;
+CREATE TABLE Bundle(
+    ID_bundle INTEGER,
+    Or_ INTEGER,
+    gemmes INTEGER,
+    PRIMARY KEY (ID_bundle),
+    FOREIGN KEY (ID_bundle) REFERENCES Article(ID_article)
+);
+
+-- Article: Cofre
+DROP TABLE IF EXISTS Cofre CASCADE;
+CREATE TABLE Cofre (
+    ID_cofre INTEGER,
+    Raresa VARCHAR(255),
+    Temps INTEGER,
+    Gemmes INTEGER,
+    PRIMARY KEY (ID_cofre),
+    FOREIGN KEY (ID_cofre) REFERENCES Article(ID_article)
+);
+
+-- Article: Arena
+DROP TABLE IF EXISTS Arena CASCADE;
+CREATE TABLE Arena(
+    ID_Arena INTEGER,
+    Nivell INTEGER,
+    Or_ INTEGER,
+    PRIMARY KEY (ID_Arena),
+    FOREIGN KEY (ID_Arena) REFERENCES Article(ID_article)
+);
+
+-- Relació Cofre - Carta
+DROP TABLE IF EXISTS cofre_carta CASCADE;
+CREATE TABLE cofre_carta(
+    ID_Arena INTEGER,
+    ID_Carta INTEGER,
+    PRIMARY KEY (ID_Arena,ID_Carta),
+    FOREIGN KEY (ID_Arena) REFERENCES Arena(ID_Arena),
+    FOREIGN KEY (ID_Carta) REFERENCES Carta(ID_Carta)
+);
+
+-- Taula Missatge
+DROP TABLE IF EXISTS Missatge CASCADE;
+CREATE TABLE Missatge (
+  ID_Missatge INTEGER,
+  Titol VARCHAR(255),
+  Cos TEXT,
+  data_ DATE,
+  PRIMARY KEY (ID_Missatge)
+);
+
+-- Conversen (Relació missatge - jugador)
+DROP TABLE IF EXISTS Conversen CASCADE;
+CREATE TABLE Conversen(
+    ID_envia INTEGER,
+    ID_rep INTEGER,
+    ID_missatge INTEGER,
+    PRIMARY KEY (ID_envia,ID_rep,ID_missatge),
+    FOREIGN KEY (ID_envia) REFERENCES Jugador(ID_jugador),
+    FOREIGN KEY (ID_rep) REFERENCES Jugador(ID_jugador),
+    FOREIGN KEY (ID_missatge) REFERENCES Missatge(ID_Missatge)
+);
+
+-- ----------------------------------------------------------------
 
 -- IMPLEMENTACIÓ DEL MÒDUL 3:
 
@@ -234,6 +345,8 @@ CREATE TABLE Lluiten (
 	FOREIGN KEY (ID_clan) REFERENCES Clan (ID_clan),
 	FOREIGN KEY (ID_batalla) REFERENCES Batalla (ID_batalla)
 );
+
+-- ----------------------------------------------------------------
 
 -- IMPLEMENTACIÓ DEL MÒDUL 4:
 
