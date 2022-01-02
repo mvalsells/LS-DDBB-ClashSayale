@@ -323,17 +323,17 @@ CREATE TABLE Conversen(
 -- Creació taula tecnologies
 CREATE TABLE Tecnologia (
 	nivell_maxim INTEGER,
-	ID_tecnologies INTEGER,
-	PRIMARY KEY (ID_tecnologies),
-	FOREIGN KEY (ID_tecnologies) REFERENCES Tecnologia (ID_tecnologies)
+	ID_tecnologia INTEGER,
+	PRIMARY KEY (ID_tecnologia),
+	FOREIGN KEY (ID_tecnologia) REFERENCES Tecnologia (ID_tecnologies)
 );
 
 -- Creació de la taula estrcutura
 CREATE TABLE Estructura (
 	minim_trofeus INTEGER,
-	ID_estructures INTEGER,
-	PRIMARY KEY (ID_estructures),
-	FOREIGN KEY (ID_estructures) REFERENCES Estructura (ID_estructures)
+	ID_estructura INTEGER,
+	PRIMARY KEY (ID_estructura),
+	FOREIGN KEY (ID_estructura) REFERENCES Estructura (ID_estructures)
 );
 
 -- Creació de les taules requereix
@@ -363,16 +363,28 @@ CREATE TABLE Clan (
 	PRIMARY KEY (ID_clan)
 );
 
--- Creació de la taula tenen
-CREATE TABLE Tenen (
+-- Creació de la taula tenen_tecnologia
+CREATE TABLE Tenen_tecnologia (
+	ID_tecnologia INTEGER,
+	ID_clan INTEGER,
 	data date,
 	nivell INTEGER,
-	ID_millores INTEGER,
-	ID_clan INTEGER,
-	PRIMARY KEY (ID_millores, ID_clan),
-	FOREIGN KEY (ID_millores) REFERENCES Millora (ID_millora),
+	PRIMARY KEY (ID_tecnologia, ID_clan),
+	FOREIGN KEY (ID_tecnologia) REFERENCES Tecnologia (ID_tecnologia),
 	FOREIGN KEY (ID_clan) REFERENCES Clan (ID_clan)
 );
+
+-- Creació de la taula tenen_tecnologia
+CREATE TABLE Tenen_estructura (
+	ID_estructura INTEGER,
+	ID_clan INTEGER,
+	data date,
+	nivell INTEGER,
+	PRIMARY KEY (ID_estructura, ID_clan),
+	FOREIGN KEY (ID_estructura) REFERENCES Tecnologia (ID_tecnologia),
+	FOREIGN KEY (ID_clan) REFERENCES Clan (ID_clan)
+);
+
 
 --Creació de la taula envia
 CREATE TABLE Envia (
