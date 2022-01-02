@@ -20,8 +20,9 @@ DROP TABLE IF EXISTS article CASCADE;
 DROP TABLE IF EXISTS Emoticones CASCADE;
 DROP TABLE IF EXISTS Bundle CASCADE;
 DROP TABLE IF EXISTS Cofre CASCADE;
-DROP TABLE IF EXISTS Art_Arena CASCADE;
 DROP TABLE IF EXISTS cofre_carta CASCADE;
+DROP TABLE IF EXISTS Art_Arena CASCADE;
+DROP TABLE IF EXISTS Compren CASCADE;
 DROP TABLE IF EXISTS Missatge CASCADE;
 DROP TABLE IF EXISTS Conversen CASCADE;
 -- Módul 3
@@ -225,14 +226,7 @@ CREATE TABLE Article (
 	ID_article INTEGER,
 	Nom VARCHAR(255),
 	Preu INTEGER,
-	ID_targeta INTEGER,
-	ID_jugador INTEGER,
-	Data_ DATE,
-	Quantiatat INTEGER,
-	Descompte INTEGER,
-	PRIMARY KEY (ID_article),
-	FOREIGN KEY (ID_targeta) REFERENCES targeta_credit(ID_targeta),
-	FOREIGN KEY (ID_jugador) REFERENCES Jugador(ID_jugador)
+	PRIMARY KEY (ID_article)
 );
 
 -- Article: Emoticones
@@ -252,16 +246,6 @@ CREATE TABLE Bundle(
     FOREIGN KEY (ID_bundle) REFERENCES Article(ID_article)
 );
 
--- Article: Cofre
-CREATE TABLE Cofre (
-    ID_cofre INTEGER,
-    Raresa VARCHAR(255),
-    Temps INTEGER,
-    Gemmes INTEGER,
-    PRIMARY KEY (ID_cofre),
-    FOREIGN KEY (ID_cofre) REFERENCES Article(ID_article)
-);
-
 -- Article: Arena
 CREATE TABLE Art_Arena(
     ID_Art_Arena INTEGER,
@@ -271,6 +255,17 @@ CREATE TABLE Art_Arena(
     FOREIGN KEY (ID_Art_Arena) REFERENCES Article(ID_article)
 );
 
+-- Article: Cofre
+CREATE TABLE Cofre (
+    ID_cofre INTEGER,
+    ID_Raresa INTEGER, -- Possiblement s'haurà de canviar el integer per varchar
+    Temps INTEGER,
+    Gemmes INTEGER,
+    PRIMARY KEY (ID_cofre),
+    FOREIGN KEY (ID_cofre) REFERENCES Article(ID_article),
+    FOREIGN KEY (ID_Raresa) REFERENCES Raresa(ID_Raresa)
+);
+
 -- Relació Cofre - Carta
 CREATE TABLE cofre_carta(
     ID_Art_Arena INTEGER,
@@ -278,6 +273,21 @@ CREATE TABLE cofre_carta(
     PRIMARY KEY (ID_Art_Arena,ID_Carta),
     FOREIGN KEY (ID_Art_Arena) REFERENCES Art_Arena(ID_Art_Arena),
     FOREIGN KEY (ID_Carta) REFERENCES Carta(ID_Carta)
+);
+
+-- Compren (Relació tarja, article, jugador)
+CREATE TABLE Compren (
+    ID_Compren INTEGER,
+    ID_Jugador INTEGER,
+    ID_Targeta INTEGER,
+    ID_Article INTEGER,
+    Data_ DATE,
+    Quantitat INTEGER,
+    Descompte INTEGER,
+    PRIMARY KEY (ID_Compren),
+    FOREIGN KEY (ID_Jugador) REFERENCES Jugador(ID_jugador),
+    FOREIGN KEY (ID_Targeta) REFERENCES targeta_credit(ID_targeta),
+    FOREIGN KEY (ID_Article) REFERENCES Article(ID_article)
 );
 
 -- Taula Missatge
