@@ -325,7 +325,7 @@ CREATE TABLE Tecnologia (
 	nivell_maxim INTEGER,
 	ID_tecnologia INTEGER,
 	PRIMARY KEY (ID_tecnologia),
-	FOREIGN KEY (ID_tecnologia) REFERENCES Tecnologia (ID_tecnologies)
+	FOREIGN KEY (ID_tecnologia) REFERENCES Tecnologia (ID_tecnologia)
 );
 
 -- Creació de la taula estrcutura
@@ -333,7 +333,7 @@ CREATE TABLE Estructura (
 	minim_trofeus INTEGER,
 	ID_estructura INTEGER,
 	PRIMARY KEY (ID_estructura),
-	FOREIGN KEY (ID_estructura) REFERENCES Estructura (ID_estructures)
+	FOREIGN KEY (ID_estructura) REFERENCES Estructura (ID_estructura)
 );
 
 -- Creació de les taules requereix
@@ -341,16 +341,16 @@ CREATE TABLE Requereix_tecnologia (
 	ID_tecnologia_nova INTEGER,
 	ID_tecnologia_requerida INTEGER,
 	PRIMARY KEY (ID_tecnologia_nova,ID_tecnologia_requerida),
-	FOREIGN KEY (ID_tecnologia_nova) REFERENCES Tecnologia (ID_tecnologies),
-	FOREIGN KEY (ID_tecnologia_requerida) REFERENCES Tecnologia (ID_tecnologies)
+	FOREIGN KEY (ID_tecnologia_nova) REFERENCES Tecnologia (ID_tecnologia),
+	FOREIGN KEY (ID_tecnologia_requerida) REFERENCES Tecnologia (ID_tecnologia)
 );
 
 CREATE TABLE Requereix_estructura (
 	ID_estructura_nova INTEGER,
 	ID_estructura_requerida INTEGER,
 	PRIMARY KEY (ID_estructura_nova,ID_estructura_requerida),
-	FOREIGN KEY (ID_estructura_nova) REFERENCES Estructura (ID_estructures),
-	FOREIGN KEY (ID_estructura_requerida) REFERENCES Estructura (ID_estructures)
+	FOREIGN KEY (ID_estructura_nova) REFERENCES Estructura (ID_estructura),
+	FOREIGN KEY (ID_estructura_requerida) REFERENCES Estructura (ID_estructura)
 );
 
 -- Creació de la taula Clan
