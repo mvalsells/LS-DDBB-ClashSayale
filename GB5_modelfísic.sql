@@ -69,11 +69,10 @@ CREATE TABLE Jugador(
 
 -- Creació de la taula millores
 CREATE TABLE Millora (
-	nom VARCHAR (255),
+	nom_millora VARCHAR (255),
 	descripcio VARCHAR (255),
 	cost INTEGER,
-	ID_millora INTEGER,
-	PRIMARY KEY (ID_millora)
+	PRIMARY KEY (nom_millora)
 );
 
 -- Creació de la taula Temporada
@@ -204,10 +203,10 @@ CREATE TABLE Comparteixen (
 
 -- Creació de la taula Modifiquen
 CREATE TABLE Modifiquen (
-	ID_millores INTEGER,
+	nom_millora VARCHAR(255),
 	ID_carta INTEGER,
-	PRIMARY KEY (ID_millores, ID_carta),
-	FOREIGN KEY (ID_millores) REFERENCES Millora (ID_millora),
+	PRIMARY KEY (nom_millora, ID_carta),
+	FOREIGN KEY (nom_millora) REFERENCES Millora (nom_millora),
 	FOREIGN KEY (ID_carta) REFERENCES Carta (ID_carta)
 );
 
