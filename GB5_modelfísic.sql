@@ -29,12 +29,13 @@ DROP TABLE IF EXISTS Conversen CASCADE;
 DROP TABLE IF EXISTS Millora CASCADE;
 DROP TABLE IF EXISTS Tecnologia CASCADE;
 DROP TABLE IF EXISTS Estructura CASCADE;
-DROP TABLE IF EXISTS Requereixen CASCADE;
+DROP TABLE IF EXISTS Requereix_tecnologia CASCADE;
+DROP TABLE IF EXISTS Requereix_estructura CASCADE;
 DROP TABLE IF EXISTS Tenen CASCADE;
 DROP TABLE IF EXISTS Clan CASCADE;
 DROP TABLE IF EXISTS Envia CASCADE;
 DROP TABLE IF EXISTS Forma_part CASCADE;
-DROP TABLE IF EXISTS Donacio CASCADE;
+DROP TABLE IF EXISTS Dona CASCADE;
 DROP TABLE IF EXISTS Rol CASCADE;
 DROP TABLE IF EXISTS Lluiten CASCADE;
 -- Módul 4
@@ -332,14 +333,21 @@ CREATE TABLE Estructura (
 	FOREIGN KEY (ID_estructures) REFERENCES Estructura (ID_estructures)
 );
 
--- Creació de la taula requereixen
-CREATE TABLE Requereixen (
-	nivell INTEGER,
-	ID_millora_nova INTEGER,
-	ID_millora_requerida INTEGER,
-	PRIMARY KEY (ID_millora_nova,ID_millora_requerida),
-	FOREIGN KEY (ID_millora_nova) REFERENCES Millora (ID_millora),
-	FOREIGN KEY (ID_millora_requerida) REFERENCES Millora (ID_millora)
+-- Creació de les taules requereix
+CREATE TABLE Requereix_tecnologia (
+	ID_tecnologia_nova INTEGER,
+	ID_tecnologia_requerida INTEGER,
+	PRIMARY KEY (ID_tecnologia_nova,ID_tecnologia_requerida),
+	FOREIGN KEY (ID_tecnologia_nova) REFERENCES Tecnologia (ID_tecnologies),
+	FOREIGN KEY (ID_tecnologia_requerida) REFERENCES Tecnologia (ID_tecnologies)
+);
+
+CREATE TABLE Requereix_estructura (
+	ID_estructura_nova INTEGER,
+	ID_estructura_requerida INTEGER,
+	PRIMARY KEY (ID_estructura_nova,ID_estructura_requerida),
+	FOREIGN KEY (ID_estructura_nova) REFERENCES Estructura (ID_estructures),
+	FOREIGN KEY (ID_estructura_requerida) REFERENCES Estructura (ID_estructures)
 );
 
 -- Creació de la taula Clan
@@ -354,6 +362,8 @@ CREATE TABLE Clan (
 
 -- Creació de la taula tenen
 CREATE TABLE Tenen (
+	data date,
+	nivell INTEGER,
 	ID_millores INTEGER,
 	ID_clan INTEGER,
 	PRIMARY KEY (ID_millores, ID_clan),
@@ -380,11 +390,15 @@ CREATE TABLE Rol (
 );
 
 -- Creació taula donació
-CREATE TABLE Donacio (
+CREATE TABLE Dona (
 	quantitat INTEGER,
 	data DATE,
 	ID_donacio INTEGER,
-	PRIMARY KEY (ID_donacio)
+	ID_jugador INTEGER,
+	ID_clan INTEGER,
+	PRIMARY KEY (ID_donacio),
+	FOREIGN KEY (ID_jugador) REFERENCES Jugador (ID_jugador),
+	FOREIGN KEY (ID_clan) REFERENCES Clan (ID_clan)
 );
 
 -- Creació de la taula Forma_part
@@ -394,13 +408,11 @@ CREATE TABLE Forma_part (
 	ID_clan INTEGER,
 	ID_jugador INTEGER,
 	ID_rol INTEGER,
-	ID_donacio INTEGER,
 	ID_Forma_part INTEGER,
 	PRIMARY KEY (ID_Forma_part),
 	FOREIGN KEY (ID_clan) REFERENCES Clan (ID_clan),
 	FOREIGN KEY (ID_jugador) REFERENCES Jugador (ID_jugador),
-	FOREIGN KEY (ID_rol) REFERENCES Rol (ID_rol),
-	FOREIGN KEY (ID_donacio) REFERENCES Donacio (ID_donacio)
+	FOREIGN KEY (ID_rol) REFERENCES Rol (ID_rol)
 );
 
 -- Creació taula lluiten
