@@ -83,6 +83,8 @@ CREATE TABLE Temporada (
 	PRIMARY KEY (ID_temporada)
 );
 
+
+
 -- Creació de la taula Arena
 CREATE TABLE Arena (
 	ID_arena INTEGER,
