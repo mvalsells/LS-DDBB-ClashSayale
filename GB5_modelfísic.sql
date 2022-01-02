@@ -90,6 +90,7 @@ CREATE TABLE Arena (
 	ID_arena INTEGER,
 	titol VARCHAR(255),
 	nombre_min INTEGER,
+	nombre_max INTEGER,
 	recompenses VARCHAR(255),
 	PRIMARY KEY (ID_arena)
 );
