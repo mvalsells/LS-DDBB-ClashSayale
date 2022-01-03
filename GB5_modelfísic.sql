@@ -77,7 +77,7 @@ CREATE TABLE Millora (
 
 -- Creació de la taula Temporada
 CREATE TABLE Temporada (
-	ID_temporada INTEGER,
+	ID_temporada VARCHAR(255),
 	data_inici DATE,
 	data_fi DATE,
 	PRIMARY KEY (ID_temporada)
@@ -100,7 +100,7 @@ CREATE TABLE Batalla (
 	ID_batalla INTEGER,
 	data_ DATE,
 	durada TIME, --ns si es coorecte aqeust tipus de variable
-	ID_temporada INTEGER,
+	ID_temporada VARCHAR(255),
 	ID_arena INTEGER,
 	PRIMARY KEY (ID_batalla),
 	FOREIGN KEY (ID_temporada) REFERENCES Temporada (ID_temporada),
@@ -533,7 +533,7 @@ CREATE TABLE Insignia (
 
 -- Creació de la taula Participen
 CREATE TABLE Participen (
-	ID_temporada INTEGER,
+	ID_temporada VARCHAR(255),
 	ID_jugador INTEGER,
 	num_victories INTEGER,
 	num_derrotes INTEGER,

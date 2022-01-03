@@ -62,3 +62,9 @@ SELECT building, description, cost
 FROM temporal2;
 
 DROP TABLE temporal2;
+
+-- Temporades
+COPY temporada(id_temporada,data_inici,data_fi)
+    FROM 'C:\Users\Public\Datasets\seasons.csv'
+    DELIMITER ','
+    CSV HEADER;
