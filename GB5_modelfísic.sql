@@ -354,45 +354,46 @@ CREATE TABLE Requereix_estructura (
 
 -- Creació de la taula Clan
 CREATE TABLE Clan (
+    tag_clan VARCHAR(255),
+	nom VARCHAR(255),
 	descripcio VARCHAR (255),
 	nombre_trofeus INTEGER,
 	trofeus_minims INTEGER,
 	puntuacio INTEGER,
-	ID_clan INTEGER,
-	PRIMARY KEY (ID_clan)
+	PRIMARY KEY (tag_clan)
 );
 
 -- Creació de la taula tenen_tecnologia
 CREATE TABLE Tenen_tecnologia (
 	ID_tecnologia INTEGER,
-	ID_clan INTEGER,
+	tag_clan VARCHAR(255),
 	data date,
 	nivell INTEGER,
-	PRIMARY KEY (ID_tecnologia, ID_clan),
+	PRIMARY KEY (ID_tecnologia, tag_clan),
 	FOREIGN KEY (ID_tecnologia) REFERENCES Tecnologia (ID_tecnologia),
-	FOREIGN KEY (ID_clan) REFERENCES Clan (ID_clan)
+	FOREIGN KEY (tag_clan) REFERENCES Clan (tag_clan)
 );
 
 -- Creació de la taula tenen_tecnologia
 CREATE TABLE Tenen_estructura (
 	ID_estructura INTEGER,
-	ID_clan INTEGER,
+	tag_clan VARCHAR(255),
 	data date,
 	nivell INTEGER,
-	PRIMARY KEY (ID_estructura, ID_clan),
+	PRIMARY KEY (ID_estructura, tag_clan),
 	FOREIGN KEY (ID_estructura) REFERENCES Tecnologia (ID_tecnologia),
-	FOREIGN KEY (ID_clan) REFERENCES Clan (ID_clan)
+	FOREIGN KEY (tag_clan) REFERENCES Clan (tag_clan)
 );
 
 
 --Creació de la taula envia
 CREATE TABLE Envia (
 	ID_missatge INTEGER,
-	ID_clan INTEGER,
+	tag_clan VARCHAR(255),
 	ID_jugador INTEGER,
-	PRIMARY KEY (ID_missatge, ID_clan, ID_jugador),
+	PRIMARY KEY (ID_missatge, tag_clan, ID_jugador),
 	FOREIGN KEY (ID_missatge) REFERENCES Missatge (ID_missatge),
-	FOREIGN KEY (ID_clan) REFERENCES Clan (ID_clan),
+	FOREIGN KEY (tag_clan) REFERENCES Clan (tag_clan),
 	FOREIGN KEY (ID_jugador) REFERENCES Jugador (ID_jugador)
 );
 
@@ -409,32 +410,32 @@ CREATE TABLE Dona (
 	data DATE,
 	ID_donacio INTEGER,
 	ID_jugador INTEGER,
-	ID_clan INTEGER,
+	tag_clan VARCHAR(255),
 	PRIMARY KEY (ID_donacio),
 	FOREIGN KEY (ID_jugador) REFERENCES Jugador (ID_jugador),
-	FOREIGN KEY (ID_clan) REFERENCES Clan (ID_clan)
+	FOREIGN KEY (tag_clan) REFERENCES Clan (tag_clan)
 );
 
 -- Creació de la taula Forma_part
 CREATE TABLE Forma_part (
 	creador_del_clan VARCHAR (255),
 	data DATE, 
-	ID_clan INTEGER,
+	tag_clan VARCHAR(255),
 	ID_jugador INTEGER,
 	ID_rol INTEGER,
 	ID_Forma_part INTEGER,
 	PRIMARY KEY (ID_Forma_part),
-	FOREIGN KEY (ID_clan) REFERENCES Clan (ID_clan),
+	FOREIGN KEY (tag_clan) REFERENCES Clan (tag_clan),
 	FOREIGN KEY (ID_jugador) REFERENCES Jugador (ID_jugador),
 	FOREIGN KEY (ID_rol) REFERENCES Rol (ID_rol)
 );
 
 -- Creació taula lluiten
 CREATE TABLE Lluiten (
-	ID_clan INTEGER,
+	tag_clan VARCHAR(255),
 	ID_batalla INTEGER,
-	PRIMARY KEY (ID_clan,ID_batalla),
-	FOREIGN KEY (ID_clan) REFERENCES Clan (ID_clan),
+	PRIMARY KEY (tag_clan,ID_batalla),
+	FOREIGN KEY (tag_clan) REFERENCES Clan (tag_clan),
 	FOREIGN KEY (ID_batalla) REFERENCES Batalla (ID_batalla)
 );
 

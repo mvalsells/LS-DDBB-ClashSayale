@@ -50,7 +50,8 @@ CREATE TEMPORARY TABLE temporal2 (
     mod_radius INTEGER,
     mod_spawn_damage INTEGER,
     mod_lifetime INTEGER,
-    description VARCHAR(255));
+    description VARCHAR(255)
+);
 
 COPY temporal2
 FROM 'C:\Users\Public\Datasets\buildings.csv'
@@ -66,5 +67,11 @@ DROP TABLE temporal2;
 -- Temporades
 COPY temporada(id_temporada,data_inici,data_fi)
     FROM 'C:\Users\Public\Datasets\seasons.csv'
+    DELIMITER ','
+    CSV HEADER;
+
+-- Clans
+COPY clan(tag_clan,nom,descripcio,trofeus_minims,nombre_trofeus,puntuacio)
+    FROM 'C:\Users\Public\Datasets\clans.csv'
     DELIMITER ','
     CSV HEADER;
