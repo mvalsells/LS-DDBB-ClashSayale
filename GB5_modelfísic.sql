@@ -125,9 +125,9 @@ CREATE TABLE Carta (
 	dany INTEGER,
 	velocitat_atac INTEGER,
 	ID_carta INTEGER,
-	ID_raresa INTEGER,
+	raresa VARCHAR(255),
 	PRIMARY KEY (ID_carta),
-	FOREIGN KEY (ID_raresa) REFERENCES Raresa (ID_raresa)
+	FOREIGN KEY (raresa) REFERENCES Raresa (nom)
 );
 
 -- Generalitzacions de l'entitat Carta
@@ -261,12 +261,12 @@ CREATE TABLE Art_Arena(
 -- Article: Cofre
 CREATE TABLE Cofre (
     ID_cofre INTEGER,
-    ID_Raresa INTEGER, -- Possiblement s'haurà de canviar el integer per varchar
+    raresa VARCHAR(255),
     Temps INTEGER,
     Gemmes INTEGER,
     PRIMARY KEY (ID_cofre),
     FOREIGN KEY (ID_cofre) REFERENCES Article(ID_article),
-    FOREIGN KEY (ID_Raresa) REFERENCES Raresa(ID_Raresa)
+    FOREIGN KEY (raresa) REFERENCES Raresa(nom)
 );
 
 -- Relació Cofre - Carta
