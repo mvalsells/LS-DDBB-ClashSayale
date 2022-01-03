@@ -76,3 +76,30 @@ COPY clan(tag_clan,nom,descripcio,trofeus_minims,nombre_trofeus,puntuacio)
     FROM 'C:\Users\Public\Datasets\clans.csv'
     DELIMITER ','
     CSV HEADER;
+
+-- Jugadors
+CREATE TEMPORARY TABLE players (
+    tag VARCHAR(255),
+    name VARCHAR(255),
+    experience INTEGER,
+    trophies INTEGER,
+    cardnumber INTEGER,
+    cardexpiry DATE
+);
+
+COPY players
+FROM 'C:\Users\Public\Datasets\players.csv'
+DELIMITER ','
+CSV HEADER;
+
+INSERT INTO jugador(tag_jugador, nom, experiencia, trofeus, targeta_credit)
+SELECT tag, name, experience, trophies, cardnumber
+FROM players;
+
+DROP TABLE players;
+
+-- Amics
+COPY amics(tag_jugador1, tag_jugador2)
+    FROM 'C:\Users\Public\Datasets\friends.csv'
+    DELIMITER ','
+    CSV HEADER;
