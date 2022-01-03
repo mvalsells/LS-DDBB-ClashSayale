@@ -103,3 +103,53 @@ COPY amics(tag_jugador1, tag_jugador2)
     FROM 'C:\Users\Public\Datasets\friends.csv'
     DELIMITER ','
     CSV HEADER;
+
+-- Cartes csv
+CREATE TEMPORARY TABLE cards (
+        name VARCHAR(255),
+        rarity VARCHAR(255),
+        arena INTEGER,
+        damage INTEGER,
+        hit_speed INTEGER,
+        spawn_damage INTEGER,
+        lifetime INTEGER,
+        radious INTEGER
+);
+
+COPY cards
+FROM 'C:\Users\Public\Datasets\cards.csv'
+DELIMITER ','
+CSV HEADER;
+
+--Afegim a cartes
+INSERT INTO Carta(nom ,dany ,velocitat_atac)
+SELECT name,damage,hit_speed
+FROM cards;
+
+--Afegim a raresa
+INSERT INTO raresa(id_raresa)
+SELECT rarity
+FROM cards;
+
+--Afegim a Edifici
+INSERT INTO edifici(vida)
+SELECT lifetime
+FROM cards;
+
+--Afegim a tropa
+INSERT INTO tropa(dany_aparicio)
+SELECT spawn_damage
+FROM cards;
+
+--Afegim a Encanteri
+INSERT INTO encanteri(radi)
+SELECT radious
+FROM cards;
+
+--Afegim a Arena
+INSERT INTO arena(id_arena)
+SELECT arena
+FROM cards;
+
+DROP TABLE cards;
+
