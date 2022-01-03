@@ -27,7 +27,8 @@ CREATE TEMPORARY TABLE temporal1 (
     mod_radius INTEGER,
     mod_spawn_damage INTEGER,
     mod_lifetime INTEGER,
-    description VARCHAR(255));
+    description VARCHAR(255)
+);
 
 COPY temporal1
 FROM 'C:\Users\Public\Datasets\technologies.csv'

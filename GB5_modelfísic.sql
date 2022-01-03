@@ -59,12 +59,12 @@ DROP TABLE IF EXISTS Temporada CASCADE;
 -- Taules necessaries al principi
 -- Taula Jugador
 CREATE TABLE Jugador(
-	ID_jugador INTEGER,
+	tag_jugador VARCHAR (255),
 	nom VARCHAR(255),
 	experiencia INTEGER,
 	trofeus INTEGER,
 	targeta_credit INTEGER,
-	PRIMARY KEY (ID_Jugador)
+	PRIMARY KEY (tag_jugador)
 );
 
 -- Creació de la taula millores
@@ -82,8 +82,6 @@ CREATE TABLE Temporada (
 	data_fi DATE,
 	PRIMARY KEY (ID_temporada)
 );
-
-
 
 -- Creació de la taula Arena
 CREATE TABLE Arena (
@@ -162,10 +160,10 @@ CREATE TABLE Pertany (
 	quantitat INTEGER,
 	data_desbolqueig DATE,
 	ID_pertany INTEGER,
-	ID_jugador INTEGER,
+	tag_jugador VARCHAR (255),
 	ID_Carta INTEGER,
 	PRIMARY KEY (ID_pertany),
-	FOREIGN KEY (ID_jugador) REFERENCES Jugador (ID_jugador),
+	FOREIGN KEY (tag_jugador) REFERENCES Jugador (tag_jugador),
 	FOREIGN KEY (ID_Carta) REFERENCES Carta (ID_carta)
 );
 
@@ -175,9 +173,9 @@ CREATE TABLE Pila (
 	descripcio VARCHAR (255),
 	data_creacio DATE,
 	ID_pila INTEGER,
-	ID_jugador INTEGER,
+	tag_jugador VARCHAR (255),
 	PRIMARY KEY (ID_pila),
-	FOREIGN KEY (ID_jugador) REFERENCES Jugador (ID_jugador)
+	FOREIGN KEY (tag_jugador) REFERENCES Jugador (tag_jugador)
 );
 
 -- Creació de la taula Formen
@@ -194,10 +192,10 @@ CREATE TABLE Formen (
 -- Creació de la taula Comparteixen
 CREATE TABLE Comparteixen (
 	ID_pila INTEGER,
-	ID_jugador INTEGER,
-	PRIMARY KEY (ID_pila, ID_jugador),
+	tag_jugador VARCHAR (255),
+	PRIMARY KEY (ID_pila, tag_jugador),
 	FOREIGN KEY (ID_pila) REFERENCES Pila (ID_pila),
-	FOREIGN KEY (ID_jugador) REFERENCES Jugador (ID_jugador)
+	FOREIGN KEY (tag_jugador) REFERENCES Jugador (tag_jugador)
 );
 
 -- Creació de la taula Modifiquen
@@ -219,9 +217,9 @@ CREATE TABLE targeta_credit(
 	numero INTEGER,
 	caducitat DATE,
 	CVV INTEGER,
-	ID_jugador INTEGER,
+	tag_jugador VARCHAR (255),
 	PRIMARY KEY (ID_targeta),
-	FOREIGN KEY (ID_Jugador) REFERENCES Jugador(ID_Jugador)
+	FOREIGN KEY (tag_jugador) REFERENCES Jugador(tag_jugador)
 );
 
 -- Generalització article
@@ -281,14 +279,14 @@ CREATE TABLE cofre_carta(
 -- Compren (Relació tarja, article, jugador)
 CREATE TABLE Compren (
     ID_Compren INTEGER,
-    ID_Jugador INTEGER,
+    tag_jugador VARCHAR (255),
     ID_Targeta INTEGER,
     ID_Article INTEGER,
     Data_ DATE,
     Quantitat INTEGER,
     Descompte INTEGER,
     PRIMARY KEY (ID_Compren),
-    FOREIGN KEY (ID_Jugador) REFERENCES Jugador(ID_jugador),
+    FOREIGN KEY (tag_jugador) REFERENCES Jugador(tag_jugador),
     FOREIGN KEY (ID_Targeta) REFERENCES targeta_credit(ID_targeta),
     FOREIGN KEY (ID_Article) REFERENCES Article(ID_article)
 );
@@ -304,12 +302,12 @@ CREATE TABLE Missatge (
 
 -- Conversen (Relació missatge - jugador)
 CREATE TABLE Conversen(
-    ID_envia INTEGER,
-    ID_rep INTEGER,
+    tag_envia VARCHAR (255),
+    tag_rep VARCHAR (255),
     ID_missatge INTEGER,
-    PRIMARY KEY (ID_envia,ID_rep,ID_missatge),
-    FOREIGN KEY (ID_envia) REFERENCES Jugador(ID_jugador),
-    FOREIGN KEY (ID_rep) REFERENCES Jugador(ID_jugador),
+    PRIMARY KEY (tag_envia,tag_rep,ID_missatge),
+    FOREIGN KEY (tag_envia) REFERENCES Jugador(tag_jugador),
+    FOREIGN KEY (tag_rep) REFERENCES Jugador(tag_jugador),
     FOREIGN KEY (ID_missatge) REFERENCES Missatge(ID_Missatge)
 );
 
@@ -390,11 +388,11 @@ CREATE TABLE Tenen_estructura (
 CREATE TABLE Envia (
 	ID_missatge INTEGER,
 	tag_clan VARCHAR(255),
-	ID_jugador INTEGER,
-	PRIMARY KEY (ID_missatge, tag_clan, ID_jugador),
+	tag_jugador VARCHAR (255),
+	PRIMARY KEY (ID_missatge, tag_clan, tag_jugador),
 	FOREIGN KEY (ID_missatge) REFERENCES Missatge (ID_missatge),
 	FOREIGN KEY (tag_clan) REFERENCES Clan (tag_clan),
-	FOREIGN KEY (ID_jugador) REFERENCES Jugador (ID_jugador)
+	FOREIGN KEY (tag_jugador) REFERENCES Jugador (tag_jugador)
 );
 
 -- Creació taula rol
@@ -409,10 +407,10 @@ CREATE TABLE Dona (
 	quantitat INTEGER,
 	data DATE,
 	ID_donacio INTEGER,
-	ID_jugador INTEGER,
+	tag_jugador VARCHAR (255),
 	tag_clan VARCHAR(255),
 	PRIMARY KEY (ID_donacio),
-	FOREIGN KEY (ID_jugador) REFERENCES Jugador (ID_jugador),
+	FOREIGN KEY (tag_jugador) REFERENCES Jugador (tag_jugador),
 	FOREIGN KEY (tag_clan) REFERENCES Clan (tag_clan)
 );
 
@@ -421,12 +419,12 @@ CREATE TABLE Forma_part (
 	creador_del_clan VARCHAR (255),
 	data DATE, 
 	tag_clan VARCHAR(255),
-	ID_jugador INTEGER,
+	tag_jugador VARCHAR (255),
 	ID_rol INTEGER,
 	ID_Forma_part INTEGER,
 	PRIMARY KEY (ID_Forma_part),
 	FOREIGN KEY (tag_clan) REFERENCES Clan (tag_clan),
-	FOREIGN KEY (ID_jugador) REFERENCES Jugador (ID_jugador),
+	FOREIGN KEY (tag_jugador) REFERENCES Jugador (tag_jugador),
 	FOREIGN KEY (ID_rol) REFERENCES Rol (ID_rol)
 );
 
@@ -454,14 +452,14 @@ CREATE TABLE Missio (
 
 -- Creació de la taula Completen
 CREATE TABLE Completen (
-	ID_jugador INTEGER,
+	tag_jugador VARCHAR (255),
 	ID_missio INTEGER,
 	ID_arena INTEGER,
 	data_ DATE,	 			--no puc ficar "date" pq es una keyword
 	or_ INTEGER, 			--no puc ficar "or" pq es una keyword
 	experiencia INTEGER,
-	PRIMARY KEY (ID_jugador, ID_missio, ID_arena),
-	FOREIGN KEY (ID_jugador) REFERENCES Jugador (ID_jugador),
+	PRIMARY KEY (tag_jugador, ID_missio, ID_arena),
+	FOREIGN KEY (tag_jugador) REFERENCES Jugador (tag_jugador),
 	FOREIGN KEY (ID_missio) REFERENCES Missio (ID_missio),
 	FOREIGN KEY (ID_arena) REFERENCES Art_Arena (ID_Art_Arena)
 );
@@ -486,39 +484,39 @@ CREATE TABLE Assoliment (
 
 -- Creació de la taula Desbloquegen
 CREATE TABLE Desbloquegen (
-	ID_Jugador INTEGER,
+	tag_jugador VARCHAR (255),
 	ID_arena INTEGER,
-	PRIMARY KEY (ID_Jugador, ID_arena),
-	FOREIGN KEY (ID_Jugador) REFERENCES Jugador (ID_jugador),
+	PRIMARY KEY (tag_jugador, ID_arena),
+	FOREIGN KEY (tag_jugador) REFERENCES Jugador (tag_jugador),
 	FOREIGN KEY (ID_arena) REFERENCES Art_Arena (ID_Art_Arena)
 );
 
 -- Creació de la taula Aconsegueix
 CREATE TABLE Aconsegueix (
-	ID_jugador INTEGER,
+	tag_jugador VARCHAR (255),
 	ID_assoliment INTEGER,
 	ID_arena INTEGER,
-	PRIMARY KEY (ID_jugador, ID_assoliment, ID_arena),
-	FOREIGN KEY (ID_jugador) REFERENCES Jugador (ID_jugador),
+	PRIMARY KEY (tag_jugador, ID_assoliment, ID_arena),
+	FOREIGN KEY (tag_jugador) REFERENCES Jugador (tag_jugador),
 	FOREIGN KEY (ID_assoliment) REFERENCES Assoliment (ID_assoliment),
 	FOREIGN KEY (ID_arena) REFERENCES Art_Arena (ID_Art_Arena)
 );
 
 -- Creació de la taula Amics
 CREATE TABLE Amics (
-	ID_jugador1 INTEGER,
-	ID_jugador2 INTEGER,
-	PRIMARY KEY (ID_jugador1, ID_jugador2),
-	FOREIGN KEY (ID_jugador1) REFERENCES Jugador (ID_jugador),
-	FOREIGN KEY (ID_jugador2) REFERENCES Jugador (ID_jugador)
+	tag_jugador1 VARCHAR (255),
+	tag_jugador2 VARCHAR (255),
+	PRIMARY KEY (tag_jugador1, tag_jugador2),
+	FOREIGN KEY (tag_jugador1) REFERENCES Jugador (tag_jugador),
+	FOREIGN KEY (tag_jugador2) REFERENCES Jugador (tag_jugador)
 );
 
 -- Creació de la taula Batallen
 CREATE TABLE Batallen (
-	ID_jugador INTEGER,
+	tag_jugador VARCHAR (255),
 	ID_batalla INTEGER,
-	PRIMARY KEY (ID_jugador, ID_batalla),
-	FOREIGN KEY (ID_jugador) REFERENCES Jugador (ID_jugador),
+	PRIMARY KEY (tag_jugador, ID_batalla),
+	FOREIGN KEY (tag_jugador) REFERENCES Jugador (tag_jugador),
 	FOREIGN KEY (ID_batalla) REFERENCES Batalla (ID_batalla)
 );
 
@@ -535,11 +533,11 @@ CREATE TABLE Insignia (
 -- Creació de la taula Participen
 CREATE TABLE Participen (
 	ID_temporada VARCHAR(255),
-	ID_jugador INTEGER,
+	tag_jugador VARCHAR (255),
 	num_victories INTEGER,
 	num_derrotes INTEGER,
 	punts INTEGER,	
-	PRIMARY KEY (ID_jugador, ID_temporada),
-	FOREIGN KEY (ID_jugador) REFERENCES Jugador (ID_jugador),
+	PRIMARY KEY (tag_jugador, ID_temporada),
+	FOREIGN KEY (tag_jugador) REFERENCES Jugador (tag_jugador),
 	FOREIGN KEY (ID_temporada) REFERENCES Temporada (ID_temporada)
 );
