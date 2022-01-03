@@ -114,10 +114,9 @@ CREATE TABLE Batalla (
 -- Creació de la taula Raresa
 
 CREATE TABLE Raresa (
-	grau VARCHAR (255),
+	nom VARCHAR (255),
 	cost_pujar_nivell INTEGER,
-	ID_raresa INTEGER,
-	PRIMARY KEY (ID_raresa)
+	PRIMARY KEY (nom)
 );
 
 -- Creació de la taula Carta
