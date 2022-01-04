@@ -4,6 +4,7 @@
 -- Eliminar taules temporals si existeixen
 DROP TABLE IF EXISTS temporal1 CASCADE;
 DROP TABLE IF EXISTS temporal2 CASCADE;
+DROP TABLE IF EXISTS temporal3 CASCADE;
 DROP TABLE IF EXISTS players CASCADE;
 DROP TABLE  IF EXISTS cards CASCADE;
 DROP TABLE IF EXISTS battle CASCADE;
@@ -11,9 +12,14 @@ DROP TABLE IF EXISTS clan_battle CASCADE;
 DROP TABLE IF EXISTS playersdeck CASCADE;
 DROP TABLE IF EXISTS quests_arenas CASCADE;
 
+
 -- Eliminar importacions anteriors
 DELETE FROM arena WHERE 1 = 1;
 DELETE FROM millora WHERE 1 = 1;
+DELETE FROM tecnologia WHERE 1 = 1;
+DELETE FROM requereix_tecnologia WHERE 1 = 1;
+DELETE FROM estructura WHERE 1 = 1;
+DELETE FROM requereix_estructura WHERE 1 = 1;
 DELETE FROM clan WHERE 1 = 1;
 DELETE FROM temporada WHERE 1 = 1;
 DELETE FROM amics WHERE 1 = 1;
@@ -58,11 +64,20 @@ FROM 'C:\Users\Public\Datasets\technologies.csv'
 DELIMITER ','
 CSV HEADER;
 
-INSERT INTO millora(nom_millora, descripcio, cost)
-SELECT technology, description, cost
+INSERT INTO millora(nom_millora, descripcio, cost, mod_damage, mod_hit_speed, mod_radius, mod_spawn_damage, mod_lifetime)
+SELECT technology, description, cost, mod_damage, mod_hit_speed, mod_radius, mod_spawn_damage, mod_lifetime
+FROM temporal1;
+
+INSERT INTO tecnologia(id_tecnologia, nivell_maxim)
+SELECT technology,max_level
+FROM temporal1;
+
+INSERT INTO requereix_tecnologia(id_tecnologia_nova, id_tecnologia_requerida, nivell_prerequisit)
+SELECT technology,prerequisite, prereq_level
 FROM temporal1;
 
 DROP TABLE temporal1;
+
 
 CREATE TEMPORARY TABLE temporal2 (
     building VARCHAR(255),
@@ -82,11 +97,26 @@ FROM 'C:\Users\Public\Datasets\buildings.csv'
 DELIMITER ','
 CSV HEADER;
 
-INSERT INTO millora(nom_millora, descripcio, cost)
-SELECT building, description, cost
+INSERT INTO millora(nom_millora, descripcio, cost, mod_damage, mod_hit_speed, mod_radius, mod_spawn_damage, mod_lifetime)
+SELECT building, description, cost, mod_damage, mod_hit_speed, mod_radius, mod_spawn_damage, mod_lifetime
 FROM temporal2;
 
+INSERT INTO estructura(id_estructura, minim_trofeus)
+SELECT building, trophies
+FROM temporal2;
+
+INSERT INTO requereix_estructura(id_estructura_nova, id_estructura_requerida)
+SELECT building, prerequisite
+FROM temporal2;
+
+
 DROP TABLE temporal2;
+
+
+
+
+
+
 
 -- Temporades
 COPY temporada(id_temporada,data_inici,data_fi)
@@ -99,6 +129,34 @@ COPY clan(tag_clan,nom,descripcio,trofeus_minims,nombre_trofeus,puntuacio)
     FROM 'C:\Users\Public\Datasets\clans.csv'
     DELIMITER ','
     CSV HEADER;
+
+CREATE TEMPORARY TABLE temporal3 (
+    clan VARCHAR(255),
+    tech VARCHAR(255),
+    structure VARCHAR(255),
+    date DATE,
+    level INTEGER
+);
+
+COPY temporal3
+FROM 'C:\Users\Public\Datasets\clan_tech_structures.csv'
+DELIMITER ','
+CSV HEADER;
+
+INSERT INTO tenen_tecnologia(tag_clan, id_tecnologia, data, nivell)
+SELECT clan, tech, date, level
+FROM temporal3
+WHERE tech IS NOT NULL;
+
+INSERT INTO tenen_estructura(tag_clan, id_estructura, data, nivell)
+SELECT clan, structure, date, level
+FROM temporal3
+WHERE structure IS NOT NULL;
+
+
+DROP TABLE temporal3;
+
+
 
 -- Jugadors
 CREATE TEMPORARY TABLE players (

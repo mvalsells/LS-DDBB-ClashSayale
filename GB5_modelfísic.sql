@@ -84,6 +84,11 @@ CREATE TABLE Millora (
 	nom_millora VARCHAR (255),
 	descripcio VARCHAR (255),
 	cost INTEGER,
+	mod_damage INTEGER,
+    mod_hit_speed INTEGER,
+    mod_radius INTEGER,
+    mod_spawn_damage INTEGER,
+    mod_lifetime INTEGER,
 	PRIMARY KEY (nom_millora)
 );
 
@@ -322,33 +327,34 @@ CREATE TABLE Conversen(
 
 -- Creació taula tecnologies
 CREATE TABLE Tecnologia (
+	ID_tecnologia VARCHAR(255),
 	nivell_maxim INTEGER,
-	ID_tecnologia INTEGER,
 	PRIMARY KEY (ID_tecnologia),
 	FOREIGN KEY (ID_tecnologia) REFERENCES Tecnologia (ID_tecnologia)
 );
 
 -- Creació de la taula estrcutura
 CREATE TABLE Estructura (
+    ID_estructura VARCHAR(255),
 	minim_trofeus INTEGER,
-	ID_estructura INTEGER,
 	PRIMARY KEY (ID_estructura),
 	FOREIGN KEY (ID_estructura) REFERENCES Estructura (ID_estructura)
 );
 
 -- Creació de les taules requereix
 CREATE TABLE Requereix_tecnologia (
-	ID_tecnologia_nova INTEGER,
-	ID_tecnologia_requerida INTEGER,
-	PRIMARY KEY (ID_tecnologia_nova,ID_tecnologia_requerida),
+	ID_tecnologia_nova VARCHAR(255),
+	ID_tecnologia_requerida VARCHAR(255),
+    nivell_prerequisit INTEGER,
+	PRIMARY KEY (ID_tecnologia_nova),
 	FOREIGN KEY (ID_tecnologia_nova) REFERENCES Tecnologia (ID_tecnologia),
 	FOREIGN KEY (ID_tecnologia_requerida) REFERENCES Tecnologia (ID_tecnologia)
 );
 
 CREATE TABLE Requereix_estructura (
-	ID_estructura_nova INTEGER,
-	ID_estructura_requerida INTEGER,
-	PRIMARY KEY (ID_estructura_nova,ID_estructura_requerida),
+	ID_estructura_nova VARCHAR(255),
+	ID_estructura_requerida VARCHAR(255),
+	PRIMARY KEY (ID_estructura_nova),
 	FOREIGN KEY (ID_estructura_nova) REFERENCES Estructura (ID_estructura),
 	FOREIGN KEY (ID_estructura_requerida) REFERENCES Estructura (ID_estructura)
 );
@@ -366,8 +372,8 @@ CREATE TABLE Clan (
 
 -- Creació de la taula tenen_tecnologia
 CREATE TABLE Tenen_tecnologia (
-	ID_tecnologia INTEGER,
 	tag_clan VARCHAR(255),
+	ID_tecnologia VARCHAR(255),
 	data date,
 	nivell INTEGER,
 	PRIMARY KEY (ID_tecnologia, tag_clan),
@@ -377,12 +383,12 @@ CREATE TABLE Tenen_tecnologia (
 
 -- Creació de la taula tenen_tecnologia
 CREATE TABLE Tenen_estructura (
-	ID_estructura INTEGER,
-	tag_clan VARCHAR(255),
+    tag_clan VARCHAR(255),
+	ID_estructura VARCHAR(255),
 	data date,
 	nivell INTEGER,
 	PRIMARY KEY (ID_estructura, tag_clan),
-	FOREIGN KEY (ID_estructura) REFERENCES Tecnologia (ID_tecnologia),
+	FOREIGN KEY (ID_estructura) REFERENCES Estructura (ID_estructura),
 	FOREIGN KEY (tag_clan) REFERENCES Clan (tag_clan)
 );
 
