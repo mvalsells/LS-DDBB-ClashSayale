@@ -11,9 +11,9 @@ seasons.csv
 
 -- FALTEN --
 arena_pack.csv - Preguntar becaris
-battles - Albert 
+battles - Albert (dubtes amb claus primàries)
 buildings (a mitges) - Marc G
-clan_battle - Albert
+clan_battle - Albert (dubtes amb claus primàries)
 clan_tech_structures - Marc G
 msg_betwen_players - Marc V
 msg_to_clans - Marc V
@@ -24,7 +24,7 @@ playersbadge - Irina
 playerscards - Marc V
 playerscalns - Marc G
 playerclansdonation - Marc G
-playerdeck - Albert
+playerdeck - Albert (error de llargària)
 quests_arena - Albert
 shared_decks - Marc V
 techonologies (a mitges) - Marc G

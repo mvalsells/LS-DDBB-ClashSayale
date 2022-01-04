@@ -6,6 +6,10 @@ DROP TABLE IF EXISTS temporal1 CASCADE;
 DROP TABLE IF EXISTS temporal2 CASCADE;
 DROP TABLE IF EXISTS players CASCADE;
 DROP TABLE  IF EXISTS cards CASCADE;
+DROP TABLE IF EXISTS battle CASCADE;
+DROP TABLE IF EXISTS clan_battle CASCADE;
+DROP TABLE IF EXISTS playersdeck CASCADE;
+DROP TABLE IF EXISTS quests_arenas CASCADE;
 
 -- Eliminar importacions anteriors
 DELETE FROM arena WHERE 1 = 1;
@@ -21,6 +25,11 @@ DELETE FROM tropa WHERE 1 = 1;
 DELETE FROM encanteri WHERE 1 = 1;
 DELETE FROM jugador WHERE 1 = 1;
 DELETE FROM targeta_credit WHERE 1 = 1;
+DELETE FROM batalla WHERE 1 = 1;
+DELETE FROM lluiten WHERE 1 = 1;
+DELETE FROM pila WHERE 1 = 1;
+DELETE FROM missio WHERE 1 = 1;
+DELETE FROM completen WHERE 1 = 1;
 
 
 -- Arena (arena.csv)
@@ -171,7 +180,7 @@ FROM cards;
 
 DROP TABLE cards;
 
--- Afegim Batalla
+-- Afegim a Batalla
 CREATE TEMPORARY TABLE battle (
         winner INTEGER,
         loser INTEGER,
@@ -187,9 +196,87 @@ FROM 'C:\Users\Public\Datasets\battles.csv'
 DELIMITER ','
 CSV HEADER;
 
---Afegim a batalla
-INSERT INTO Batalla(data ,durada)
-SELECT date, duration
-FROM battle;
+--Afegim a batalla (com afegim un id si en el .csv no en tenim???)
+-- INSERT INTO batalla(ID_batalla, data ,durada)
+-- SELECT ???, date, duration
+-- FROM battle;
 
+-- (AQUÍ PASSA EL MATEIX AMB  "tag_jugador", EN EL .csv NO ENS HO POSA)
+-- Afegim a guanyador
+-- INSERT INTO guanya(num_trofeus)
+-- SELECT winner_score
+-- FROM battle;
 
+-- Afegim a perdedor
+-- INSERT INTO perd(num_trofeus)
+-- SELECT loser_score
+-- FROM battle;
+
+DROP TABLE battle;
+
+-- Afegim a batalla de clans
+CREATE TEMPORARY TABLE clan_battle (
+        battle INTEGER,
+        clan VARCHAR (255),
+        start_date DATE,
+        end_date DATE
+);
+
+COPY clan_battle
+FROM 'C:\Users\Public\Datasets\clan_battles.csv'
+DELIMITER ','
+CSV HEADER;
+
+-- MATEIX ERROR AMB LES CLAUS PRIMÀRIES I FORÀNIES
+-- Afegim a lluiten
+-- INSERT INTO lluiten(tag_clan, ID_batalla)
+-- SELECT clan, battle
+-- FROM clan_battle;
+
+DROP TABLE clan_battle;
+
+-- Afegim a pila
+CREATE TEMPORARY TABLE playersdeck (
+        player VARCHAR (255),
+        deck INTEGER,
+        title VARCHAR (255),
+        description TEXT,
+        date DATE,
+        card INTEGER,
+        level INTEGER
+);
+
+COPY playersdeck
+FROM 'C:\Users\Public\Datasets\playersdeck.csv'
+DELIMITER ','
+CSV HEADER;
+
+-- HI HA UN ERROR DE LLARGÀRIA DE VARCHAR tot i qu he canviat a TEXT (en teoria deixa més caràcters)
+-- INSERT INTO pila (tag_jugador, ID_pila, nom, descripcio, data_creacio)
+-- SELECT player, deck, title, description, date
+-- FROM playersdeck;
+
+DROP TABLE playersdeck;
+
+-- Afegim a Missió
+CREATE TEMPORARY TABLE quests_arenas (
+        quest_id INTEGER,
+        arena_id INTEGER,
+        gold INTEGER,
+        experience INTEGER
+);
+
+COPY quests_arenas
+FROM 'C:\Users\Public\Datasets\quests_arenas.csv'
+DELIMITER ','
+CSV HEADER;
+
+INSERT INTO missio (id_missio)
+SELECT DISTINCT quest_id
+FROM quests_arenas;
+
+INSERT INTO completen (id_missio, id_arena, or_, experiencia)
+SELECT quest_id, arena_id, gold, experience
+FROM quests_arenas;
+
+DROP TABLE quests_arenas;

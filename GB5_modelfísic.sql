@@ -50,6 +50,8 @@ DROP TABLE IF EXISTS Aconsegueix CASCADE;
 DROP TABLE IF EXISTS Amics CASCADE;
 DROP TABLE IF EXISTS Batallen CASCADE;
 DROP TABLE IF EXISTS Batalla CASCADE;
+DROP TABLE IF EXISTS Guanya CASCADE;
+DROP TABLE IF EXISTS Perd CASCADE;
 DROP TABLE IF EXISTS Insignia CASCADE;
 DROP TABLE IF EXISTS Participen CASCADE;
 DROP TABLE IF EXISTS Temporada CASCADE;
@@ -181,11 +183,11 @@ CREATE TABLE Pertany (
 
 -- Creació de la taula Pila
 CREATE TABLE Pila (
+    tag_jugador VARCHAR (255),
+    ID_pila INTEGER,
 	nom VARCHAR (255),
-	descripcio VARCHAR (255),
+	descripcio TEXT,
 	data_creacio DATE,
-	ID_pila INTEGER,
-	tag_jugador VARCHAR (255),
 	PRIMARY KEY (ID_pila),
 	FOREIGN KEY (tag_jugador) REFERENCES Jugador (tag_jugador)
 );
@@ -445,24 +447,18 @@ CREATE TABLE Lluiten (
 -- Creació de la taula Missio
 CREATE TABLE Missio (
 	ID_missio INTEGER,
-	tasques VARCHAR(255),
-	recompenses INTEGER,
-	titol VARCHAR(255),
 	PRIMARY KEY (ID_missio)
 );
 
 -- Creació de la taula Completen
 CREATE TABLE Completen (
-	tag_jugador VARCHAR (255),
 	ID_missio INTEGER,
 	ID_arena INTEGER,
-	data_ DATE,	 			--no puc ficar "date" pq es una keyword
-	or_ INTEGER, 			--no puc ficar "or" pq es una keyword
+	or_ INTEGER,
 	experiencia INTEGER,
-	PRIMARY KEY (tag_jugador, ID_missio, ID_arena),
-	FOREIGN KEY (tag_jugador) REFERENCES Jugador (tag_jugador),
+	PRIMARY KEY (ID_missio, ID_arena),
 	FOREIGN KEY (ID_missio) REFERENCES Missio (ID_missio),
-	FOREIGN KEY (ID_arena) REFERENCES Art_Arena (ID_Art_Arena)
+	FOREIGN KEY (ID_arena) REFERENCES Arena (ID_arena)
 );
 
 -- Creació de la taula Depen
