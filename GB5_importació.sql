@@ -20,6 +20,7 @@ DELETE FROM edifici WHERE 1 = 1;
 DELETE FROM tropa WHERE 1 = 1;
 DELETE FROM encanteri WHERE 1 = 1;
 DELETE FROM jugador WHERE 1 = 1;
+DELETE FROM targeta_credit WHERE 1 = 1;
 
 
 -- Arena (arena.csv)
@@ -105,7 +106,7 @@ FROM 'C:\Users\Public\Datasets\players.csv'
 DELIMITER ','
 CSV HEADER;
 
-INSERT INTO Targeta_credit(numero,caducitat)
+INSERT INTO targeta_credit(numero, caducitat)
 SELECT DISTINCT cardnumber, cardexpiry
 FROM players;
 
@@ -169,4 +170,26 @@ FROM cards;
 -- FROM cards;
 
 DROP TABLE cards;
+
+-- Afegim Batalla
+CREATE TEMPORARY TABLE battle (
+        winner INTEGER,
+        loser INTEGER,
+        winner_score INTEGER,
+        loser_score INTEGER,
+        date DATE,
+        duration TIME,
+        clan_battle INTEGER
+);
+
+COPY battle
+FROM 'C:\Users\Public\Datasets\battles.csv'
+DELIMITER ','
+CSV HEADER;
+
+--Afegim a batalla
+INSERT INTO Batalla(data ,durada)
+SELECT date, duration
+FROM battle;
+
 

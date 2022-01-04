@@ -59,8 +59,8 @@ DROP TABLE IF EXISTS Temporada CASCADE;
 -- Taules necessaries al principi
 
 -- Taula Targeta de credit
-CREATE TABLE Targeta_credit(
-	numero VARCHAR(255),
+CREATE TABLE targeta_credit(
+	numero VARCHAR (255),
 	caducitat DATE,
 	CVV INTEGER,
 	PRIMARY KEY (numero)
@@ -74,7 +74,7 @@ CREATE TABLE Jugador(
 	trofeus INTEGER,
 	targeta_credit VARCHAR(255),
 	PRIMARY KEY (tag_jugador),
-	FOREIGN KEY (targeta_credit) REFERENCES Targeta_credit(numero)
+	FOREIGN KEY (targeta_credit) REFERENCES targeta_credit(numero)
 );
 
 -- Creació de la taula millores
@@ -106,8 +106,8 @@ CREATE TABLE Arena (
 -- Creació de la taula Batallen
 CREATE TABLE Batalla (
 	ID_batalla INTEGER,
-	data_ DATE,
-	durada TIME, --ns si es coorecte aqeust tipus de variable
+	data DATE,
+	durada TIME,
 	ID_temporada VARCHAR(255),
 	ID_arena INTEGER,
 	PRIMARY KEY (ID_batalla),
@@ -288,7 +288,7 @@ CREATE TABLE Compren (
     Descompte INTEGER,
     PRIMARY KEY (ID_Compren),
     FOREIGN KEY (tag_jugador) REFERENCES Jugador(tag_jugador),
-    FOREIGN KEY (num_targeta) REFERENCES Targeta_credit(numero),
+    FOREIGN KEY (num_targeta) REFERENCES targeta_credit(numero),
     FOREIGN KEY (ID_Article) REFERENCES Article(ID_article)
 );
 
@@ -512,15 +512,25 @@ CREATE TABLE Amics (
 	FOREIGN KEY (tag_jugador2) REFERENCES Jugador (tag_jugador)
 );
 
--- Creació de la taula Batallen
-CREATE TABLE Batallen (
+-- Creació de la taula Guanya
+CREATE TABLE Guanya (
 	tag_jugador VARCHAR (255),
 	ID_batalla INTEGER,
+	num_trofeus INTEGER,
 	PRIMARY KEY (tag_jugador, ID_batalla),
 	FOREIGN KEY (tag_jugador) REFERENCES Jugador (tag_jugador),
 	FOREIGN KEY (ID_batalla) REFERENCES Batalla (ID_batalla)
 );
 
+-- Creació de la taula Perd
+CREATE TABLE Perd (
+    tag_jugador VARCHAR (255),
+    ID_batalla INTEGER,
+    num_trofeus INTEGER,
+    PRIMARY KEY (tag_jugador, ID_batalla),
+    FOREIGN KEY (tag_jugador) REFERENCES Jugador (tag_jugador),
+    FOREIGN KEY (ID_batalla) REFERENCES Batalla (ID_batalla)
+);
 
 -- Creació de la taula Insignia
 CREATE TABLE Insignia (
