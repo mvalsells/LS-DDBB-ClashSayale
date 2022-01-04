@@ -11,6 +11,8 @@ DROP TABLE IF EXISTS battle CASCADE;
 DROP TABLE IF EXISTS clan_battle CASCADE;
 DROP TABLE IF EXISTS playersdeck CASCADE;
 DROP TABLE IF EXISTS quests_arenas CASCADE;
+DROP TABLE IF EXISTS player_purchases CASCADE;
+DROP TABLE IF EXISTS players_quests CASCADE;
 
 
 -- Eliminar importacions anteriors
@@ -36,6 +38,8 @@ DELETE FROM lluiten WHERE 1 = 1;
 DELETE FROM pila WHERE 1 = 1;
 DELETE FROM missio WHERE 1 = 1;
 DELETE FROM completen WHERE 1 = 1;
+--DELETE FROM player_purchases WHERE 1 = 1;
+--DELETE FROM players_quests WHERE 1 = 1;
 
 
 -- Arena (arena.csv)
@@ -338,3 +342,80 @@ SELECT quest_id, arena_id, gold, experience
 FROM quests_arenas;
 
 DROP TABLE quests_arenas;
+
+--player_purchase csv
+CREATE TEMPORARY TABLE player_purchases(
+    player VARCHAR(255),
+    credit_card VARCHAR(255),
+    buy_id INTEGER,
+    buy_name VARCHAR(255),
+    buy_cost FLOAT,
+    buy_stock INTEGER,
+    date DATE,
+    discount FLOAT,
+    arenapack_id  INTEGER,
+    chest_name VARCHAR(255),
+    chest_rarity VARCHAR(255),
+    chest_unlock_time INTEGER,
+    chest_num_cards INTEGER,
+    bundle_gold INTEGER,
+    bundle_gems INTEGER,
+    emote_name VARCHAR(255),
+    emote_path VARCHAR(255)
+);
+
+COPY player_purchases
+FROM 'C:\Users\Public\Datasets\player_purchases.csv'
+DELIMITER ','
+CSV HEADER;
+
+--Player no cal ja s'ha afegit
+--Credit card ja afegida no cal
+--Id_compren es duplica al csv, es duplica pel nom
+--INSERT INTO compren(id_compren,quantitat,data_,descompte)
+--SELECT buy_id,buy_stock,date,discount
+--FROM player_purchases;
+
+
+--Afegim a articles
+INSERT INTO article(nom,preu)
+SELECT buy_name, buy_cost
+FROM player_purchases;
+
+--Afegim a arena paquet
+--Hi han valors nulls a la id
+--INSERT INTO art_arena(id_art_arena)
+--SELECT arenapack_id
+--FROM player_purchases;
+
+--Afegim a cofre
+INSERT INTO cofre(nom_cofre, temps, raresa, quantitat_cartes)
+SELECT chest_name, chest_unlock_time, chest_rarity, chest_num_cards
+FROM player_purchases;
+
+--Afegim a bundle
+INSERT INTO bundle(or_, gemmes)
+SELECT bundle_gold, bundle_gems
+FROM player_purchases;
+
+--Afegim a emoticones
+INSERT INTO emoticones(nom_imatge, direccio_imatge)
+SELECT emote_name,emote_path
+FROM player_purchases;
+
+--Player_quest csv
+CREATE TEMPORARY TABLE players_quests(
+  player_tag VARCHAR(255),
+  quest_id INTEGER,
+  quest_title VARCHAR(255),
+  quest_description VARCHAR(255),
+  quest_requirement VARCHAR(255),
+  quest_depends INTEGER,
+  unlock DATE
+);
+
+COPY players_quests
+FROM 'C:\Users\Public\Datasets\players_quests.csv'
+DELIMITER ','
+CSV HEADER;
+

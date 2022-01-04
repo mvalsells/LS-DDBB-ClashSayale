@@ -232,23 +232,24 @@ CREATE TABLE Modifiquen (
 
 -- Generalització article
 CREATE TABLE Article (
-	ID_article INTEGER,
+	ID_article SERIAL,
 	Nom VARCHAR(255),
-	Preu INTEGER,
+	Preu FLOAT,
 	PRIMARY KEY (ID_article)
 );
 
 -- Article: Emoticones
 CREATE TABLE Emoticones (
-	ID_emoticones INTEGER,
-	imatge_animada VARCHAR(255),
+	ID_emoticones SERIAL,
+	nom_imatge VARCHAR(255),
+	direccio_imatge VARCHAR(255),
 	PRIMARY KEY(ID_emoticones),
 	FOREIGN KEY (ID_emoticones) REFERENCES Article(ID_article)
 );
 
 -- Article: Bundle
 CREATE TABLE Bundle(
-    ID_bundle INTEGER,
+    ID_bundle SERIAL,
     Or_ INTEGER,
     gemmes INTEGER,
     PRIMARY KEY (ID_bundle),
@@ -266,7 +267,9 @@ CREATE TABLE Art_Arena(
 
 -- Article: Cofre
 CREATE TABLE Cofre (
-    ID_cofre INTEGER,
+    ID_cofre SERIAL,
+    nom_cofre VARCHAR(255),
+    quantitat_cartes INTEGER,
     raresa VARCHAR(255),
     Temps INTEGER,
     Gemmes INTEGER,
@@ -292,7 +295,7 @@ CREATE TABLE Compren (
     ID_Article INTEGER,
     Data_ DATE,
     Quantitat INTEGER,
-    Descompte INTEGER,
+    Descompte FLOAT,
     PRIMARY KEY (ID_Compren),
     FOREIGN KEY (tag_jugador) REFERENCES Jugador(tag_jugador),
     FOREIGN KEY (num_targeta) REFERENCES targeta_credit(numero),
