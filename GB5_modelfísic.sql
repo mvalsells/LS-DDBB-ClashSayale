@@ -57,14 +57,24 @@ DROP TABLE IF EXISTS Temporada CASCADE;
 -- ----------------------------------------------------------------
 
 -- Taules necessaries al principi
+
+-- Taula Targeta de credit
+CREATE TABLE Targeta_credit(
+	numero VARCHAR(255),
+	caducitat DATE,
+	CVV INTEGER,
+	PRIMARY KEY (numero)
+);
+
 -- Taula Jugador
 CREATE TABLE Jugador(
 	tag_jugador VARCHAR (255),
 	nom VARCHAR(255),
 	experiencia INTEGER,
 	trofeus INTEGER,
-	targeta_credit INTEGER,
-	PRIMARY KEY (tag_jugador)
+	targeta_credit VARCHAR(255),
+	PRIMARY KEY (tag_jugador),
+	FOREIGN KEY (targeta_credit) REFERENCES Targeta_credit(numero)
 );
 
 -- Creació de la taula millores
@@ -122,17 +132,19 @@ CREATE TABLE Carta (
 	nom VARCHAR (255),
 	dany INTEGER,
 	velocitat_atac INTEGER,
-	ID_carta INTEGER,
+	ID_carta SERIAL,
 	raresa VARCHAR(255),
+	arena INTEGER,
 	PRIMARY KEY (ID_carta),
-	FOREIGN KEY (raresa) REFERENCES Raresa (nom)
+	FOREIGN KEY (raresa) REFERENCES Raresa (nom),
+	FOREIGN KEY (arena) REFERENCES Arena(ID_arena)
 );
 
 -- Generalitzacions de l'entitat Carta
 -- Creació de la taula Edifici
 CREATE TABLE Edifici (
 	vida INTEGER,
-	ID_edifici INTEGER,
+	ID_edifici SERIAL,
 	PRIMARY KEY (ID_edifici),
 	FOREIGN KEY (ID_edifici) REFERENCES Edifici (ID_edifici)
 );
@@ -140,7 +152,7 @@ CREATE TABLE Edifici (
 -- Creació de la taula Tropa
 CREATE TABLE Tropa (
 	dany_aparicio INTEGER,
-	ID_tropa INTEGER,
+	ID_tropa SERIAL,
 	PRIMARY KEY (ID_tropa),
 	FOREIGN KEY (ID_tropa) REFERENCES Tropa (ID_tropa)
 );
@@ -148,7 +160,7 @@ CREATE TABLE Tropa (
 -- Creació de la taula Encanteri
 CREATE TABLE Encanteri (
 	radi INTEGER,
-	ID_encanteri INTEGER,
+	ID_encanteri SERIAL,
 	PRIMARY KEY (ID_encanteri),
 	FOREIGN KEY (ID_encanteri) REFERENCES Encanteri (ID_encanteri)
 );
@@ -211,17 +223,6 @@ CREATE TABLE Modifiquen (
 
 -- IMPLEMENTACIÓ DEL MÒDUL 2:
 
--- Taula Targeta de credit
-CREATE TABLE targeta_credit(
-	ID_targeta INTEGER,
-	numero INTEGER,
-	caducitat DATE,
-	CVV INTEGER,
-	tag_jugador VARCHAR (255),
-	PRIMARY KEY (ID_targeta),
-	FOREIGN KEY (tag_jugador) REFERENCES Jugador(tag_jugador)
-);
-
 -- Generalització article
 CREATE TABLE Article (
 	ID_article INTEGER,
@@ -280,14 +281,14 @@ CREATE TABLE cofre_carta(
 CREATE TABLE Compren (
     ID_Compren INTEGER,
     tag_jugador VARCHAR (255),
-    ID_Targeta INTEGER,
+    num_targeta VARCHAR(255),
     ID_Article INTEGER,
     Data_ DATE,
     Quantitat INTEGER,
     Descompte INTEGER,
     PRIMARY KEY (ID_Compren),
     FOREIGN KEY (tag_jugador) REFERENCES Jugador(tag_jugador),
-    FOREIGN KEY (ID_Targeta) REFERENCES targeta_credit(ID_targeta),
+    FOREIGN KEY (num_targeta) REFERENCES Targeta_credit(numero),
     FOREIGN KEY (ID_Article) REFERENCES Article(ID_article)
 );
 

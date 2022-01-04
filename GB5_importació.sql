@@ -4,10 +4,23 @@
 -- Eliminar taules temporals si existeixen
 DROP TABLE IF EXISTS temporal1 CASCADE;
 DROP TABLE IF EXISTS temporal2 CASCADE;
+DROP TABLE IF EXISTS players CASCADE;
+DROP TABLE  IF EXISTS cards CASCADE;
 
 -- Eliminar importacions anteriors
 DELETE FROM arena WHERE 1 = 1;
 DELETE FROM millora WHERE 1 = 1;
+DELETE FROM clan WHERE 1 = 1;
+DELETE FROM temporada WHERE 1 = 1;
+DELETE FROM amics WHERE 1 = 1;
+DELETE FROM carta WHERE 1 = 1;
+DELETE FROM carta WHERE 1 = 1;
+DELETE FROM raresa WHERE 1 = 1;
+DELETE FROM edifici WHERE 1 = 1;
+DELETE FROM tropa WHERE 1 = 1;
+DELETE FROM encanteri WHERE 1 = 1;
+DELETE FROM jugador WHERE 1 = 1;
+
 
 -- Arena (arena.csv)
 COPY arena(id_arena, titol, nombre_min, nombre_max)
@@ -83,7 +96,7 @@ CREATE TEMPORARY TABLE players (
     name VARCHAR(255),
     experience INTEGER,
     trophies INTEGER,
-    cardnumber INTEGER,
+    cardnumber VARCHAR(255),
     cardexpiry DATE
 );
 
@@ -91,6 +104,10 @@ COPY players
 FROM 'C:\Users\Public\Datasets\players.csv'
 DELIMITER ','
 CSV HEADER;
+
+INSERT INTO Targeta_credit(numero,caducitat)
+SELECT DISTINCT cardnumber, cardexpiry
+FROM players;
 
 INSERT INTO jugador(tag_jugador, nom, experiencia, trofeus, targeta_credit)
 SELECT tag, name, experience, trophies, cardnumber
@@ -127,8 +144,8 @@ SELECT name,damage,hit_speed
 FROM cards;
 
 --Afegim a raresa
-INSERT INTO raresa(id_raresa)
-SELECT rarity
+INSERT INTO raresa(nom)
+SELECT DISTINCT rarity
 FROM cards;
 
 --Afegim a Edifici
@@ -147,9 +164,9 @@ SELECT radious
 FROM cards;
 
 --Afegim a Arena
-INSERT INTO arena(id_arena)
-SELECT arena
-FROM cards;
+-- INSERT INTO arena(id_arena)
+-- SELECT DISTINCT arena
+-- FROM cards;
 
 DROP TABLE cards;
 
