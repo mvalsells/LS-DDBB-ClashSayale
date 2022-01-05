@@ -167,6 +167,7 @@ DROP TABLE temporal3;
 
 
 
+
 -- Jugadors
 CREATE TEMPORARY TABLE players (
     tag VARCHAR(255),
@@ -191,6 +192,15 @@ SELECT tag, name, experience, trophies, cardnumber
 FROM players;
 
 DROP TABLE players;
+
+
+--Donacio
+
+COPY dona(tag_jugador, tag_clan, quantitat, data)
+FROM 'C:\Users\Public\Datasets\playersClansdonations.csv'
+DELIMITER ','
+CSV HEADER;
+
 
 -- Amics
 COPY amics(tag_jugador1, tag_jugador2)
