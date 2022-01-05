@@ -13,6 +13,8 @@ DROP TABLE IF EXISTS playersdeck CASCADE;
 DROP TABLE IF EXISTS quests_arenas CASCADE;
 DROP TABLE IF EXISTS player_purchases CASCADE;
 DROP TABLE IF EXISTS players_quests CASCADE;
+DROP TABLE  IF EXISTS playerClans CASCADE;
+
 
 
 -- Eliminar importacions anteriors
@@ -38,6 +40,8 @@ DELETE FROM lluiten WHERE 1 = 1;
 DELETE FROM pila WHERE 1 = 1;
 DELETE FROM missio WHERE 1 = 1;
 DELETE FROM completen WHERE 1 = 1;
+DELETE FROM dona WHERE 1 = 1;
+
 --DELETE FROM player_purchases WHERE 1 = 1;
 --DELETE FROM players_quests WHERE 1 = 1;
 
@@ -134,6 +138,10 @@ COPY clan(tag_clan,nom,descripcio,trofeus_minims,nombre_trofeus,puntuacio)
     DELIMITER ','
     CSV HEADER;
 
+
+
+--Clans tenen_tecnologia/tenen_estructures
+
 CREATE TEMPORARY TABLE temporal3 (
     clan VARCHAR(255),
     tech VARCHAR(255),
@@ -186,6 +194,36 @@ SELECT tag, name, experience, trophies, cardnumber
 FROM players;
 
 DROP TABLE players;
+
+--Donació a clans
+
+COPY dona(tag_jugador, tag_clan, quantitat, data)
+FROM 'C:\Users\Public\Datasets\playersClansdonations.csv'
+DELIMITER ','
+CSV HEADER;
+
+
+--Rols
+
+CREATE TEMPORARY TABLE playerClans (
+    player VARCHAR(255),
+    clan VARCHAR(255),
+    role TEXT,
+    date DATE
+);
+
+COPY playerClans
+FROM 'C:\Users\Public\Datasets\playersClans.csv'
+DELIMITER ','
+CSV HEADER;
+
+INSERT INTO rol(descripcio)
+SELECT role
+FROM playerClans;
+
+
+DROP TABLE IF EXISTS playerClans;
+
 
 -- Amics
 COPY amics(tag_jugador1, tag_jugador2)

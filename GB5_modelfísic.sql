@@ -409,18 +409,19 @@ CREATE TABLE Envia (
 
 -- Creació taula rol
 CREATE TABLE Rol (
-	descripcio VARCHAR (255),
-	ID_rol INTEGER,
+    ID_rol SERIAL,
+    nom VARCHAR(255),
+	descripcio VARCHAR(511),
 	PRIMARY KEY (ID_rol)
 );
 
 -- Creació taula donació
 CREATE TABLE Dona (
-	quantitat INTEGER,
-	data DATE,
-	ID_donacio INTEGER,
+    ID_donacio SERIAL,
 	tag_jugador VARCHAR (255),
 	tag_clan VARCHAR(255),
+	quantitat INTEGER,
+	data DATE,
 	PRIMARY KEY (ID_donacio),
 	FOREIGN KEY (tag_jugador) REFERENCES Jugador (tag_jugador) ON DELETE CASCADE,
 	FOREIGN KEY (tag_clan) REFERENCES Clan (tag_clan) ON DELETE CASCADE
