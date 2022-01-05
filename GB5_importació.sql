@@ -18,7 +18,9 @@ DROP TABLE IF EXISTS msgClansTmp CASCADE;
 DROP TABLE IF EXISTS playerCardsTmp CASCADE;
 DROP TABLE  IF EXISTS playerClans CASCADE;
 DROP TABLE IF EXISTS temporal4;
-
+DROP TABLE IF EXISTS msgPlayersTmp CASCADE;
+DROP TABLE IF EXISTS msgClansTmp CASCADE;
+DROP TABLE IF EXISTS playerCardsTmp CASCADE;
 
 -- Eliminar importacions anteriors
 DELETE FROM arena WHERE 1 = 1;
@@ -43,6 +45,8 @@ DELETE FROM lluiten WHERE 1 = 1;
 DELETE FROM pila WHERE 1 = 1;
 DELETE FROM missio WHERE 1 = 1;
 DELETE FROM completen WHERE 1 = 1;
+DELETE FROM pertany WHERE 1 = 1;
+DELETE FROM comparteixen WHERE 1 = 1;
 --DELETE FROM player_purchases WHERE 1 = 1;
 --DELETE FROM players_quests WHERE 1 = 1;
 
@@ -456,3 +460,59 @@ FROM 'C:\Users\Public\Datasets\players_quests.csv'
 DELIMITER ','
 CSV HEADER;
 
+-- -------------- MISSATGES --------------
+
+-- msg_between_players.csv
+CREATE TEMPORARY TABLE msgPlayersTmp(
+    id INTEGER,
+    sender VARCHAR(255),
+    reciver VARCHAR(255),
+    text TEXT,
+    date DATE,
+    answer INTEGER
+);
+
+COPY msgPlayersTmp
+FROM 'C:\Users\Public\Datasets\messages_between_players.csv'
+DELIMITER ','
+CSV HEADER;
+
+-- msg_to_clans.csv
+CREATE TEMPORARY TABLE msgClansTmp(
+    id INTEGER,
+    player VARCHAR(255),
+    clan VARCHAR(255),
+    text TEXT,
+    date DATE,
+    answer INTEGER
+);
+
+COPY msgClansTmp
+FROM 'C:\Users\Public\Datasets\messages_to_clans.csv'
+DELIMITER ','
+CSV HEADER;
+
+-- ------------------------------------------
+-- -------------- Cartes --------------
+CREATE TEMPORARY TABLE playerCardsTmp(
+    player VARCHAR(255),
+    id INTEGER,
+    name VARCHAR(255),
+    level INTEGER,
+    amount INTEGER,
+    date DATE
+);
+
+COPY playerCardsTmp
+FROM 'C:\Users\Public\Datasets\playerscards.csv'
+DELIMITER ','
+CSV HEADER;
+
+-- INSERT INTO pertany(id_pertany,id_carta,tag_jugador,quantitat,data_desbolqueig, nivell)
+-- SELECT id, (SELECT id_carta FROM carta WHERE nom LIKE playerCardsTmp.name),player,amount,date,level
+-- FROM playerCardsTmp;
+
+-- Decks compartits (shared_decks.csv)
+-- COPY comparteixen(id_pila, tag_jugador)
+-- FROM 'C:\Users\Public\Datasets\shared_decks.csv'
+-- CSV HEADER;
