@@ -7,7 +7,7 @@ clans.csv
 friends.csv
 players.csv
 seasons.csv
-
+shared_decks - Marc V (Falta descomentar quan vagi bé insert decks)
 
 -- FALTEN --
 arena_pack.csv - Preguntar becaris
@@ -26,6 +26,6 @@ playerscalns - Marc G
 playerclansdonation - Marc G
 playerdeck - Albert (error de llargària)
 quests_arena - Albert
-shared_decks - Marc V
+
 techonologies (a mitges) - Marc G
 
