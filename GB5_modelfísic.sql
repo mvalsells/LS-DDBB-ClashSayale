@@ -174,6 +174,12 @@ CREATE TABLE Encanteri (
 
 -- Resta de taules (no formen part de la generalització de Carta)
 
+CREATE TABLE NivellCarta(
+    nivell INTEGER,
+    multiplicador INTEGER,
+    PRIMARY KEY (nivell)
+);
+
 -- Creació de la taula Pertany
 CREATE TABLE Pertany (
 	quantitat INTEGER,
@@ -181,9 +187,11 @@ CREATE TABLE Pertany (
 	ID_pertany INTEGER,
 	tag_jugador VARCHAR (255),
 	ID_Carta INTEGER,
+	nivell INTEGER,
 	PRIMARY KEY (ID_pertany),
 	FOREIGN KEY (tag_jugador) REFERENCES Jugador (tag_jugador) ON DELETE CASCADE,
-	FOREIGN KEY (ID_Carta) REFERENCES Carta (ID_carta) ON DELETE CASCADE
+	FOREIGN KEY (ID_Carta) REFERENCES Carta (ID_carta) ON DELETE CASCADE,
+	FOREIGN KEY (nivell) REFERENCES NivellCarta(nivell) ON DELETE CASCADE
 );
 
 -- Creació de la taula Pila
