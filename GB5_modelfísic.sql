@@ -76,7 +76,7 @@ CREATE TABLE Jugador(
 	trofeus INTEGER,
 	targeta_credit VARCHAR(255),
 	PRIMARY KEY (tag_jugador),
-	FOREIGN KEY (targeta_credit) REFERENCES targeta_credit(numero)
+	FOREIGN KEY (targeta_credit) REFERENCES targeta_credit(numero) ON DELETE CASCADE
 );
 
 -- Creació de la taula millores
@@ -118,8 +118,8 @@ CREATE TABLE Batalla (
 	ID_temporada VARCHAR(255),
 	ID_arena INTEGER,
 	PRIMARY KEY (ID_batalla),
-	FOREIGN KEY (ID_temporada) REFERENCES Temporada (ID_temporada),
-	FOREIGN KEY (ID_arena) REFERENCES Arena (ID_arena)
+	FOREIGN KEY (ID_temporada) REFERENCES Temporada (ID_temporada) ON DELETE CASCADE,
+	FOREIGN KEY (ID_arena) REFERENCES Arena (ID_arena) ON DELETE CASCADE
 );
 
 -- ----------------------------------------------------------------
@@ -143,8 +143,8 @@ CREATE TABLE Carta (
 	raresa VARCHAR(255),
 	arena INTEGER,
 	PRIMARY KEY (ID_carta),
-	FOREIGN KEY (raresa) REFERENCES Raresa (nom),
-	FOREIGN KEY (arena) REFERENCES Arena(ID_arena)
+	FOREIGN KEY (raresa) REFERENCES Raresa (nom) ON DELETE CASCADE,
+	FOREIGN KEY (arena) REFERENCES Arena(ID_arena) ON DELETE CASCADE
 );
 
 -- Generalitzacions de l'entitat Carta
@@ -153,7 +153,7 @@ CREATE TABLE Edifici (
 	vida INTEGER,
 	ID_edifici SERIAL,
 	PRIMARY KEY (ID_edifici),
-	FOREIGN KEY (ID_edifici) REFERENCES Edifici (ID_edifici)
+	FOREIGN KEY (ID_edifici) REFERENCES Edifici (ID_edifici) ON DELETE CASCADE
 );
 
 -- Creació de la taula Tropa
@@ -161,7 +161,7 @@ CREATE TABLE Tropa (
 	dany_aparicio INTEGER,
 	ID_tropa SERIAL,
 	PRIMARY KEY (ID_tropa),
-	FOREIGN KEY (ID_tropa) REFERENCES Tropa (ID_tropa)
+	FOREIGN KEY (ID_tropa) REFERENCES Tropa (ID_tropa) ON DELETE CASCADE
 );
 
 -- Creació de la taula Encanteri
@@ -169,7 +169,7 @@ CREATE TABLE Encanteri (
 	radi INTEGER,
 	ID_encanteri SERIAL,
 	PRIMARY KEY (ID_encanteri),
-	FOREIGN KEY (ID_encanteri) REFERENCES Encanteri (ID_encanteri)
+	FOREIGN KEY (ID_encanteri) REFERENCES Encanteri (ID_encanteri) ON DELETE CASCADE
 );
 
 -- Resta de taules (no formen part de la generalització de Carta)
@@ -182,8 +182,8 @@ CREATE TABLE Pertany (
 	tag_jugador VARCHAR (255),
 	ID_Carta INTEGER,
 	PRIMARY KEY (ID_pertany),
-	FOREIGN KEY (tag_jugador) REFERENCES Jugador (tag_jugador),
-	FOREIGN KEY (ID_Carta) REFERENCES Carta (ID_carta)
+	FOREIGN KEY (tag_jugador) REFERENCES Jugador (tag_jugador) ON DELETE CASCADE,
+	FOREIGN KEY (ID_Carta) REFERENCES Carta (ID_carta) ON DELETE CASCADE
 );
 
 -- Creació de la taula Pila
@@ -194,7 +194,7 @@ CREATE TABLE Pila (
 	descripcio TEXT,
 	data_creacio DATE,
 	PRIMARY KEY (ID_pila),
-	FOREIGN KEY (tag_jugador) REFERENCES Jugador (tag_jugador)
+	FOREIGN KEY (tag_jugador) REFERENCES Jugador (tag_jugador) ON DELETE CASCADE
 );
 
 -- Creació de la taula Formen
@@ -202,8 +202,8 @@ CREATE TABLE Formen (
 	ID_carta INTEGER,
 	ID_pila INTEGER,
 	PRIMARY KEY (ID_carta, ID_pila),
-	FOREIGN KEY (ID_carta) REFERENCES Carta (ID_carta),
-	FOREIGN KEY (ID_pila) REFERENCES Pila (ID_pila)
+	FOREIGN KEY (ID_carta) REFERENCES Carta (ID_carta) ON DELETE CASCADE,
+	FOREIGN KEY (ID_pila) REFERENCES Pila (ID_pila) ON DELETE CASCADE
 );
 
 
@@ -213,8 +213,8 @@ CREATE TABLE Comparteixen (
 	ID_pila INTEGER,
 	tag_jugador VARCHAR (255),
 	PRIMARY KEY (ID_pila, tag_jugador),
-	FOREIGN KEY (ID_pila) REFERENCES Pila (ID_pila),
-	FOREIGN KEY (tag_jugador) REFERENCES Jugador (tag_jugador)
+	FOREIGN KEY (ID_pila) REFERENCES Pila (ID_pila) ON DELETE CASCADE,
+	FOREIGN KEY (tag_jugador) REFERENCES Jugador (tag_jugador) ON DELETE CASCADE
 );
 
 -- Creació de la taula Modifiquen
@@ -222,8 +222,8 @@ CREATE TABLE Modifiquen (
 	nom_millora VARCHAR(255),
 	ID_carta INTEGER,
 	PRIMARY KEY (nom_millora, ID_carta),
-	FOREIGN KEY (nom_millora) REFERENCES Millora (nom_millora),
-	FOREIGN KEY (ID_carta) REFERENCES Carta (ID_carta)
+	FOREIGN KEY (nom_millora) REFERENCES Millora (nom_millora) ON DELETE CASCADE,
+	FOREIGN KEY (ID_carta) REFERENCES Carta (ID_carta) ON DELETE CASCADE
 );
 
 -- ----------------------------------------------------------------
@@ -244,7 +244,7 @@ CREATE TABLE Emoticones (
 	nom_imatge VARCHAR(255),
 	direccio_imatge VARCHAR(255),
 	PRIMARY KEY(ID_emoticones),
-	FOREIGN KEY (ID_emoticones) REFERENCES Article(ID_article)
+	FOREIGN KEY (ID_emoticones) REFERENCES Article(ID_article) ON DELETE CASCADE
 );
 
 -- Article: Bundle
@@ -253,7 +253,7 @@ CREATE TABLE Bundle(
     Or_ INTEGER,
     gemmes INTEGER,
     PRIMARY KEY (ID_bundle),
-    FOREIGN KEY (ID_bundle) REFERENCES Article(ID_article)
+    FOREIGN KEY (ID_bundle) REFERENCES Article(ID_article) ON DELETE CASCADE
 );
 
 -- Article: Arena
@@ -262,7 +262,7 @@ CREATE TABLE Art_Arena(
     Nivell INTEGER,
     Or_ INTEGER,
     PRIMARY KEY (ID_Art_Arena),
-    FOREIGN KEY (ID_Art_Arena) REFERENCES Article(ID_article)
+    FOREIGN KEY (ID_Art_Arena) REFERENCES Article(ID_article) ON DELETE CASCADE
 );
 
 -- Article: Cofre
@@ -274,8 +274,8 @@ CREATE TABLE Cofre (
     Temps INTEGER,
     Gemmes INTEGER,
     PRIMARY KEY (ID_cofre),
-    FOREIGN KEY (ID_cofre) REFERENCES Article(ID_article),
-    FOREIGN KEY (raresa) REFERENCES Raresa(nom)
+    FOREIGN KEY (ID_cofre) REFERENCES Article(ID_article) ON DELETE CASCADE,
+    FOREIGN KEY (raresa) REFERENCES Raresa(nom) ON DELETE CASCADE
 );
 
 -- Relació Cofre - Carta
@@ -283,8 +283,8 @@ CREATE TABLE cofre_carta(
     ID_Art_Arena INTEGER,
     ID_Carta INTEGER,
     PRIMARY KEY (ID_Art_Arena,ID_Carta),
-    FOREIGN KEY (ID_Art_Arena) REFERENCES Art_Arena(ID_Art_Arena),
-    FOREIGN KEY (ID_Carta) REFERENCES Carta(ID_Carta)
+    FOREIGN KEY (ID_Art_Arena) REFERENCES Art_Arena(ID_Art_Arena) ON DELETE CASCADE,
+    FOREIGN KEY (ID_Carta) REFERENCES Carta(ID_Carta) ON DELETE CASCADE
 );
 
 -- Compren (Relació tarja, article, jugador)
@@ -297,9 +297,9 @@ CREATE TABLE Compren (
     Quantitat INTEGER,
     Descompte FLOAT,
     PRIMARY KEY (ID_Compren),
-    FOREIGN KEY (tag_jugador) REFERENCES Jugador(tag_jugador),
-    FOREIGN KEY (num_targeta) REFERENCES targeta_credit(numero),
-    FOREIGN KEY (ID_Article) REFERENCES Article(ID_article)
+    FOREIGN KEY (tag_jugador) REFERENCES Jugador(tag_jugador) ON DELETE CASCADE,
+    FOREIGN KEY (num_targeta) REFERENCES targeta_credit(numero) ON DELETE CASCADE,
+    FOREIGN KEY (ID_Article) REFERENCES Article(ID_article) ON DELETE CASCADE
 );
 
 -- Taula Missatge
@@ -317,9 +317,9 @@ CREATE TABLE Conversen(
     tag_rep VARCHAR (255),
     ID_missatge INTEGER,
     PRIMARY KEY (tag_envia,tag_rep,ID_missatge),
-    FOREIGN KEY (tag_envia) REFERENCES Jugador(tag_jugador),
-    FOREIGN KEY (tag_rep) REFERENCES Jugador(tag_jugador),
-    FOREIGN KEY (ID_missatge) REFERENCES Missatge(ID_Missatge)
+    FOREIGN KEY (tag_envia) REFERENCES Jugador(tag_jugador) ON DELETE CASCADE,
+    FOREIGN KEY (tag_rep) REFERENCES Jugador(tag_jugador) ON DELETE CASCADE,
+    FOREIGN KEY (ID_missatge) REFERENCES Missatge(ID_Missatge) ON DELETE CASCADE
 );
 
 -- ----------------------------------------------------------------
@@ -333,7 +333,7 @@ CREATE TABLE Tecnologia (
 	ID_tecnologia VARCHAR(255),
 	nivell_maxim INTEGER,
 	PRIMARY KEY (ID_tecnologia),
-	FOREIGN KEY (ID_tecnologia) REFERENCES Tecnologia (ID_tecnologia)
+	FOREIGN KEY (ID_tecnologia) REFERENCES Tecnologia (ID_tecnologia) ON DELETE CASCADE
 );
 
 -- Creació de la taula estrcutura
@@ -341,7 +341,7 @@ CREATE TABLE Estructura (
     ID_estructura VARCHAR(255),
 	minim_trofeus INTEGER,
 	PRIMARY KEY (ID_estructura),
-	FOREIGN KEY (ID_estructura) REFERENCES Estructura (ID_estructura)
+	FOREIGN KEY (ID_estructura) REFERENCES Estructura (ID_estructura) ON DELETE CASCADE
 );
 
 -- Creació de les taules requereix
@@ -350,16 +350,16 @@ CREATE TABLE Requereix_tecnologia (
 	ID_tecnologia_requerida VARCHAR(255),
     nivell_prerequisit INTEGER,
 	PRIMARY KEY (ID_tecnologia_nova),
-	FOREIGN KEY (ID_tecnologia_nova) REFERENCES Tecnologia (ID_tecnologia),
-	FOREIGN KEY (ID_tecnologia_requerida) REFERENCES Tecnologia (ID_tecnologia)
+	FOREIGN KEY (ID_tecnologia_nova) REFERENCES Tecnologia (ID_tecnologia) ON DELETE CASCADE,
+	FOREIGN KEY (ID_tecnologia_requerida) REFERENCES Tecnologia (ID_tecnologia) ON DELETE CASCADE
 );
 
 CREATE TABLE Requereix_estructura (
 	ID_estructura_nova VARCHAR(255),
 	ID_estructura_requerida VARCHAR(255),
 	PRIMARY KEY (ID_estructura_nova),
-	FOREIGN KEY (ID_estructura_nova) REFERENCES Estructura (ID_estructura),
-	FOREIGN KEY (ID_estructura_requerida) REFERENCES Estructura (ID_estructura)
+	FOREIGN KEY (ID_estructura_nova) REFERENCES Estructura (ID_estructura) ON DELETE CASCADE,
+	FOREIGN KEY (ID_estructura_requerida) REFERENCES Estructura (ID_estructura) ON DELETE CASCADE
 );
 
 -- Creació de la taula Clan
@@ -380,8 +380,8 @@ CREATE TABLE Tenen_tecnologia (
 	data date,
 	nivell INTEGER,
 	PRIMARY KEY (ID_tecnologia, tag_clan),
-	FOREIGN KEY (ID_tecnologia) REFERENCES Tecnologia (ID_tecnologia),
-	FOREIGN KEY (tag_clan) REFERENCES Clan (tag_clan)
+	FOREIGN KEY (ID_tecnologia) REFERENCES Tecnologia (ID_tecnologia) ON DELETE CASCADE,
+	FOREIGN KEY (tag_clan) REFERENCES Clan (tag_clan) ON DELETE CASCADE
 );
 
 -- Creació de la taula tenen_tecnologia
@@ -391,8 +391,8 @@ CREATE TABLE Tenen_estructura (
 	data date,
 	nivell INTEGER,
 	PRIMARY KEY (ID_estructura, tag_clan),
-	FOREIGN KEY (ID_estructura) REFERENCES Estructura (ID_estructura),
-	FOREIGN KEY (tag_clan) REFERENCES Clan (tag_clan)
+	FOREIGN KEY (ID_estructura) REFERENCES Estructura (ID_estructura) ON DELETE CASCADE,
+	FOREIGN KEY (tag_clan) REFERENCES Clan (tag_clan) ON DELETE CASCADE
 );
 
 
@@ -402,9 +402,9 @@ CREATE TABLE Envia (
 	tag_clan VARCHAR(255),
 	tag_jugador VARCHAR (255),
 	PRIMARY KEY (ID_missatge, tag_clan, tag_jugador),
-	FOREIGN KEY (ID_missatge) REFERENCES Missatge (ID_missatge),
-	FOREIGN KEY (tag_clan) REFERENCES Clan (tag_clan),
-	FOREIGN KEY (tag_jugador) REFERENCES Jugador (tag_jugador)
+	FOREIGN KEY (ID_missatge) REFERENCES Missatge (ID_missatge) ON DELETE CASCADE,
+	FOREIGN KEY (tag_clan) REFERENCES Clan (tag_clan) ON DELETE CASCADE,
+	FOREIGN KEY (tag_jugador) REFERENCES Jugador (tag_jugador) ON DELETE CASCADE
 );
 
 -- Creació taula rol
@@ -422,8 +422,8 @@ CREATE TABLE Dona (
 	tag_jugador VARCHAR (255),
 	tag_clan VARCHAR(255),
 	PRIMARY KEY (ID_donacio),
-	FOREIGN KEY (tag_jugador) REFERENCES Jugador (tag_jugador),
-	FOREIGN KEY (tag_clan) REFERENCES Clan (tag_clan)
+	FOREIGN KEY (tag_jugador) REFERENCES Jugador (tag_jugador) ON DELETE CASCADE,
+	FOREIGN KEY (tag_clan) REFERENCES Clan (tag_clan) ON DELETE CASCADE
 );
 
 -- Creació de la taula Forma_part
@@ -435,9 +435,9 @@ CREATE TABLE Forma_part (
 	ID_rol INTEGER,
 	ID_Forma_part INTEGER,
 	PRIMARY KEY (ID_Forma_part),
-	FOREIGN KEY (tag_clan) REFERENCES Clan (tag_clan),
-	FOREIGN KEY (tag_jugador) REFERENCES Jugador (tag_jugador),
-	FOREIGN KEY (ID_rol) REFERENCES Rol (ID_rol)
+	FOREIGN KEY (tag_clan) REFERENCES Clan (tag_clan) ON DELETE CASCADE,
+	FOREIGN KEY (tag_jugador) REFERENCES Jugador (tag_jugador) ON DELETE CASCADE,
+	FOREIGN KEY (ID_rol) REFERENCES Rol (ID_rol) ON DELETE CASCADE
 );
 
 -- Creació taula lluiten
@@ -445,8 +445,8 @@ CREATE TABLE Lluiten (
 	tag_clan VARCHAR(255),
 	ID_batalla INTEGER,
 	PRIMARY KEY (tag_clan,ID_batalla),
-	FOREIGN KEY (tag_clan) REFERENCES Clan (tag_clan),
-	FOREIGN KEY (ID_batalla) REFERENCES Batalla (ID_batalla)
+	FOREIGN KEY (tag_clan) REFERENCES Clan (tag_clan) ON DELETE CASCADE,
+	FOREIGN KEY (ID_batalla) REFERENCES Batalla (ID_batalla) ON DELETE CASCADE
 );
 
 -- ----------------------------------------------------------------
@@ -466,8 +466,8 @@ CREATE TABLE Completen (
 	or_ INTEGER,
 	experiencia INTEGER,
 	PRIMARY KEY (ID_missio, ID_arena),
-	FOREIGN KEY (ID_missio) REFERENCES Missio (ID_missio),
-	FOREIGN KEY (ID_arena) REFERENCES Arena (ID_arena)
+	FOREIGN KEY (ID_missio) REFERENCES Missio (ID_missio) ON DELETE CASCADE,
+	FOREIGN KEY (ID_arena) REFERENCES Arena (ID_arena) ON DELETE CASCADE
 );
 
 -- Creació de la taula Depen
@@ -475,8 +475,8 @@ CREATE TABLE Depen (
 	ID_missio1 INTEGER,
 	ID_missio2 INTEGER,
 	PRIMARY KEY (ID_missio1, ID_missio2),
-	FOREIGN KEY (ID_missio1) REFERENCES Missio (ID_missio),
-	FOREIGN KEY (ID_missio2) REFERENCES Missio (ID_missio)
+	FOREIGN KEY (ID_missio1) REFERENCES Missio (ID_missio) ON DELETE CASCADE,
+	FOREIGN KEY (ID_missio2) REFERENCES Missio (ID_missio) ON DELETE CASCADE
 );
 
 -- Creació de la taula Assoliment
@@ -485,7 +485,7 @@ CREATE TABLE Assoliment (
 	titol VARCHAR(255),
 	recompensa_gemmes INTEGER,
 	PRIMARY KEY (ID_assoliment),
-	FOREIGN KEY (ID_assoliment) REFERENCES Assoliment (ID_assoliment)
+	FOREIGN KEY (ID_assoliment) REFERENCES Assoliment (ID_assoliment) ON DELETE CASCADE
 );
 
 -- Creació de la taula Desbloquegen
@@ -493,8 +493,8 @@ CREATE TABLE Desbloquegen (
 	tag_jugador VARCHAR (255),
 	ID_arena INTEGER,
 	PRIMARY KEY (tag_jugador, ID_arena),
-	FOREIGN KEY (tag_jugador) REFERENCES Jugador (tag_jugador),
-	FOREIGN KEY (ID_arena) REFERENCES Art_Arena (ID_Art_Arena)
+	FOREIGN KEY (tag_jugador) REFERENCES Jugador (tag_jugador) ON DELETE CASCADE,
+	FOREIGN KEY (ID_arena) REFERENCES Art_Arena (ID_Art_Arena) ON DELETE CASCADE
 );
 
 -- Creació de la taula Aconsegueix
@@ -503,9 +503,9 @@ CREATE TABLE Aconsegueix (
 	ID_assoliment INTEGER,
 	ID_arena INTEGER,
 	PRIMARY KEY (tag_jugador, ID_assoliment, ID_arena),
-	FOREIGN KEY (tag_jugador) REFERENCES Jugador (tag_jugador),
-	FOREIGN KEY (ID_assoliment) REFERENCES Assoliment (ID_assoliment),
-	FOREIGN KEY (ID_arena) REFERENCES Art_Arena (ID_Art_Arena)
+	FOREIGN KEY (tag_jugador) REFERENCES Jugador (tag_jugador) ON DELETE CASCADE,
+	FOREIGN KEY (ID_assoliment) REFERENCES Assoliment (ID_assoliment) ON DELETE CASCADE,
+	FOREIGN KEY (ID_arena) REFERENCES Art_Arena (ID_Art_Arena) ON DELETE CASCADE
 );
 
 -- Creació de la taula Amics
@@ -513,8 +513,8 @@ CREATE TABLE Amics (
 	tag_jugador1 VARCHAR (255),
 	tag_jugador2 VARCHAR (255),
 	PRIMARY KEY (tag_jugador1, tag_jugador2),
-	FOREIGN KEY (tag_jugador1) REFERENCES Jugador (tag_jugador),
-	FOREIGN KEY (tag_jugador2) REFERENCES Jugador (tag_jugador)
+	FOREIGN KEY (tag_jugador1) REFERENCES Jugador (tag_jugador) ON DELETE CASCADE,
+	FOREIGN KEY (tag_jugador2) REFERENCES Jugador (tag_jugador) ON DELETE CASCADE
 );
 
 -- Creació de la taula Guanya
@@ -523,8 +523,8 @@ CREATE TABLE Guanya (
 	ID_batalla INTEGER,
 	num_trofeus INTEGER,
 	PRIMARY KEY (tag_jugador, ID_batalla),
-	FOREIGN KEY (tag_jugador) REFERENCES Jugador (tag_jugador),
-	FOREIGN KEY (ID_batalla) REFERENCES Batalla (ID_batalla)
+	FOREIGN KEY (tag_jugador) REFERENCES Jugador (tag_jugador) ON DELETE CASCADE,
+	FOREIGN KEY (ID_batalla) REFERENCES Batalla (ID_batalla) ON DELETE CASCADE
 );
 
 -- Creació de la taula Perd
@@ -533,8 +533,8 @@ CREATE TABLE Perd (
     ID_batalla INTEGER,
     num_trofeus INTEGER,
     PRIMARY KEY (tag_jugador, ID_batalla),
-    FOREIGN KEY (tag_jugador) REFERENCES Jugador (tag_jugador),
-    FOREIGN KEY (ID_batalla) REFERENCES Batalla (ID_batalla)
+    FOREIGN KEY (tag_jugador) REFERENCES Jugador (tag_jugador) ON DELETE CASCADE,
+    FOREIGN KEY (ID_batalla) REFERENCES Batalla (ID_batalla) ON DELETE CASCADE
 );
 
 -- Creació de la taula Insignia
@@ -543,7 +543,7 @@ CREATE TABLE Insignia (
 	imatge VARCHAR(255), --Es correcte que Imatge sigui VARCHAR?
 	titol VARCHAR(255),
 	PRIMARY KEY (ID_insignia),
-	FOREIGN KEY (ID_insignia) REFERENCES Insignia (ID_insignia)
+	FOREIGN KEY (ID_insignia) REFERENCES Insignia (ID_insignia) ON DELETE CASCADE
 );
 
 -- Creació de la taula Participen
@@ -554,6 +554,6 @@ CREATE TABLE Participen (
 	num_derrotes INTEGER,
 	punts INTEGER,	
 	PRIMARY KEY (tag_jugador, ID_temporada),
-	FOREIGN KEY (tag_jugador) REFERENCES Jugador (tag_jugador),
-	FOREIGN KEY (ID_temporada) REFERENCES Temporada (ID_temporada)
+	FOREIGN KEY (tag_jugador) REFERENCES Jugador (tag_jugador) ON DELETE CASCADE,
+	FOREIGN KEY (ID_temporada) REFERENCES Temporada (ID_temporada) ON DELETE CASCADE
 );
