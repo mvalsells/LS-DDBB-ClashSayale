@@ -216,6 +216,12 @@ FROM 'C:\Users\Public\Datasets\playersClans.csv'
 DELIMITER ','
 CSV HEADER;
 
+INSERT INTO forma_part(tag_jugador, tag_clan, data)
+SELECT player, clan, date
+FROM temporal4;
+
+
+
 DROP TABLE IF EXISTS temporal4;
 
 -- Amics
