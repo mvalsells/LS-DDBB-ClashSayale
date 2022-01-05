@@ -17,7 +17,7 @@ DROP TABLE IF EXISTS msgPlayersTmp CASCADE;
 DROP TABLE IF EXISTS msgClansTmp CASCADE;
 DROP TABLE IF EXISTS playerCardsTmp CASCADE;
 DROP TABLE  IF EXISTS playerClans CASCADE;
-
+DROP TABLE IF EXISTS temporal4;
 
 
 -- Eliminar importacions anteriors
@@ -201,6 +201,22 @@ FROM 'C:\Users\Public\Datasets\playersClansdonations.csv'
 DELIMITER ','
 CSV HEADER;
 
+
+--Forma part
+
+CREATE TEMPORARY TABLE temporal4 (
+    player VARCHAR(255),
+    clan VARCHAR(255),
+    role TEXT,
+    date DATE
+);
+
+COPY temporal4(player, clan, role, date)
+FROM 'C:\Users\Public\Datasets\playersClans.csv'
+DELIMITER ','
+CSV HEADER;
+
+DROP TABLE IF EXISTS temporal4;
 
 -- Amics
 COPY amics(tag_jugador1, tag_jugador2)

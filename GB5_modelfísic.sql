@@ -438,12 +438,12 @@ CREATE TABLE Dona (
 
 -- Creació de la taula Forma_part
 CREATE TABLE Forma_part (
-	creador_del_clan VARCHAR (255),
-	data DATE, 
+    ID_Forma_part SERIAL,
 	tag_clan VARCHAR(255),
 	tag_jugador VARCHAR (255),
 	ID_rol INTEGER,
-	ID_Forma_part INTEGER,
+	creador_del_clan VARCHAR (255),
+	data DATE,
 	PRIMARY KEY (ID_Forma_part),
 	FOREIGN KEY (tag_clan) REFERENCES Clan (tag_clan) ON DELETE CASCADE,
 	FOREIGN KEY (tag_jugador) REFERENCES Jugador (tag_jugador) ON DELETE CASCADE,
