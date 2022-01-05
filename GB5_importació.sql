@@ -16,8 +16,10 @@ DROP TABLE IF EXISTS players_quests CASCADE;
 DROP TABLE IF EXISTS msgPlayersTmp CASCADE;
 DROP TABLE IF EXISTS msgClansTmp CASCADE;
 DROP TABLE IF EXISTS playerCardsTmp CASCADE;
-DROP TABLE  IF EXISTS playerClans CASCADE;
+DROP TABLE IF EXISTS playerClans CASCADE;
 DROP TABLE IF EXISTS temporal4;
+DROP TABLE IF EXISTS playersbadge CASCADE;
+DROP TABLE IF EXISTS playersachievements CASCADE;
 
 
 -- Eliminar importacions anteriors
@@ -43,8 +45,13 @@ DELETE FROM lluiten WHERE 1 = 1;
 DELETE FROM pila WHERE 1 = 1;
 DELETE FROM missio WHERE 1 = 1;
 DELETE FROM completen WHERE 1 = 1;
---DELETE FROM player_purchases WHERE 1 = 1;
---DELETE FROM players_quests WHERE 1 = 1;
+DELETE FROM  compren WHERE 1 = 1;
+DELETE FROM  article WHERE 1 = 1;
+DELETE FROM cofre WHERE 1 = 1;
+DELETE FROM bundle WHERE 1 = 1;
+DELETE FROM emoticones WHERE 1 = 1;
+DELETE FROM insignia WHERE 1 = 1;
+DELETE FROM assoliment WHERE 1 = 1;
 
 
 -- Arena (arena.csv)
@@ -408,9 +415,9 @@ CSV HEADER;
 
 --Player no cal ja s'ha afegit
 --Credit card ja afegida no cal
---Id_compren es duplica al csv, es duplica pel nom
+--Id_compren es duplica al csv, es duplica pel  o surt valor null
 --INSERT INTO compren(id_compren,quantitat,data_,descompte)
---SELECT buy_id,buy_stock,date,discount
+--SELECT DISTINCT buy_id,buy_stock,date,discount
 --FROM player_purchases;
 
 
@@ -455,4 +462,63 @@ COPY players_quests
 FROM 'C:\Users\Public\Datasets\players_quests.csv'
 DELIMITER ','
 CSV HEADER;
+
+--Afegim a missio
+--Quest id no cal
+--(model fisic) titol,descripcio, requeriment, desbloqueja
+--id duplicada o null
+--INSERT INTO missio(titol, descripcio, requeriment, desbloqueja)
+--SELECT quest_title,quest_description,quest_requirement,unlock
+--FROM players_quests;
+
+--Afegim a depen
+--quest depends es la missio de la que depen
+--valors null a la missio2
+--INSERT INTO depen(id_missio1, id_missio2)
+--SELECT quest_id, quest_depends
+--FROM players_quests;
+
+--Player budget csv
+CREATE TEMPORARY TABLE playersbadge(
+    player VARCHAR(255),
+    name VARCHAR(255),
+    arena INTEGER,
+    date DATE,
+    img VARCHAR(255)
+);
+
+COPY playersbadge
+FROM 'C:\Users\Public\Datasets\playersbadge.csv'
+DELIMITER ','
+CSV HEADER;
+
+--Afegim a insignia
+--(model fisic) incrementar id i afegir data
+-- INSERT INTO insignia(imatge, titol, data)
+SELECT name,img,date
+FROM playersbadge;
+
+-- PLayersachievements csv
+CREATE TABLE playersachievements(
+    player VARCHAR(255),
+    name VARCHAR(255),
+    description VARCHAR(255),
+    arena INTEGER,
+    date DATE,
+    gems INTEGER
+);
+
+COPY playersachievements
+FROM 'C:\Users\Public\Datasets\playersachievements.csv'
+DELIMITER ','
+CSV HEADER;
+
+--Afegim a asoliments
+--(model fisic) incrementar id, afegir data i descripcio
+INSERT INTO assoliment(titol, recompensa_gemmes, descripcio,data)
+SELECT name, gems, description,date
+FROM playersachievements;
+
+
+
 
