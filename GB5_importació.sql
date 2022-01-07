@@ -226,6 +226,9 @@ INSERT INTO forma_part(tag_jugador, tag_clan, data)
 SELECT player, clan, date
 FROM temporal4;
 
+INSERT INTO rol(descripcio)
+SELECT role
+FROM temporal4;
 
 
 DROP TABLE IF EXISTS temporal4;
