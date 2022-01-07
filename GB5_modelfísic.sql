@@ -467,6 +467,10 @@ CREATE TABLE Lluiten (
 -- Creació de la taula Missio
 CREATE TABLE Missio (
 	ID_missio INTEGER,
+	titol VARCHAR(255),
+    descripcio VARCHAR(255),
+    requeriment VARCHAR(255),
+    desbloqueja DATE,
 	PRIMARY KEY (ID_missio)
 );
 
@@ -492,9 +496,11 @@ CREATE TABLE Depen (
 
 -- Creació de la taula Assoliment
 CREATE TABLE Assoliment (
-	ID_assoliment INTEGER,
+	ID_assoliment SERIAL,
 	titol VARCHAR(255),
 	recompensa_gemmes INTEGER,
+	descripcio VARCHAR(255),
+	data DATE,
 	PRIMARY KEY (ID_assoliment),
 	FOREIGN KEY (ID_assoliment) REFERENCES Assoliment (ID_assoliment) ON DELETE CASCADE
 );
@@ -550,9 +556,10 @@ CREATE TABLE Perd (
 
 -- Creació de la taula Insignia
 CREATE TABLE Insignia (
-	ID_insignia INTEGER,
+	ID_insignia SERIAL,
 	imatge VARCHAR(255), --Es correcte que Imatge sigui VARCHAR?
 	titol VARCHAR(255),
+	data DATE,
 	PRIMARY KEY (ID_insignia),
 	FOREIGN KEY (ID_insignia) REFERENCES Insignia (ID_insignia) ON DELETE CASCADE
 );
