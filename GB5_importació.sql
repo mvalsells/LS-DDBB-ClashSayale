@@ -281,7 +281,7 @@ INSERT INTO encanteri(radi)
 SELECT radious
 FROM cards;
 
---Afegim a Arena
+-- Afegim a Arena
 -- INSERT INTO arena(id_arena)
 -- SELECT DISTINCT arena
 -- FROM cards;
@@ -304,8 +304,8 @@ FROM 'C:\Users\Public\Datasets\battles.csv'
 DELIMITER ','
 CSV HEADER;
 
---Afegim a batalla (com afegim un id si en el .csv no en tenim???)
--- INSERT INTO batalla(ID_batalla, data ,durada)
+-- Afegim a batalla (com afegim un id si en el .csv no en tenim???)
+-- INSERT INTO batalla(ID_batalla, data, durada)
 -- SELECT ???, date, duration
 -- FROM battle;
 
@@ -359,10 +359,9 @@ FROM 'C:\Users\Public\Datasets\playersdeck.csv'
 DELIMITER ','
 CSV HEADER;
 
--- HI HA UN ERROR DE LLARGÀRIA DE VARCHAR tot i qu he canviat a TEXT (en teoria deixa més caràcters)
--- INSERT INTO pila (tag_jugador, ID_pila, nom, descripcio, data_creacio)
--- SELECT player, deck, title, description, date
--- FROM playersdeck;
+INSERT INTO pila (tag_jugador, ID_pila, nom, descripcio, data_creacio)
+SELECT DISTINCT player, deck, title, description, date
+FROM playersdeck;
 
 DROP TABLE playersdeck;
 
@@ -536,6 +535,6 @@ SELECT (SELECT id_carta FROM carta WHERE nom LIKE pct.name),player,amount,date,l
 FROM playerCardsTmp AS pct ;
 
 -- Decks compartits (shared_decks.csv)
--- COPY comparteixen(id_pila, tag_jugador)
--- FROM 'C:\Users\Public\Datasets\shared_decks.csv'
--- CSV HEADER;
+COPY comparteixen(id_pila, tag_jugador)
+FROM 'C:\Users\Public\Datasets\shared_decks.csv'
+CSV HEADER;
