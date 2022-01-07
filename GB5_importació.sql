@@ -21,6 +21,8 @@ DROP TABLE IF EXISTS temporal4;
 DROP TABLE IF EXISTS msgPlayersTmp CASCADE;
 DROP TABLE IF EXISTS msgClansTmp CASCADE;
 DROP TABLE IF EXISTS playerCardsTmp CASCADE;
+DROP TABLE IF EXISTS playersbadge CASCADE;
+DROP TABLE IF EXISTS playersachievements CASCADE;
 
 
 -- Eliminar importacions anteriors
@@ -58,6 +60,8 @@ DELETE FROM emoticones WHERE 1 = 1;
 DELETE FROM bundle WHERE 1 = 1;
 DELETE FROM missio WHERE 1 = 1;
 DELETE FROM depen WHERE 1 = 1;
+DELETE FROM assoliment WHERE 1 = 1;
+DELETE FROM insignia WHERE 1 = 1;
 
 
 -- Arena (arena.csv)
