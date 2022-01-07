@@ -16,8 +16,11 @@ DROP TABLE IF EXISTS players_quests CASCADE;
 DROP TABLE IF EXISTS msgPlayersTmp CASCADE;
 DROP TABLE IF EXISTS msgClansTmp CASCADE;
 DROP TABLE IF EXISTS playerCardsTmp CASCADE;
-DROP TABLE  IF EXISTS playerClans CASCADE;
+DROP TABLE IF EXISTS playerClans CASCADE;
 DROP TABLE IF EXISTS temporal4;
+DROP TABLE IF EXISTS msgPlayersTmp CASCADE;
+DROP TABLE IF EXISTS msgClansTmp CASCADE;
+DROP TABLE IF EXISTS playerCardsTmp CASCADE;
 
 
 -- Eliminar importacions anteriors
@@ -43,6 +46,9 @@ DELETE FROM lluiten WHERE 1 = 1;
 DELETE FROM pila WHERE 1 = 1;
 DELETE FROM missio WHERE 1 = 1;
 DELETE FROM completen WHERE 1 = 1;
+DELETE FROM pertany WHERE 1 = 1;
+DELETE FROM comparteixen WHERE 1 = 1;
+DELETE FROM missatge WHERE 1 = 1;
 --DELETE FROM player_purchases WHERE 1 = 1;
 --DELETE FROM players_quests WHERE 1 = 1;
 
@@ -480,7 +486,8 @@ FROM msgPlayersTmp;
 
 INSERT INTO missatge(id_missatge, cos, data_, id_resposta)
 SELECT id, text, date, answer
-FROM msgPlayersTmp;
+FROM msgPlayersTmp
+WHERE id IS NOT NULL;
 
 -- msg_to_clans.csv
 CREATE TEMPORARY TABLE msgClansTmp(
@@ -497,9 +504,9 @@ FROM 'C:\Users\Public\Datasets\messages_to_clans.csv'
 DELIMITER ','
 CSV HEADER;
 
-INSERT INTO missatge(id_missatge, cos, data_, id_resposta)
-SELECT (c.id+p.total), c.text, c.date, (c.answer+p.total)
-FROM msgClansTmp AS c, msgPlayersTmp AS p;
+-- INSERT INTO missatge(id_missatge, cos, data_, id_resposta)
+-- SELECT (c.id+p.total), c.text, c.date, (c.answer+p.total)
+-- FROM msgClansTmp AS c, msgPlayersTmp AS p;
 
 -- ------------------------------------------
 -- -------------- Cartes --------------
