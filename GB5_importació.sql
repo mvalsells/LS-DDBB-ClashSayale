@@ -469,13 +469,22 @@ CREATE TEMPORARY TABLE msgPlayersTmp(
     reciver VARCHAR(255),
     text TEXT,
     date DATE,
-    answer INTEGER
+    answer INTEGER,
+    total INTEGER
 );
 
-COPY msgPlayersTmp
+COPY msgPlayersTmp(id, sender, reciver, text, date, answer)
 FROM 'C:\Users\Public\Datasets\messages_between_players.csv'
 DELIMITER ','
 CSV HEADER;
+
+INSERT INTO msgPlayersTmp(total)
+SELECT COUNT(id)
+FROM msgPlayersTmp;
+
+INSERT INTO missatge(id_missatge, cos, data_, id_resposta)
+SELECT id, text, date, answer
+FROM msgPlayersTmp;
 
 -- msg_to_clans.csv
 CREATE TEMPORARY TABLE msgClansTmp(
@@ -491,6 +500,10 @@ COPY msgClansTmp
 FROM 'C:\Users\Public\Datasets\messages_to_clans.csv'
 DELIMITER ','
 CSV HEADER;
+
+INSERT INTO missatge(id_missatge, cos, data_, id_resposta)
+SELECT (c.id+p.total), c.text, c.date, (c.answer+p.total)
+FROM msgClansTmp AS c, msgPlayersTmp AS p;
 
 -- ------------------------------------------
 -- -------------- Cartes --------------

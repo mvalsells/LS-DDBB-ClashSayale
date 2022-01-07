@@ -317,6 +317,7 @@ CREATE TABLE Missatge (
   Titol VARCHAR(255),
   Cos TEXT,
   data_ DATE,
+  ID_resposta INTEGER,
   PRIMARY KEY (ID_Missatge)
 );
 
