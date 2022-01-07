@@ -480,14 +480,14 @@ FROM 'C:\Users\Public\Datasets\messages_between_players.csv'
 DELIMITER ','
 CSV HEADER;
 
-INSERT INTO msgPlayersTmp(total)
-SELECT COUNT(id)
+INSERT INTO msgPlayersTmp(id,total)
+SELECT '-2147483648',COUNT(id)
 FROM msgPlayersTmp;
 
 INSERT INTO missatge(id_missatge, cos, data_, id_resposta)
 SELECT id, text, date, answer
 FROM msgPlayersTmp
-WHERE id IS NOT NULL;
+WHERE id IS NOT NULL AND text IS NOT NULL AND date IS NOT NULL AND answer IS NOT NULL;
 
 -- msg_to_clans.csv
 CREATE TEMPORARY TABLE msgClansTmp(
@@ -504,9 +504,9 @@ FROM 'C:\Users\Public\Datasets\messages_to_clans.csv'
 DELIMITER ','
 CSV HEADER;
 
--- INSERT INTO missatge(id_missatge, cos, data_, id_resposta)
--- SELECT (c.id+p.total), c.text, c.date, (c.answer+p.total)
--- FROM msgClansTmp AS c, msgPlayersTmp AS p;
+INSERT INTO missatge(id_missatge, cos, data_, id_resposta)
+SELECT (id + (SELECT total FROM msgPlayersTmp WHERE id = -2147483648)), text, date, (answer + (SELECT total FROM msgPlayersTmp WHERE id = -2147483648))
+FROM msgClansTmp;
 
 -- ------------------------------------------
 -- -------------- Cartes --------------
