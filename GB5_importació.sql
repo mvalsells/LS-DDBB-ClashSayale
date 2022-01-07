@@ -49,8 +49,15 @@ DELETE FROM completen WHERE 1 = 1;
 DELETE FROM pertany WHERE 1 = 1;
 DELETE FROM comparteixen WHERE 1 = 1;
 DELETE FROM missatge WHERE 1 = 1;
---DELETE FROM player_purchases WHERE 1 = 1;
---DELETE FROM players_quests WHERE 1 = 1;
+DELETE FROM art_arena WHERE 1=1;
+DELETE FROM nivellcarta WHERE 1 = 1;
+DELETE FROM compren WHERE 1=1;
+DELETE FROM article WHERE 1 = 1;
+DELETE FROM cofre WHERE 1 = 1;
+DELETE FROM emoticones WHERE 1 = 1;
+DELETE FROM bundle WHERE 1 = 1;
+DELETE FROM missio WHERE 1 = 1;
+DELETE FROM depen WHERE 1 = 1;
 
 
 -- Arena (arena.csv)
@@ -418,7 +425,7 @@ CSV HEADER;
 --Credit card ja afegida no cal
 --Id_compren es duplica al csv, es duplica pel nom
 --INSERT INTO compren(id_compren,quantitat,data_,descompte)
---SELECT buy_id,buy_stock,date,discount
+--SELECT DISTINCT buy_id,buy_stock,date,discount
 --FROM player_purchases;
 
 
@@ -428,10 +435,10 @@ SELECT buy_name, buy_cost
 FROM player_purchases;
 
 --Afegim a arena paquet
---Hi han valors nulls a la id
---INSERT INTO art_arena(id_art_arena)
---SELECT arenapack_id
---FROM player_purchases;
+INSERT INTO art_arena(id_art_arena)
+SELECT DISTINCT arenapack_id
+FROM player_purchases
+WHERE arenapack_id IS NOT NULL;
 
 --Afegim a cofre
 INSERT INTO cofre(nom_cofre, temps, raresa, quantitat_cartes)
@@ -463,6 +470,57 @@ COPY players_quests
 FROM 'C:\Users\Public\Datasets\players_quests.csv'
 DELIMITER ','
 CSV HEADER;
+
+--Afegim a missions
+--id repetida
+--INSERT INTO missio(id_missio, titol, descripcio, requeriment, desbloqueja)
+--SELECT DISTINCT quest_id,quest_title,quest_description,quest_requirement,unlock
+--FROM players_quests;
+
+--Afegim depen
+INSERT INTO depen(id_missio1, id_missio2)
+SELECT DISTINCT quest_id,quest_depends
+FROM players_quests
+WHERE quest_id IS NOT NULL AND quest_depends IS NOT NULL;
+
+-- Playersachievement
+CREATE TEMPORARY TABLE playersachievements(
+    player VARCHAR(255),
+    name VARCHAR(255),
+    description VARCHAR(255),
+    arena INTEGER,
+    date DATE,
+    gems INTEGER
+);
+
+COPY playersachievements
+FROM 'C:\Users\Public\Datasets\playersachievements.csv'
+DELIMITER ','
+CSV HEADER;
+
+--Afegim a assoliments
+INSERT INTO assoliment(titol, recompensa_gemmes, descripcio, data)
+SELECT name,gems,description,date
+FROM playersachievements;
+
+--Players badge csv
+CREATE TEMPORARY TABLE playersbadge(
+    player VARCHAR(255),
+    name VARCHAR(255),
+    arena INTEGER,
+    date DATE,
+    img VARCHAR(255)
+);
+
+COPY playersbadge
+FROM 'C:\Users\Public\Datasets\playersbadge.csv'
+DELIMITER ','
+CSV HEADER;
+
+--afegim a insignia
+INSERT INTO insignia(imatge, titol, data)
+SELECT img,name,date
+FROM playersbadge;
 
 -- -------------- MISSATGES --------------
 
@@ -526,7 +584,7 @@ FROM 'C:\Users\Public\Datasets\playerscards.csv'
 DELIMITER ','
 CSV HEADER;
 
-INSERT INTO nivellcarta
+INSERT INTO nivellcarta(nivell)
 SELECT DISTINCT level
 FROM playerCardsTmp;
 
