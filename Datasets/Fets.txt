@@ -8,6 +8,8 @@ friends.csv
 players.csv
 seasons.csv
 shared_decks - Marc V (Falta descomentar quan vagi bé insert decks)
+msg_betwen_players - Marc V
+msg_to_clans - Marc V
 
 -- FALTEN --
 arena_pack.csv - Preguntar becaris
@@ -15,8 +17,7 @@ battles - Albert (dubtes amb claus primàries)
 buildings (a mitges) - Marc G
 clan_battle - Albert (dubtes amb claus primàries)
 clan_tech_structures - Marc G
-msg_betwen_players - Marc V
-msg_to_clans - Marc V
+
 player_purchases - Irina
 player_quests - Irina
 playersachivements - Irina

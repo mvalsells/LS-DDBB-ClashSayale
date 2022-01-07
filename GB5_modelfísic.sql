@@ -185,7 +185,7 @@ CREATE TABLE NivellCarta(
 CREATE TABLE Pertany (
 	quantitat INTEGER,
 	data_desbolqueig DATE,
-	ID_pertany INTEGER,
+	ID_pertany SERIAL,
 	tag_jugador VARCHAR (255),
 	ID_Carta INTEGER,
 	nivell INTEGER,

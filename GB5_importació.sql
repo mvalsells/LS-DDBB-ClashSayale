@@ -527,9 +527,13 @@ FROM 'C:\Users\Public\Datasets\playerscards.csv'
 DELIMITER ','
 CSV HEADER;
 
--- INSERT INTO pertany(id_pertany,id_carta,tag_jugador,quantitat,data_desbolqueig, nivell)
--- SELECT id, (SELECT id_carta FROM carta WHERE nom LIKE playerCardsTmp.name),player,amount,date,level
--- FROM playerCardsTmp;
+INSERT INTO nivellcarta
+SELECT DISTINCT level
+FROM playerCardsTmp;
+
+INSERT INTO pertany(id_carta,tag_jugador,quantitat,data_desbolqueig, nivell)
+SELECT (SELECT id_carta FROM carta WHERE nom LIKE pct.name),player,amount,date,level
+FROM playerCardsTmp AS pct ;
 
 -- Decks compartits (shared_decks.csv)
 -- COPY comparteixen(id_pila, tag_jugador)
