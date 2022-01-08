@@ -113,7 +113,7 @@ CREATE TABLE Arena (
 
 -- Creació de la taula Batallen
 CREATE TABLE Batalla (
-	ID_batalla INTEGER,
+	ID_batalla SERIAL,
 	data DATE,
 	durada TIME,
 	ID_temporada VARCHAR(255),
@@ -454,7 +454,7 @@ CREATE TABLE Forma_part (
 -- Creació taula lluiten
 CREATE TABLE Lluiten (
 	tag_clan VARCHAR(255),
-	ID_batalla INTEGER,
+	ID_batalla SERIAL,
 	PRIMARY KEY (tag_clan,ID_batalla),
 	FOREIGN KEY (tag_clan) REFERENCES Clan (tag_clan) ON DELETE CASCADE,
 	FOREIGN KEY (ID_batalla) REFERENCES Batalla (ID_batalla) ON DELETE CASCADE
@@ -537,7 +537,7 @@ CREATE TABLE Amics (
 -- Creació de la taula Guanya
 CREATE TABLE Guanya (
 	tag_jugador VARCHAR (255),
-	ID_batalla INTEGER,
+	ID_batalla SERIAL,
 	num_trofeus INTEGER,
 	PRIMARY KEY (tag_jugador, ID_batalla),
 	FOREIGN KEY (tag_jugador) REFERENCES Jugador (tag_jugador) ON DELETE CASCADE,
@@ -547,7 +547,7 @@ CREATE TABLE Guanya (
 -- Creació de la taula Perd
 CREATE TABLE Perd (
     tag_jugador VARCHAR (255),
-    ID_batalla INTEGER,
+    ID_batalla SERIAL,
     num_trofeus INTEGER,
     PRIMARY KEY (tag_jugador, ID_batalla),
     FOREIGN KEY (tag_jugador) REFERENCES Jugador (tag_jugador) ON DELETE CASCADE,

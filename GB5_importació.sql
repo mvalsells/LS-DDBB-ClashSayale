@@ -138,12 +138,6 @@ FROM temporal2;
 
 DROP TABLE temporal2;
 
-
-
-
-
-
-
 -- Temporades
 COPY temporada(id_temporada,data_inici,data_fi)
     FROM 'C:\Users\Public\Datasets\seasons.csv'
@@ -179,11 +173,7 @@ SELECT clan, structure, date, level
 FROM temporal3
 WHERE structure IS NOT NULL;
 
-
 DROP TABLE temporal3;
-
-
-
 
 -- Jugadors
 CREATE TEMPORARY TABLE players (
@@ -210,17 +200,13 @@ FROM players;
 
 DROP TABLE players;
 
-
 --Donacio
-
 COPY dona(tag_jugador, tag_clan, quantitat, data)
 FROM 'C:\Users\Public\Datasets\playersClansdonations.csv'
 DELIMITER ','
 CSV HEADER;
 
-
 --Forma part
-
 CREATE TEMPORARY TABLE temporal4 (
     player VARCHAR(255),
     clan VARCHAR(255),
@@ -241,7 +227,6 @@ INSERT INTO rol(descripcio)
 SELECT role
 FROM temporal4;
 
-
 DROP TABLE IF EXISTS temporal4;
 
 -- Amics
@@ -252,14 +237,14 @@ COPY amics(tag_jugador1, tag_jugador2)
 
 -- Cartes csv
 CREATE TEMPORARY TABLE cards (
-        name VARCHAR(255),
-        rarity VARCHAR(255),
-        arena INTEGER,
-        damage INTEGER,
-        hit_speed INTEGER,
-        spawn_damage INTEGER,
-        lifetime INTEGER,
-        radious INTEGER
+    name VARCHAR(255),
+    rarity VARCHAR(255),
+    arena INTEGER,
+    damage INTEGER,
+    hit_speed INTEGER,
+    spawn_damage INTEGER,
+    lifetime INTEGER,
+    radious INTEGER
 );
 
 COPY cards
@@ -299,70 +284,15 @@ FROM cards;
 
 DROP TABLE cards;
 
--- Afegim a Batalla
-CREATE TEMPORARY TABLE battle (
-        winner INTEGER,
-        loser INTEGER,
-        winner_score INTEGER,
-        loser_score INTEGER,
-        date DATE,
-        duration TIME,
-        clan_battle INTEGER
-);
-
-COPY battle
-FROM 'C:\Users\Public\Datasets\battles.csv'
-DELIMITER ','
-CSV HEADER;
-
--- Afegim a batalla (com afegim un id si en el .csv no en tenim???)
--- INSERT INTO batalla(ID_batalla, data, durada)
--- SELECT ???, date, duration
--- FROM battle;
-
--- (AQUÍ PASSA EL MATEIX AMB  "tag_jugador", EN EL .csv NO ENS HO POSA)
--- Afegim a guanyador
--- INSERT INTO guanya(num_trofeus)
--- SELECT winner_score
--- FROM battle;
-
--- Afegim a perdedor
--- INSERT INTO perd(num_trofeus)
--- SELECT loser_score
--- FROM battle;
-
-DROP TABLE battle;
-
--- Afegim a batalla de clans
-CREATE TEMPORARY TABLE clan_battle (
-        battle INTEGER,
-        clan VARCHAR (255),
-        start_date DATE,
-        end_date DATE
-);
-
-COPY clan_battle
-FROM 'C:\Users\Public\Datasets\clan_battles.csv'
-DELIMITER ','
-CSV HEADER;
-
--- MATEIX ERROR AMB LES CLAUS PRIMÀRIES I FORÀNIES
--- Afegim a lluiten
--- INSERT INTO lluiten(tag_clan, ID_batalla)
--- SELECT clan, battle
--- FROM clan_battle;
-
-DROP TABLE clan_battle;
-
 -- Afegim a pila
 CREATE TEMPORARY TABLE playersdeck (
-        player VARCHAR (255),
-        deck INTEGER,
-        title VARCHAR (255),
-        description TEXT,
-        date DATE,
-        card INTEGER,
-        level INTEGER
+    player VARCHAR (255),
+    deck INTEGER,
+    title VARCHAR (255),
+    description TEXT,
+    date DATE,
+    card INTEGER,
+    level INTEGER
 );
 
 COPY playersdeck
@@ -374,14 +304,67 @@ INSERT INTO pila (tag_jugador, ID_pila, nom, descripcio, data_creacio)
 SELECT DISTINCT player, deck, title, description, date
 FROM playersdeck;
 
+-- Afegim a Batalla
+CREATE TEMPORARY TABLE battle (
+    winner INTEGER,
+    loser INTEGER,
+    winner_score INTEGER,
+    loser_score INTEGER,
+    date DATE,
+    duration TIME,
+    clan_battle INTEGER
+);
+
+COPY battle
+FROM 'C:\Users\Public\Datasets\battles.csv'
+DELIMITER ','
+CSV HEADER;
+
+-- Afegim a batalla
+INSERT INTO batalla(data, durada)
+SELECT date, duration
+FROM battle;
+
+-- Afegim a guanyador
+-- INSERT INTO guanya(tag_jugador, num_trofeus)
+-- SELECT player, (SELECT winner_score FROM battle WHERE playersdeck.deck = battle.winner)
+-- FROM playersdeck;
+
+-- Afegim a perdedor
+-- INSERT INTO perd(tag_jugador, num_trofeus)
+-- SELECT player, (SELECT loser_score FROM battle WHERE playersdeck.deck = battle.loser)
+-- FROM playersdeck;
+
+-- Fem aquí el drop table de playersdeck ja que si no no existeix la taula per fer comparació
 DROP TABLE playersdeck;
+DROP TABLE battle;
+
+-- Afegim a batalla de clans
+CREATE TEMPORARY TABLE clan_battle (
+    battle INTEGER,
+    clan VARCHAR (255),
+    start_date DATE,
+    end_date DATE
+);
+
+COPY clan_battle
+FROM 'C:\Users\Public\Datasets\clan_battles.csv'
+DELIMITER ','
+CSV HEADER;
+
+-- Afegim a lluiten
+INSERT INTO lluiten(tag_clan, ID_batalla)
+SELECT clan, battle
+FROM clan_battle;
+
+DROP TABLE clan_battle;
 
 -- Afegim a Missió
 CREATE TEMPORARY TABLE quests_arenas (
-        quest_id INTEGER,
-        arena_id INTEGER,
-        gold INTEGER,
-        experience INTEGER
+    quest_id INTEGER,
+    arena_id INTEGER,
+    gold INTEGER,
+    experience INTEGER
 );
 
 COPY quests_arenas
