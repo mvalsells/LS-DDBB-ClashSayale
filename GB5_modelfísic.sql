@@ -140,10 +140,10 @@ CREATE TABLE Carta (
 	nom VARCHAR (255),
 	dany INTEGER,
 	velocitat_atac INTEGER,
-	ID_carta SERIAL,
+	-- ID_carta INTEGER,
 	raresa VARCHAR(255),
 	arena INTEGER,
-	PRIMARY KEY (ID_carta),
+	PRIMARY KEY (nom),
 	FOREIGN KEY (raresa) REFERENCES Raresa (nom) ON DELETE CASCADE,
 	FOREIGN KEY (arena) REFERENCES Arena(ID_arena) ON DELETE CASCADE
 );
@@ -152,25 +152,25 @@ CREATE TABLE Carta (
 -- Creació de la taula Edifici
 CREATE TABLE Edifici (
 	vida INTEGER,
-	ID_edifici SERIAL,
-	PRIMARY KEY (ID_edifici),
-	FOREIGN KEY (ID_edifici) REFERENCES Edifici (ID_edifici) ON DELETE CASCADE
+	nom VARCHAR(255),
+	PRIMARY KEY (nom),
+	FOREIGN KEY (nom) REFERENCES Carta(nom) ON DELETE CASCADE
 );
 
 -- Creació de la taula Tropa
 CREATE TABLE Tropa (
 	dany_aparicio INTEGER,
-	ID_tropa SERIAL,
-	PRIMARY KEY (ID_tropa),
-	FOREIGN KEY (ID_tropa) REFERENCES Tropa (ID_tropa) ON DELETE CASCADE
+	nom VARCHAR(255),
+	PRIMARY KEY (nom),
+	FOREIGN KEY (nom) REFERENCES Carta(nom) ON DELETE CASCADE
 );
 
 -- Creació de la taula Encanteri
 CREATE TABLE Encanteri (
 	radi INTEGER,
-	ID_encanteri SERIAL,
-	PRIMARY KEY (ID_encanteri),
-	FOREIGN KEY (ID_encanteri) REFERENCES Encanteri (ID_encanteri) ON DELETE CASCADE
+	nom VARCHAR(255),
+	PRIMARY KEY (nom),
+	FOREIGN KEY (nom) REFERENCES Carta(nom) ON DELETE CASCADE
 );
 
 -- Resta de taules (no formen part de la generalització de Carta)
@@ -187,11 +187,11 @@ CREATE TABLE Pertany (
 	data_desbolqueig DATE,
 	ID_pertany SERIAL,
 	tag_jugador VARCHAR (255),
-	ID_Carta INTEGER,
+	nom_carta VARCHAR(255),
 	nivell INTEGER,
 	PRIMARY KEY (ID_pertany),
 	FOREIGN KEY (tag_jugador) REFERENCES Jugador (tag_jugador) ON DELETE CASCADE,
-	FOREIGN KEY (ID_Carta) REFERENCES Carta (ID_carta) ON DELETE CASCADE,
+	FOREIGN KEY (nom_carta) REFERENCES Carta (nom) ON DELETE CASCADE,
 	FOREIGN KEY (nivell) REFERENCES NivellCarta(nivell) ON DELETE CASCADE
 );
 
@@ -199,19 +199,20 @@ CREATE TABLE Pertany (
 CREATE TABLE Pila (
     tag_jugador VARCHAR (255),
     ID_pila INTEGER,
-	nom VARCHAR (255),
+	nom_carta VARCHAR (255),
 	descripcio TEXT,
 	data_creacio DATE,
 	PRIMARY KEY (ID_pila),
-	FOREIGN KEY (tag_jugador) REFERENCES Jugador (tag_jugador) ON DELETE CASCADE
+	FOREIGN KEY (tag_jugador) REFERENCES Jugador (tag_jugador) ON DELETE CASCADE,
+	FOREIGN KEY (nom_carta) REFERENCES Carta(nom) ON DELETE CASCADE
 );
 
 -- Creació de la taula Formen
 CREATE TABLE Formen (
-	ID_carta INTEGER,
+	nom_carta VARCHAR(255),
 	ID_pila INTEGER,
-	PRIMARY KEY (ID_carta, ID_pila),
-	FOREIGN KEY (ID_carta) REFERENCES Carta (ID_carta) ON DELETE CASCADE,
+	PRIMARY KEY (nom_carta, ID_pila),
+	FOREIGN KEY (nom_carta) REFERENCES Carta (nom) ON DELETE CASCADE,
 	FOREIGN KEY (ID_pila) REFERENCES Pila (ID_pila) ON DELETE CASCADE
 );
 
@@ -229,10 +230,10 @@ CREATE TABLE Comparteixen (
 -- Creació de la taula Modifiquen
 CREATE TABLE Modifiquen (
 	nom_millora VARCHAR(255),
-	ID_carta INTEGER,
-	PRIMARY KEY (nom_millora, ID_carta),
+	nom_carta VARCHAR(255),
+	PRIMARY KEY (nom_millora, nom_carta),
 	FOREIGN KEY (nom_millora) REFERENCES Millora (nom_millora) ON DELETE CASCADE,
-	FOREIGN KEY (ID_carta) REFERENCES Carta (ID_carta) ON DELETE CASCADE
+	FOREIGN KEY (nom_carta) REFERENCES Carta (nom) ON DELETE CASCADE
 );
 
 -- ----------------------------------------------------------------
@@ -290,10 +291,10 @@ CREATE TABLE Cofre (
 -- Relació Cofre - Carta
 CREATE TABLE cofre_carta(
     ID_Art_Arena INTEGER,
-    ID_Carta INTEGER,
-    PRIMARY KEY (ID_Art_Arena,ID_Carta),
+    nom_carta VARCHAR(255),
+    PRIMARY KEY (ID_Art_Arena,nom_carta),
     FOREIGN KEY (ID_Art_Arena) REFERENCES Art_Arena(ID_Art_Arena) ON DELETE CASCADE,
-    FOREIGN KEY (ID_Carta) REFERENCES Carta(ID_Carta) ON DELETE CASCADE
+    FOREIGN KEY (nom_carta) REFERENCES Carta(nom) ON DELETE CASCADE
 );
 
 -- Compren (Relació tarja, article, jugador)
