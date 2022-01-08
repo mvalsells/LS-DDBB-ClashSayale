@@ -140,7 +140,6 @@ CREATE TABLE Carta (
 	nom VARCHAR (255),
 	dany INTEGER,
 	velocitat_atac INTEGER,
-	-- ID_carta INTEGER,
 	raresa VARCHAR(255),
 	arena INTEGER,
 	PRIMARY KEY (nom),
@@ -199,6 +198,7 @@ CREATE TABLE Pertany (
 CREATE TABLE Pila (
     tag_jugador VARCHAR (255),
     ID_pila INTEGER,
+    nom VARCHAR(255),
 	nom_carta VARCHAR (255),
 	descripcio TEXT,
 	data_creacio DATE,
