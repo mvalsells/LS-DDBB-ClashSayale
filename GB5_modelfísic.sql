@@ -421,7 +421,7 @@ CREATE TABLE Envia (
 CREATE TABLE Rol (
     ID_rol SERIAL,
     nom VARCHAR(255),
-	descripcio VARCHAR(511),
+	descripcio TEXT,
 	PRIMARY KEY (ID_rol)
 );
 
