@@ -219,14 +219,13 @@ FROM 'C:\Users\Public\Datasets\playersClans.csv'
 DELIMITER ','
 CSV HEADER;
 
-INSERT INTO forma_part(tag_jugador, tag_clan, data)
-SELECT player, clan, date
-FROM temporal4;
-
 INSERT INTO rol(nom, descripcio)
 SELECT DISTINCT split_part(role,':', 1), split_part(role,':', 2)
 FROM temporal4;
 
+INSERT INTO forma_part(tag_jugador, tag_clan, id_rol, data)
+SELECT player, clan, (SELECT rol.id_rol FROM rol, temporal4, forma_part WHERE temporal4.clan = forma_part.tag_clan AND temporal4.player = forma_part.tag_jugador), date
+FROM temporal4;
 DROP TABLE IF EXISTS temporal4;
 
 -- Amics
