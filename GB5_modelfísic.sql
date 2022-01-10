@@ -456,6 +456,8 @@ CREATE TABLE Forma_part (
 CREATE TABLE Lluiten (
 	tag_clan VARCHAR(255),
 	ID_batalla SERIAL,
+	data_inici DATE,
+	data_fi DATE,
 	PRIMARY KEY (tag_clan,ID_batalla),
 	FOREIGN KEY (tag_clan) REFERENCES Clan (tag_clan) ON DELETE CASCADE,
 	FOREIGN KEY (ID_batalla) REFERENCES Batalla (ID_batalla) ON DELETE CASCADE

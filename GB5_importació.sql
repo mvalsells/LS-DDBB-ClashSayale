@@ -7,6 +7,7 @@ DROP TABLE IF EXISTS temporal2 CASCADE;
 DROP TABLE IF EXISTS temporal3 CASCADE;
 DROP TABLE IF EXISTS players CASCADE;
 DROP TABLE  IF EXISTS cards CASCADE;
+DROP TABLE IF EXISTS friend CASCADE;
 DROP TABLE IF EXISTS battle CASCADE;
 DROP TABLE IF EXISTS clan_battle CASCADE;
 DROP TABLE IF EXISTS playersdeck CASCADE;
@@ -198,7 +199,7 @@ INSERT INTO jugador(tag_jugador, nom, experiencia, trofeus, targeta_credit)
 SELECT tag, name, experience, trophies, cardnumber
 FROM players;
 
-DROP TABLE players;
+DROP TABLE IF EXISTS players;
 
 --Donacio
 COPY dona(tag_jugador, tag_clan, quantitat, data)
@@ -219,9 +220,6 @@ FROM 'C:\Users\Public\Datasets\playersClans.csv'
 DELIMITER ','
 CSV HEADER;
 
-
-
-
 INSERT INTO rol(nom, descripcio)
 SELECT DISTINCT split_part(role,':', 1), split_part(role,':', 2)
 FROM temporal4;
@@ -230,15 +228,24 @@ INSERT INTO forma_part(tag_jugador, tag_clan, id_rol, data)
 SELECT player, clan, 1, date
 FROM temporal4;
 
-
 DROP TABLE IF EXISTS temporal4;
 
-
 -- Amics
-COPY amics(tag_jugador1, tag_jugador2)
+CREATE TEMPORARY TABLE friend (
+    C1 VARCHAR (255),
+    C2 VARCHAR (255)
+);
+
+COPY friend(C1, C2)
     FROM 'C:\Users\Public\Datasets\friends.csv'
     DELIMITER ','
     CSV HEADER;
+
+INSERT INTO amics (tag_jugador1, tag_jugador2)
+SELECT C1, C2
+FROM friend;
+
+DROP TABLE friend;
 
 -- Cartes csv
 CREATE TEMPORARY TABLE cards (
@@ -361,9 +368,9 @@ DELIMITER ','
 CSV HEADER;
 
 -- Afegim a lluiten
--- INSERT INTO lluiten(tag_clan, ID_batalla)
--- SELECT clan, battle
--- FROM clan_battle;
+INSERT INTO lluiten(tag_clan, ID_batalla, data_inici, data_fi)
+SELECT clan, battle, start_date, end_date
+FROM clan_battle;
 
 DROP TABLE clan_battle;
 
