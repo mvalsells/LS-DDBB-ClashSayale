@@ -263,19 +263,22 @@ SELECT DISTINCT rarity
 FROM cards;
 
 --Afegim a Edifici
-INSERT INTO edifici(vida)
-SELECT lifetime
-FROM cards;
+INSERT INTO edifici(nom,vida)
+SELECT name,lifetime
+FROM cards
+WHERE lifetime IS NOT NULL;
 
 --Afegim a tropa
-INSERT INTO tropa(dany_aparicio)
-SELECT spawn_damage
-FROM cards;
+INSERT INTO tropa(nom,dany_aparicio)
+SELECT name,spawn_damage
+FROM cards
+WHERE spawn_damage IS NOT NULL;
 
 --Afegim a Encanteri
-INSERT INTO encanteri(radi)
-SELECT radious
-FROM cards;
+INSERT INTO encanteri(nom,radi)
+SELECT name,radious
+FROM cards
+WHERE radious IS NOT NULL;
 
 -- Afegim a Arena
 -- INSERT INTO arena(id_arena)
@@ -353,9 +356,9 @@ DELIMITER ','
 CSV HEADER;
 
 -- Afegim a lluiten
-INSERT INTO lluiten(tag_clan, ID_batalla)
-SELECT clan, battle
-FROM clan_battle;
+-- INSERT INTO lluiten(tag_clan, ID_batalla)
+-- SELECT clan, battle
+-- FROM clan_battle;
 
 DROP TABLE clan_battle;
 
@@ -575,9 +578,10 @@ INSERT INTO nivellcarta(nivell)
 SELECT DISTINCT level
 FROM playerCardsTmp;
 
-INSERT INTO pertany(id_carta,tag_jugador,quantitat,data_desbolqueig, nivell)
-SELECT (SELECT id_carta FROM carta WHERE nom LIKE pct.name),player,amount,date,level
-FROM playerCardsTmp AS pct ;
+INSERT INTO pertany(nom_carta,tag_jugador,quantitat,data_desbolqueig, nivell)
+SELECT pct.name,pct.player,pct.amount,pct.date,pct.level
+FROM playerCardsTmp AS pct, carta AS c
+WHERE pct.name = c.nom;
 
 -- Decks compartits (shared_decks.csv)
 COPY comparteixen(id_pila, tag_jugador)
