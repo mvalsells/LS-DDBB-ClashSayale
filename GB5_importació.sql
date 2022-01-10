@@ -549,7 +549,13 @@ FROM msgPlayersTmp;
 INSERT INTO missatge(id_missatge, cos, data_, id_resposta)
 SELECT id, text, date, answer
 FROM msgPlayersTmp
-WHERE id IS NOT NULL AND text IS NOT NULL AND date IS NOT NULL AND answer IS NOT NULL;
+WHERE id IS NOT NULL AND text IS NOT NULL AND date IS NOT NULL;
+
+INSERT INTO conversen(tag_envia, tag_rep, id_missatge)
+SELECT sender, reciver, id
+FROM msgPlayersTmp
+WHERE id IS NOT NULL AND msgPlayersTmp.sender IS NOT NULL AND msgPlayersTmp.reciver IS NOT NULL;
+
 
 -- msg_to_clans.csv
 CREATE TEMPORARY TABLE msgClansTmp(
@@ -568,6 +574,10 @@ CSV HEADER;
 
 INSERT INTO missatge(id_missatge, cos, data_, id_resposta)
 SELECT (id + (SELECT total FROM msgPlayersTmp WHERE id = -2147483648)), text, date, (answer + (SELECT total FROM msgPlayersTmp WHERE id = -2147483648))
+FROM msgClansTmp;
+
+INSERT INTO Envia(ID_MISSATGE, TAG_CLAN, TAG_JUGADOR)
+SELECT id, clan, player
 FROM msgClansTmp;
 
 -- ------------------------------------------
