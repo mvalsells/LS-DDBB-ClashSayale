@@ -219,14 +219,13 @@ FROM 'C:\Users\Public\Datasets\playersClans.csv'
 DELIMITER ','
 CSV HEADER;
 
-INSERT INTO forma_part(tag_jugador, tag_clan, data)
-SELECT player, clan, date
+INSERT INTO rol(nom, descripcio)
+SELECT DISTINCT split_part(role,':', 1), split_part(role,':', 2)
 FROM temporal4;
 
-INSERT INTO rol(descripcio)
-SELECT role
+INSERT INTO forma_part(tag_jugador, tag_clan, id_rol, data)
+SELECT player, clan, (SELECT rol.id_rol FROM rol, temporal4, forma_part WHERE temporal4.clan = forma_part.tag_clan AND temporal4.player = forma_part.tag_jugador), date
 FROM temporal4;
-
 DROP TABLE IF EXISTS temporal4;
 
 -- Amics
@@ -329,14 +328,14 @@ SELECT date, duration
 FROM battle;
 
 -- Afegim a guanyador
--- INSERT INTO guanya(tag_jugador, num_trofeus)
--- SELECT player, (SELECT winner_score FROM battle WHERE playersdeck.deck = battle.winner)
--- FROM playersdeck;
+INSERT INTO guanya(tag_jugador, num_trofeus)
+SELECT (SELECT tag_jugador FROM pila WHERE id_pila = battle.winner), battle.winner_score
+FROM battle;
 
 -- Afegim a perdedor
--- INSERT INTO perd(tag_jugador, num_trofeus)
--- SELECT player, (SELECT loser_score FROM battle WHERE playersdeck.deck = battle.loser)
--- FROM playersdeck;
+INSERT INTO perd(tag_jugador, num_trofeus)
+SELECT (SELECT tag_jugador FROM pila WHERE id_pila = battle.loser), battle.loser_score
+FROM battle;
 
 -- Fem aquí el drop table de playersdeck ja que si no no existeix la taula per fer comparació
 DROP TABLE playersdeck;
