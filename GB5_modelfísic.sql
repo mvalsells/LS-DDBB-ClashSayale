@@ -381,7 +381,10 @@ CREATE TABLE Clan (
 	nombre_trofeus INTEGER,
 	trofeus_minims INTEGER,
 	puntuacio INTEGER,
-	PRIMARY KEY (tag_clan)
+	creador_clan VARCHAR(255),
+	PRIMARY KEY (tag_clan),
+    FOREIGN KEY (creador_clan) REFERENCES Jugador (tag_jugador) ON DELETE CASCADE
+
 );
 
 -- Creació de la taula tenen_tecnologia
@@ -444,7 +447,6 @@ CREATE TABLE Forma_part (
 	tag_clan VARCHAR(255),
 	tag_jugador VARCHAR (255),
 	ID_rol INTEGER,
-	creador_del_clan VARCHAR (255),
 	data DATE,
 	PRIMARY KEY (ID_Forma_part),
 	FOREIGN KEY (tag_clan) REFERENCES Clan (tag_clan) ON DELETE CASCADE,
