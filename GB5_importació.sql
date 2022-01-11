@@ -2,14 +2,15 @@
 -- Importació
 
 -- Eliminar taules temporals si existeixen
-DROP TABLE IF EXISTS temporal1 CASCADE;
-DROP TABLE IF EXISTS temporal2 CASCADE;
-DROP TABLE IF EXISTS temporal3 CASCADE;
+DROP TABLE IF EXISTS technologies CASCADE;
+DROP TABLE IF EXISTS buildings CASCADE;
+DROP TABLE IF EXISTS clans_tech_strucutres CASCADE;
+DROP TABLE IF EXISTS jugadors_clans CASCADE;
 DROP TABLE IF EXISTS players CASCADE;
 DROP TABLE  IF EXISTS cards CASCADE;
 DROP TABLE IF EXISTS friend CASCADE;
 DROP TABLE IF EXISTS battle CASCADE;
-DROP TABLE IF EXISTS clan_battle CASCADE;
+DROP TABLE IF EXISTS clans_battle CASCADE;
 DROP TABLE IF EXISTS playersdeck CASCADE;
 DROP TABLE IF EXISTS quests_arenas CASCADE;
 DROP TABLE IF EXISTS player_purchases CASCADE;
@@ -18,7 +19,6 @@ DROP TABLE IF EXISTS msgPlayersTmp CASCADE;
 DROP TABLE IF EXISTS msgClansTmp CASCADE;
 DROP TABLE IF EXISTS playerCardsTmp CASCADE;
 DROP TABLE IF EXISTS playerClans CASCADE;
-DROP TABLE IF EXISTS temporal4;
 DROP TABLE IF EXISTS msgPlayersTmp CASCADE;
 DROP TABLE IF EXISTS msgClansTmp CASCADE;
 DROP TABLE IF EXISTS playerCardsTmp CASCADE;
@@ -36,7 +36,6 @@ DELETE FROM requereix_estructura WHERE 1 = 1;
 DELETE FROM clan WHERE 1 = 1;
 DELETE FROM temporada WHERE 1 = 1;
 DELETE FROM amics WHERE 1 = 1;
-DELETE FROM carta WHERE 1 = 1;
 DELETE FROM carta WHERE 1 = 1;
 DELETE FROM raresa WHERE 1 = 1;
 DELETE FROM edifici WHERE 1 = 1;
@@ -59,7 +58,6 @@ DELETE FROM article WHERE 1 = 1;
 DELETE FROM cofre WHERE 1 = 1;
 DELETE FROM emoticones WHERE 1 = 1;
 DELETE FROM bundle WHERE 1 = 1;
-DELETE FROM missio WHERE 1 = 1;
 DELETE FROM depen WHERE 1 = 1;
 DELETE FROM assoliment WHERE 1 = 1;
 DELETE FROM insignia WHERE 1 = 1;
@@ -72,7 +70,7 @@ DELIMITER ','
 CSV HEADER;
 
 -- Millora (technologies.csv buildings.csv)
-CREATE TEMPORARY TABLE temporal1 (
+CREATE TEMPORARY TABLE technologies (
     technology VARCHAR(255),
     cost INTEGER,
     max_level INTEGER,
@@ -86,27 +84,27 @@ CREATE TEMPORARY TABLE temporal1 (
     description VARCHAR(255)
 );
 
-COPY temporal1
+COPY technologies
 FROM 'C:\Users\Public\Datasets\technologies.csv'
 DELIMITER ','
 CSV HEADER;
 
 INSERT INTO millora(nom_millora, descripcio, cost, mod_damage, mod_hit_speed, mod_radius, mod_spawn_damage, mod_lifetime)
 SELECT technology, description, cost, mod_damage, mod_hit_speed, mod_radius, mod_spawn_damage, mod_lifetime
-FROM temporal1;
+FROM technologies;
 
 INSERT INTO tecnologia(id_tecnologia, nivell_maxim)
 SELECT technology,max_level
-FROM temporal1;
+FROM technologies;
 
 INSERT INTO requereix_tecnologia(id_tecnologia_nova, id_tecnologia_requerida, nivell_prerequisit)
 SELECT technology,prerequisite, prereq_level
-FROM temporal1;
+FROM technologies;
 
-DROP TABLE temporal1;
+DROP TABLE technologies;
 
 
-CREATE TEMPORARY TABLE temporal2 (
+CREATE TEMPORARY TABLE buildings (
     building VARCHAR(255),
     cost INTEGER,
     trophies INTEGER,
@@ -119,25 +117,25 @@ CREATE TEMPORARY TABLE temporal2 (
     description VARCHAR(255)
 );
 
-COPY temporal2
+COPY buildings
 FROM 'C:\Users\Public\Datasets\buildings.csv'
 DELIMITER ','
 CSV HEADER;
 
 INSERT INTO millora(nom_millora, descripcio, cost, mod_damage, mod_hit_speed, mod_radius, mod_spawn_damage, mod_lifetime)
 SELECT building, description, cost, mod_damage, mod_hit_speed, mod_radius, mod_spawn_damage, mod_lifetime
-FROM temporal2;
+FROM buildings;
 
 INSERT INTO estructura(id_estructura, minim_trofeus)
 SELECT building, trophies
-FROM temporal2;
+FROM buildings;
 
 INSERT INTO requereix_estructura(id_estructura_nova, id_estructura_requerida)
 SELECT building, prerequisite
-FROM temporal2;
+FROM buildings;
 
 
-DROP TABLE temporal2;
+DROP TABLE buildings;
 
 -- Temporades
 COPY temporada(id_temporada,data_inici,data_fi)
@@ -151,7 +149,7 @@ COPY clan(tag_clan,nom,descripcio,trofeus_minims,nombre_trofeus,puntuacio)
     DELIMITER ','
     CSV HEADER;
 
-CREATE TEMPORARY TABLE temporal3 (
+CREATE TEMPORARY TABLE clans_tech_strucutres (
     clan VARCHAR(255),
     tech VARCHAR(255),
     structure VARCHAR(255),
@@ -159,22 +157,22 @@ CREATE TEMPORARY TABLE temporal3 (
     level INTEGER
 );
 
-COPY temporal3
+COPY clans_tech_strucutres
 FROM 'C:\Users\Public\Datasets\clan_tech_structures.csv'
 DELIMITER ','
 CSV HEADER;
 
 INSERT INTO tenen_tecnologia(tag_clan, id_tecnologia, data, nivell)
 SELECT clan, tech, date, level
-FROM temporal3
+FROM clans_tech_strucutres
 WHERE tech IS NOT NULL;
 
 INSERT INTO tenen_estructura(tag_clan, id_estructura, data, nivell)
 SELECT clan, structure, date, level
-FROM temporal3
+FROM clans_tech_strucutres
 WHERE structure IS NOT NULL;
 
-DROP TABLE temporal3;
+DROP TABLE clans_tech_strucutres;
 
 -- Jugadors
 CREATE TEMPORARY TABLE players (
@@ -208,27 +206,30 @@ DELIMITER ','
 CSV HEADER;
 
 --Forma part
-CREATE TEMPORARY TABLE temporal4 (
+
+CREATE TEMPORARY TABLE jugadors_clans (
     player VARCHAR(255),
     clan VARCHAR(255),
     role TEXT,
     date DATE
 );
 
-COPY temporal4(player, clan, role, date)
+COPY jugadors_clans(player, clan, role, date)
 FROM 'C:\Users\Public\Datasets\playersClans.csv'
 DELIMITER ','
 CSV HEADER;
 
 INSERT INTO rol(nom, descripcio)
-SELECT DISTINCT split_part(role,':', 1), split_part(role,':', 2)
-FROM temporal4;
+SELECT DISTINCT split_part(role,': ', 1), split_part(role,': ', 2)
+FROM jugadors_clans;
 
 INSERT INTO forma_part(tag_jugador, tag_clan, id_rol, data)
-SELECT player, clan, 1, date
-FROM temporal4;
+SELECT player, clan, rol.id_rol, date
+FROM rol JOIN jugadors_clans ON jugadors_clans.role = concat(rol.nom, ': ', rol.descripcio);
 
-DROP TABLE IF EXISTS temporal4;
+
+
+DROP TABLE IF EXISTS jugadors_clans;
 
 -- Amics
 CREATE TEMPORARY TABLE friend (
@@ -292,11 +293,6 @@ SELECT name,radious
 FROM cards
 WHERE radious IS NOT NULL;
 
--- Afegim a Arena
--- INSERT INTO arena(id_arena)
--- SELECT DISTINCT arena
--- FROM cards;
-
 DROP TABLE cards;
 
 -- Afegim a pila
@@ -352,27 +348,54 @@ FROM battle;
 
 -- Fem aquí el drop table de playersdeck ja que si no no existeix la taula per fer comparació
 DROP TABLE playersdeck;
-DROP TABLE battle;
 
 -- Afegim a batalla de clans
-CREATE TEMPORARY TABLE clan_battle (
+CREATE TEMPORARY TABLE clans_battle (
     battle INTEGER,
     clan VARCHAR (255),
     start_date DATE,
     end_date DATE
 );
 
-COPY clan_battle
+COPY clans_battle
 FROM 'C:\Users\Public\Datasets\clan_battles.csv'
 DELIMITER ','
 CSV HEADER;
 
 -- Afegim a lluiten
 INSERT INTO lluiten(tag_clan, ID_batalla, data_inici, data_fi)
-SELECT clan, battle, start_date, end_date
-FROM clan_battle;
+SELECT clan, (SELECT DISTINCT clan_battle FROM battle WHERE clans_battle.battle = battle.clan_battle), start_date, end_date
+FROM clans_battle;
 
-DROP TABLE clan_battle;
+DROP TABLE clans_battle;
+DROP TABLE battle;
+
+--Player_quest csv
+CREATE TEMPORARY TABLE players_quests(
+  player_tag VARCHAR(255),
+  quest_id INTEGER,
+  quest_title VARCHAR(255),
+  quest_description VARCHAR(255),
+  quest_requirement VARCHAR(255),
+  quest_depends INTEGER,
+  unlock DATE
+);
+
+COPY players_quests
+FROM 'C:\Users\Public\Datasets\players_quests.csv'
+DELIMITER ','
+CSV HEADER;
+
+--Afegim a missions
+INSERT INTO missio(id_missio,titol, descripcio, requeriment)
+SELECT DISTINCT quest_id,quest_title,quest_description,quest_requirement
+FROM players_quests;
+
+--Afegim depen
+INSERT INTO depen(id_missio1, id_missio2)
+SELECT DISTINCT quest_id,quest_depends
+FROM players_quests
+WHERE quest_id IS NOT NULL AND quest_depends IS NOT NULL;
 
 -- Afegim a Missió
 CREATE TEMPORARY TABLE quests_arenas (
@@ -387,13 +410,10 @@ FROM 'C:\Users\Public\Datasets\quests_arenas.csv'
 DELIMITER ','
 CSV HEADER;
 
-INSERT INTO missio (id_missio)
-SELECT DISTINCT quest_id
-FROM quests_arenas;
-
-INSERT INTO completen (id_missio, id_arena, or_, experiencia)
-SELECT quest_id, arena_id, gold, experience
-FROM quests_arenas;
+--INSERT INTO completen(id_missio, id_arena, tag_jugador,or_, experiencia,desbloqueja)
+--SELECT qa.quest_id, qa.arena_id,pq.player_tag,qa.gold, qa.experience,pq.unlock
+--FROM quests_arenas AS qa, players_quests AS pq
+--WHERE qa.quest_id = pq.quest_id;
 
 DROP TABLE quests_arenas;
 
@@ -423,17 +443,9 @@ FROM 'C:\Users\Public\Datasets\player_purchases.csv'
 DELIMITER ','
 CSV HEADER;
 
---Player no cal ja s'ha afegit
---Credit card ja afegida no cal
---Id_compren es duplica al csv, es duplica pel nom
---INSERT INTO compren(id_compren,quantitat,data_,descompte)
---SELECT DISTINCT buy_id,buy_stock,date,discount
---FROM player_purchases;
-
-
 --Afegim a articles
-INSERT INTO article(nom,preu)
-SELECT buy_name, buy_cost
+INSERT INTO article(id_article,nom,preu,quantitat)
+SELECT DISTINCT buy_id,buy_name, buy_cost, buy_stock
 FROM player_purchases;
 
 --Afegim a arena paquet
@@ -444,46 +456,24 @@ WHERE arenapack_id IS NOT NULL;
 
 --Afegim a cofre
 INSERT INTO cofre(nom_cofre, temps, raresa, quantitat_cartes)
-SELECT chest_name, chest_unlock_time, chest_rarity, chest_num_cards
+SELECT DISTINCT chest_name, chest_unlock_time, chest_rarity, chest_num_cards
 FROM player_purchases;
 
 --Afegim a bundle
 INSERT INTO bundle(or_, gemmes)
-SELECT bundle_gold, bundle_gems
+SELECT DISTINCT bundle_gold, bundle_gems
 FROM player_purchases;
 
 --Afegim a emoticones
 INSERT INTO emoticones(nom_imatge, direccio_imatge)
-SELECT emote_name,emote_path
+SELECT DISTINCT emote_name,emote_path
 FROM player_purchases;
 
---Player_quest csv
-CREATE TEMPORARY TABLE players_quests(
-  player_tag VARCHAR(255),
-  quest_id INTEGER,
-  quest_title VARCHAR(255),
-  quest_description VARCHAR(255),
-  quest_requirement VARCHAR(255),
-  quest_depends INTEGER,
-  unlock DATE
-);
+--Id_compren es duplica
+INSERT INTO compren(tag_jugador, num_targeta,data_,descompte)
+SELECT DISTINCT player,credit_card,date,discount
+FROM player_purchases;
 
-COPY players_quests
-FROM 'C:\Users\Public\Datasets\players_quests.csv'
-DELIMITER ','
-CSV HEADER;
-
---Afegim a missions
---id repetida
---INSERT INTO missio(id_missio, titol, descripcio, requeriment, desbloqueja)
---SELECT DISTINCT quest_id,quest_title,quest_description,quest_requirement,unlock
---FROM players_quests;
-
---Afegim depen
-INSERT INTO depen(id_missio1, id_missio2)
-SELECT DISTINCT quest_id,quest_depends
-FROM players_quests
-WHERE quest_id IS NOT NULL AND quest_depends IS NOT NULL;
 
 -- Playersachievement
 CREATE TEMPORARY TABLE playersachievements(
