@@ -208,6 +208,7 @@ DELIMITER ','
 CSV HEADER;
 
 --Forma part
+
 CREATE TEMPORARY TABLE temporal4 (
     player VARCHAR(255),
     clan VARCHAR(255),
@@ -221,12 +222,15 @@ DELIMITER ','
 CSV HEADER;
 
 INSERT INTO rol(nom, descripcio)
-SELECT DISTINCT split_part(role,':', 1), split_part(role,':', 2)
+SELECT DISTINCT split_part(role,': ', 1), split_part(role,': ', 2)
 FROM temporal4;
 
 INSERT INTO forma_part(tag_jugador, tag_clan, id_rol, data)
-SELECT player, clan, 1, date
-FROM temporal4;
+SELECT player, clan, rol.id_rol, date
+FROM rol JOIN temporal4 ON temporal4.role = concat(rol.nom, ': ', rol.descripcio);
+
+
+
 
 DROP TABLE IF EXISTS temporal4;
 
