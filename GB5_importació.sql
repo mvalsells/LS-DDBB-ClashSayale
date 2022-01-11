@@ -9,7 +9,7 @@ DROP TABLE IF EXISTS players CASCADE;
 DROP TABLE  IF EXISTS cards CASCADE;
 DROP TABLE IF EXISTS friend CASCADE;
 DROP TABLE IF EXISTS battle CASCADE;
-DROP TABLE IF EXISTS clan_battle CASCADE;
+DROP TABLE IF EXISTS clans_battle CASCADE;
 DROP TABLE IF EXISTS playersdeck CASCADE;
 DROP TABLE IF EXISTS quests_arenas CASCADE;
 DROP TABLE IF EXISTS player_purchases CASCADE;
@@ -356,27 +356,27 @@ FROM battle;
 
 -- Fem aquí el drop table de playersdeck ja que si no no existeix la taula per fer comparació
 DROP TABLE playersdeck;
-DROP TABLE battle;
 
 -- Afegim a batalla de clans
-CREATE TEMPORARY TABLE clan_battle (
+CREATE TEMPORARY TABLE clans_battle (
     battle INTEGER,
     clan VARCHAR (255),
     start_date DATE,
     end_date DATE
 );
 
-COPY clan_battle
+COPY clans_battle
 FROM 'C:\Users\Public\Datasets\clan_battles.csv'
 DELIMITER ','
 CSV HEADER;
 
 -- Afegim a lluiten
 INSERT INTO lluiten(tag_clan, ID_batalla, data_inici, data_fi)
-SELECT clan, battle, start_date, end_date
-FROM clan_battle;
+SELECT clan, (SELECT DISTINCT clan_battle FROM battle WHERE clans_battle.battle = battle.clan_battle), start_date, end_date
+FROM clans_battle;
 
-DROP TABLE clan_battle;
+DROP TABLE clans_battle;
+DROP TABLE battle;
 
 -- Afegim a Missió
 CREATE TEMPORARY TABLE quests_arenas (
