@@ -533,18 +533,13 @@ CREATE TEMPORARY TABLE msgPlayersTmp(
     reciver VARCHAR(255),
     text TEXT,
     date DATE,
-    answer INTEGER,
-    total INTEGER
+    answer INTEGER
 );
 
 COPY msgPlayersTmp(id, sender, reciver, text, date, answer)
 FROM 'C:\Users\Public\Datasets\messages_between_players.csv'
 DELIMITER ','
 CSV HEADER;
-
-INSERT INTO msgPlayersTmp(id,total)
-SELECT '-2147483648',COUNT(id)
-FROM msgPlayersTmp;
 
 INSERT INTO missatge(id_missatge, cos, data_, id_resposta)
 SELECT id, text, date, answer
@@ -554,7 +549,7 @@ WHERE id IS NOT NULL AND text IS NOT NULL AND date IS NOT NULL;
 INSERT INTO conversen(tag_envia, tag_rep, id_missatge)
 SELECT sender, reciver, id
 FROM msgPlayersTmp
-WHERE id IS NOT NULL AND msgPlayersTmp.sender IS NOT NULL AND msgPlayersTmp.reciver IS NOT NULL;
+WHERE id IS NOT NULL AND sender IS NOT NULL AND reciver IS NOT NULL;
 
 
 -- msg_to_clans.csv
@@ -572,13 +567,19 @@ FROM 'C:\Users\Public\Datasets\messages_to_clans.csv'
 DELIMITER ','
 CSV HEADER;
 
+INSERT INTO msgPlayersTmp(id,answer)
+SELECT '-2147483648',COUNT(id_missatge)
+FROM missatge;
+
 INSERT INTO missatge(id_missatge, cos, data_, id_resposta)
-SELECT (id + (SELECT total FROM msgPlayersTmp WHERE id = -2147483648)), text, date, (answer + (SELECT total FROM msgPlayersTmp WHERE id = -2147483648))
-FROM msgClansTmp;
+SELECT (mct.id + mpt.answer), mct.text, mct.date, (mct.answer + mpt.answer)
+FROM msgClansTmp AS mct
+JOIN msgPlayersTmp AS mpt ON mpt.id = -2147483648;
 
 INSERT INTO Envia(ID_MISSATGE, TAG_CLAN, TAG_JUGADOR)
-SELECT id, clan, player
-FROM msgClansTmp;
+SELECT (mct.id + mpt.answer), clan, player
+FROM msgClansTmp AS mct
+JOIN msgPlayersTmp AS mpt ON mpt.id = -2147483648;
 
 -- ------------------------------------------
 -- -------------- Cartes --------------
@@ -602,8 +603,8 @@ FROM playerCardsTmp;
 
 INSERT INTO pertany(nom_carta,tag_jugador,quantitat,data_desbolqueig, nivell)
 SELECT pct.name,pct.player,pct.amount,pct.date,pct.level
-FROM playerCardsTmp AS pct, carta AS c
-WHERE pct.name = c.nom;
+FROM playerCardsTmp AS pct
+JOIN carta AS c ON pct.name = c.nom;
 
 -- Decks compartits (shared_decks.csv)
 COPY comparteixen(id_pila, tag_jugador)

@@ -7,7 +7,7 @@ clans.csv
 friends.csv
 players.csv
 seasons.csv
-shared_decks - Marc V (Falta descomentar quan vagi bé insert decks)
+shared_decks - Marc V
 msg_betwen_players - Marc V
 msg_to_clans - Marc V
 
@@ -29,4 +29,3 @@ playersdeck - Albert
 quests_arena - Albert
 
 techonologies (a mitges) - Marc G
-
