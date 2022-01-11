@@ -2,9 +2,10 @@
 -- Importació
 
 -- Eliminar taules temporals si existeixen
-DROP TABLE IF EXISTS temporal1 CASCADE;
-DROP TABLE IF EXISTS temporal2 CASCADE;
-DROP TABLE IF EXISTS temporal3 CASCADE;
+DROP TABLE IF EXISTS technologies CASCADE;
+DROP TABLE IF EXISTS buildings CASCADE;
+DROP TABLE IF EXISTS clans_tech_strucutres CASCADE;
+DROP TABLE IF EXISTS jugadors_clans CASCADE;
 DROP TABLE IF EXISTS players CASCADE;
 DROP TABLE  IF EXISTS cards CASCADE;
 DROP TABLE IF EXISTS friend CASCADE;
@@ -18,7 +19,6 @@ DROP TABLE IF EXISTS msgPlayersTmp CASCADE;
 DROP TABLE IF EXISTS msgClansTmp CASCADE;
 DROP TABLE IF EXISTS playerCardsTmp CASCADE;
 DROP TABLE IF EXISTS playerClans CASCADE;
-DROP TABLE IF EXISTS temporal4;
 DROP TABLE IF EXISTS msgPlayersTmp CASCADE;
 DROP TABLE IF EXISTS msgClansTmp CASCADE;
 DROP TABLE IF EXISTS playerCardsTmp CASCADE;
@@ -72,7 +72,7 @@ DELIMITER ','
 CSV HEADER;
 
 -- Millora (technologies.csv buildings.csv)
-CREATE TEMPORARY TABLE temporal1 (
+CREATE TEMPORARY TABLE technologies (
     technology VARCHAR(255),
     cost INTEGER,
     max_level INTEGER,
@@ -86,27 +86,27 @@ CREATE TEMPORARY TABLE temporal1 (
     description VARCHAR(255)
 );
 
-COPY temporal1
+COPY technologies
 FROM 'C:\Users\Public\Datasets\technologies.csv'
 DELIMITER ','
 CSV HEADER;
 
 INSERT INTO millora(nom_millora, descripcio, cost, mod_damage, mod_hit_speed, mod_radius, mod_spawn_damage, mod_lifetime)
 SELECT technology, description, cost, mod_damage, mod_hit_speed, mod_radius, mod_spawn_damage, mod_lifetime
-FROM temporal1;
+FROM technologies;
 
 INSERT INTO tecnologia(id_tecnologia, nivell_maxim)
 SELECT technology,max_level
-FROM temporal1;
+FROM technologies;
 
 INSERT INTO requereix_tecnologia(id_tecnologia_nova, id_tecnologia_requerida, nivell_prerequisit)
 SELECT technology,prerequisite, prereq_level
-FROM temporal1;
+FROM technologies;
 
-DROP TABLE temporal1;
+DROP TABLE technologies;
 
 
-CREATE TEMPORARY TABLE temporal2 (
+CREATE TEMPORARY TABLE buildings (
     building VARCHAR(255),
     cost INTEGER,
     trophies INTEGER,
@@ -119,25 +119,25 @@ CREATE TEMPORARY TABLE temporal2 (
     description VARCHAR(255)
 );
 
-COPY temporal2
+COPY buildings
 FROM 'C:\Users\Public\Datasets\buildings.csv'
 DELIMITER ','
 CSV HEADER;
 
 INSERT INTO millora(nom_millora, descripcio, cost, mod_damage, mod_hit_speed, mod_radius, mod_spawn_damage, mod_lifetime)
 SELECT building, description, cost, mod_damage, mod_hit_speed, mod_radius, mod_spawn_damage, mod_lifetime
-FROM temporal2;
+FROM buildings;
 
 INSERT INTO estructura(id_estructura, minim_trofeus)
 SELECT building, trophies
-FROM temporal2;
+FROM buildings;
 
 INSERT INTO requereix_estructura(id_estructura_nova, id_estructura_requerida)
 SELECT building, prerequisite
-FROM temporal2;
+FROM buildings;
 
 
-DROP TABLE temporal2;
+DROP TABLE buildings;
 
 -- Temporades
 COPY temporada(id_temporada,data_inici,data_fi)
@@ -151,7 +151,7 @@ COPY clan(tag_clan,nom,descripcio,trofeus_minims,nombre_trofeus,puntuacio)
     DELIMITER ','
     CSV HEADER;
 
-CREATE TEMPORARY TABLE temporal3 (
+CREATE TEMPORARY TABLE clans_tech_strucutres (
     clan VARCHAR(255),
     tech VARCHAR(255),
     structure VARCHAR(255),
@@ -159,22 +159,22 @@ CREATE TEMPORARY TABLE temporal3 (
     level INTEGER
 );
 
-COPY temporal3
+COPY clans_tech_strucutres
 FROM 'C:\Users\Public\Datasets\clan_tech_structures.csv'
 DELIMITER ','
 CSV HEADER;
 
 INSERT INTO tenen_tecnologia(tag_clan, id_tecnologia, data, nivell)
 SELECT clan, tech, date, level
-FROM temporal3
+FROM clans_tech_strucutres
 WHERE tech IS NOT NULL;
 
 INSERT INTO tenen_estructura(tag_clan, id_estructura, data, nivell)
 SELECT clan, structure, date, level
-FROM temporal3
+FROM clans_tech_strucutres
 WHERE structure IS NOT NULL;
 
-DROP TABLE temporal3;
+DROP TABLE clans_tech_strucutres;
 
 -- Jugadors
 CREATE TEMPORARY TABLE players (
@@ -209,30 +209,29 @@ CSV HEADER;
 
 --Forma part
 
-CREATE TEMPORARY TABLE temporal4 (
+CREATE TEMPORARY TABLE jugadors_clans (
     player VARCHAR(255),
     clan VARCHAR(255),
     role TEXT,
     date DATE
 );
 
-COPY temporal4(player, clan, role, date)
+COPY jugadors_clans(player, clan, role, date)
 FROM 'C:\Users\Public\Datasets\playersClans.csv'
 DELIMITER ','
 CSV HEADER;
 
 INSERT INTO rol(nom, descripcio)
 SELECT DISTINCT split_part(role,': ', 1), split_part(role,': ', 2)
-FROM temporal4;
+FROM jugadors_clans;
 
 INSERT INTO forma_part(tag_jugador, tag_clan, id_rol, data)
 SELECT player, clan, rol.id_rol, date
-FROM rol JOIN temporal4 ON temporal4.role = concat(rol.nom, ': ', rol.descripcio);
+FROM rol JOIN jugadors_clans ON jugadors_clans.role = concat(rol.nom, ': ', rol.descripcio);
 
 
 
-
-DROP TABLE IF EXISTS temporal4;
+DROP TABLE IF EXISTS jugadors_clans;
 
 -- Amics
 CREATE TEMPORARY TABLE friend (
