@@ -242,9 +242,10 @@ CREATE TABLE Modifiquen (
 
 -- Generalització article
 CREATE TABLE Article (
-	ID_article SERIAL,
+	ID_article INTEGER,
 	Nom VARCHAR(255),
 	Preu FLOAT,
+	Quantitat INTEGER,
 	PRIMARY KEY (ID_article)
 );
 
@@ -299,12 +300,11 @@ CREATE TABLE cofre_carta(
 
 -- Compren (Relació tarja, article, jugador)
 CREATE TABLE Compren (
-    ID_Compren INTEGER,
+    ID_Compren SERIAL,
     tag_jugador VARCHAR (255),
     num_targeta VARCHAR(255),
     ID_Article INTEGER,
     Data_ DATE,
-    Quantitat INTEGER,
     Descompte FLOAT,
     PRIMARY KEY (ID_Compren),
     FOREIGN KEY (tag_jugador) REFERENCES Jugador(tag_jugador) ON DELETE CASCADE,
@@ -475,7 +475,6 @@ CREATE TABLE Missio (
 	titol VARCHAR(255),
     descripcio VARCHAR(255),
     requeriment VARCHAR(255),
-    desbloqueja DATE,
 	PRIMARY KEY (ID_missio)
 );
 
@@ -483,11 +482,14 @@ CREATE TABLE Missio (
 CREATE TABLE Completen (
 	ID_missio INTEGER,
 	ID_arena INTEGER,
+	tag_jugador VARCHAR(255),
 	or_ INTEGER,
 	experiencia INTEGER,
-	PRIMARY KEY (ID_missio, ID_arena),
+	desbloqueja DATE,
+	PRIMARY KEY (ID_missio, ID_arena,tag_jugador),
 	FOREIGN KEY (ID_missio) REFERENCES Missio (ID_missio) ON DELETE CASCADE,
-	FOREIGN KEY (ID_arena) REFERENCES Arena (ID_arena) ON DELETE CASCADE
+	FOREIGN KEY (ID_arena) REFERENCES Arena (ID_arena) ON DELETE CASCADE,
+	FOREIGN KEY (tag_jugador) REFERENCES Jugador (tag_jugador) ON DELETE CASCADE
 );
 
 -- Creació de la taula Depen

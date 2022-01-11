@@ -37,7 +37,6 @@ DELETE FROM clan WHERE 1 = 1;
 DELETE FROM temporada WHERE 1 = 1;
 DELETE FROM amics WHERE 1 = 1;
 DELETE FROM carta WHERE 1 = 1;
-DELETE FROM carta WHERE 1 = 1;
 DELETE FROM raresa WHERE 1 = 1;
 DELETE FROM edifici WHERE 1 = 1;
 DELETE FROM tropa WHERE 1 = 1;
@@ -59,7 +58,6 @@ DELETE FROM article WHERE 1 = 1;
 DELETE FROM cofre WHERE 1 = 1;
 DELETE FROM emoticones WHERE 1 = 1;
 DELETE FROM bundle WHERE 1 = 1;
-DELETE FROM missio WHERE 1 = 1;
 DELETE FROM depen WHERE 1 = 1;
 DELETE FROM assoliment WHERE 1 = 1;
 DELETE FROM insignia WHERE 1 = 1;
@@ -295,11 +293,6 @@ SELECT name,radious
 FROM cards
 WHERE radious IS NOT NULL;
 
--- Afegim a Arena
--- INSERT INTO arena(id_arena)
--- SELECT DISTINCT arena
--- FROM cards;
-
 DROP TABLE cards;
 
 -- Afegim a pila
@@ -377,6 +370,33 @@ FROM clans_battle;
 DROP TABLE clans_battle;
 DROP TABLE battle;
 
+--Player_quest csv
+CREATE TEMPORARY TABLE players_quests(
+  player_tag VARCHAR(255),
+  quest_id INTEGER,
+  quest_title VARCHAR(255),
+  quest_description VARCHAR(255),
+  quest_requirement VARCHAR(255),
+  quest_depends INTEGER,
+  unlock DATE
+);
+
+COPY players_quests
+FROM 'C:\Users\Public\Datasets\players_quests.csv'
+DELIMITER ','
+CSV HEADER;
+
+--Afegim a missions
+INSERT INTO missio(id_missio,titol, descripcio, requeriment)
+SELECT DISTINCT quest_id,quest_title,quest_description,quest_requirement
+FROM players_quests;
+
+--Afegim depen
+INSERT INTO depen(id_missio1, id_missio2)
+SELECT DISTINCT quest_id,quest_depends
+FROM players_quests
+WHERE quest_id IS NOT NULL AND quest_depends IS NOT NULL;
+
 -- Afegim a Missió
 CREATE TEMPORARY TABLE quests_arenas (
     quest_id INTEGER,
@@ -390,13 +410,10 @@ FROM 'C:\Users\Public\Datasets\quests_arenas.csv'
 DELIMITER ','
 CSV HEADER;
 
-INSERT INTO missio (id_missio)
-SELECT DISTINCT quest_id
-FROM quests_arenas;
-
-INSERT INTO completen (id_missio, id_arena, or_, experiencia)
-SELECT quest_id, arena_id, gold, experience
-FROM quests_arenas;
+--INSERT INTO completen(id_missio, id_arena, tag_jugador,or_, experiencia,desbloqueja)
+--SELECT qa.quest_id, qa.arena_id,pq.player_tag,qa.gold, qa.experience,pq.unlock
+--FROM quests_arenas AS qa, players_quests AS pq
+--WHERE qa.quest_id = pq.quest_id;
 
 DROP TABLE quests_arenas;
 
@@ -426,17 +443,9 @@ FROM 'C:\Users\Public\Datasets\player_purchases.csv'
 DELIMITER ','
 CSV HEADER;
 
---Player no cal ja s'ha afegit
---Credit card ja afegida no cal
---Id_compren es duplica al csv, es duplica pel nom
---INSERT INTO compren(id_compren,quantitat,data_,descompte)
---SELECT DISTINCT buy_id,buy_stock,date,discount
---FROM player_purchases;
-
-
 --Afegim a articles
-INSERT INTO article(nom,preu)
-SELECT buy_name, buy_cost
+INSERT INTO article(id_article,nom,preu,quantitat)
+SELECT DISTINCT buy_id,buy_name, buy_cost, buy_stock
 FROM player_purchases;
 
 --Afegim a arena paquet
@@ -447,46 +456,24 @@ WHERE arenapack_id IS NOT NULL;
 
 --Afegim a cofre
 INSERT INTO cofre(nom_cofre, temps, raresa, quantitat_cartes)
-SELECT chest_name, chest_unlock_time, chest_rarity, chest_num_cards
+SELECT DISTINCT chest_name, chest_unlock_time, chest_rarity, chest_num_cards
 FROM player_purchases;
 
 --Afegim a bundle
 INSERT INTO bundle(or_, gemmes)
-SELECT bundle_gold, bundle_gems
+SELECT DISTINCT bundle_gold, bundle_gems
 FROM player_purchases;
 
 --Afegim a emoticones
 INSERT INTO emoticones(nom_imatge, direccio_imatge)
-SELECT emote_name,emote_path
+SELECT DISTINCT emote_name,emote_path
 FROM player_purchases;
 
---Player_quest csv
-CREATE TEMPORARY TABLE players_quests(
-  player_tag VARCHAR(255),
-  quest_id INTEGER,
-  quest_title VARCHAR(255),
-  quest_description VARCHAR(255),
-  quest_requirement VARCHAR(255),
-  quest_depends INTEGER,
-  unlock DATE
-);
+--Id_compren es duplica
+INSERT INTO compren(tag_jugador, num_targeta,data_,descompte)
+SELECT DISTINCT player,credit_card,date,discount
+FROM player_purchases;
 
-COPY players_quests
-FROM 'C:\Users\Public\Datasets\players_quests.csv'
-DELIMITER ','
-CSV HEADER;
-
---Afegim a missions
---id repetida
---INSERT INTO missio(id_missio, titol, descripcio, requeriment, desbloqueja)
---SELECT DISTINCT quest_id,quest_title,quest_description,quest_requirement,unlock
---FROM players_quests;
-
---Afegim depen
-INSERT INTO depen(id_missio1, id_missio2)
-SELECT DISTINCT quest_id,quest_depends
-FROM players_quests
-WHERE quest_id IS NOT NULL AND quest_depends IS NOT NULL;
 
 -- Playersachievement
 CREATE TEMPORARY TABLE playersachievements(
