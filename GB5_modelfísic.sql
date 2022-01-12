@@ -201,7 +201,7 @@ CREATE TABLE Pila (
 	descripcio TEXT,
 	data_creacio DATE,
 	PRIMARY KEY (ID_pila),
-	FOREIGN KEY (tag_jugador) REFERENCES Jugador (tag_jugador) ON DELETE CASCADE,
+	FOREIGN KEY (tag_jugador) REFERENCES Jugador (tag_jugador) ON DELETE CASCADE
 );
 
 -- Creació de la taula Formen
