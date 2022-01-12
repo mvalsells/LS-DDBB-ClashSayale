@@ -117,6 +117,7 @@ CREATE TABLE Batalla (
 	durada TIME,
 	ID_temporada VARCHAR(255),
 	ID_arena INTEGER,
+	clan_battle INTEGER,
 	PRIMARY KEY (ID_batalla),
 	FOREIGN KEY (ID_temporada) REFERENCES Temporada (ID_temporada) ON DELETE CASCADE,
 	FOREIGN KEY (ID_arena) REFERENCES Arena (ID_arena) ON DELETE CASCADE
