@@ -24,6 +24,7 @@ DROP TABLE IF EXISTS msgClansTmp CASCADE;
 DROP TABLE IF EXISTS playerCardsTmp CASCADE;
 DROP TABLE IF EXISTS playersbadge CASCADE;
 DROP TABLE IF EXISTS playersachievements CASCADE;
+DROP TABLE IF EXISTS arena_packTmp CASCADE;
 
 
 -- Eliminar importacions anteriors
@@ -51,7 +52,7 @@ DELETE FROM completen WHERE 1 = 1;
 DELETE FROM pertany WHERE 1 = 1;
 DELETE FROM comparteixen WHERE 1 = 1;
 DELETE FROM missatge WHERE 1 = 1;
-DELETE FROM art_arena WHERE 1=1;
+DELETE FROM arena_pack WHERE 1=1;
 DELETE FROM nivellcarta WHERE 1 = 1;
 DELETE FROM compren WHERE 1=1;
 DELETE FROM article WHERE 1 = 1;
@@ -451,8 +452,8 @@ SELECT DISTINCT buy_id,buy_name, buy_cost, buy_stock
 FROM player_purchases;
 
 --Afegim a arena paquet
-INSERT INTO art_arena(id_art_arena)
-SELECT DISTINCT arenapack_id
+INSERT INTO arena_pack(id_arena_pack,id_pack)
+SELECT DISTINCT buy_id,arenapack_id
 FROM player_purchases
 WHERE arenapack_id IS NOT NULL;
 
@@ -601,4 +602,25 @@ JOIN carta AS c ON pct.name = c.nom;
 -- Decks compartits (shared_decks.csv)
 COPY comparteixen(id_pila, tag_jugador)
 FROM 'C:\Users\Public\Datasets\shared_decks.csv'
+DELIMITER ','
 CSV HEADER;
+
+
+-- Arena pack
+CREATE TABLE arena_packTmp(
+    id INTEGER,
+    arena INTEGER,
+    gold INTEGER
+);
+
+COPY arena_packTmp(id,arena,gold)
+FROM 'C:\Users\Public\Datasets\arena_pack.csv'
+DELIMITER ','
+CSV HEADER;
+
+INSERT INTO arena_pack_arena(id_arena, id_arena_pack, or_)
+SELECT arena,id,gold
+FROM arena_packTmp AS apt
+JOIN arena_pack AS ap ON ap.id_arena_pack = apt.id;
+
+

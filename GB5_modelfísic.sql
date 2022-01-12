@@ -22,7 +22,8 @@ DROP TABLE IF EXISTS Emoticones CASCADE;
 DROP TABLE IF EXISTS Bundle CASCADE;
 DROP TABLE IF EXISTS Cofre CASCADE;
 DROP TABLE IF EXISTS cofre_carta CASCADE;
-DROP TABLE IF EXISTS Art_Arena CASCADE;
+DROP TABLE IF EXISTS Arena_pack CASCADE;
+DROP TABLE IF EXISTS arena_pack_arena CASCADE;
 DROP TABLE IF EXISTS Compren CASCADE;
 DROP TABLE IF EXISTS Missatge CASCADE;
 DROP TABLE IF EXISTS Conversen CASCADE;
@@ -266,12 +267,20 @@ CREATE TABLE Bundle(
 );
 
 -- Article: Arena
-CREATE TABLE Art_Arena(
-    ID_Art_Arena INTEGER,
-    Nivell INTEGER,
-    Or_ INTEGER,
-    PRIMARY KEY (ID_Art_Arena),
-    FOREIGN KEY (ID_Art_Arena) REFERENCES Article(ID_article) ON DELETE CASCADE
+CREATE TABLE Arena_pack(
+    ID_arena_pack INTEGER,
+    ID_pack INTEGER,
+    PRIMARY KEY (ID_arena_pack),
+    FOREIGN KEY (ID_arena_pack) REFERENCES Article(ID_article) ON DELETE CASCADE
+);
+
+CREATE TABLE arena_pack_arena(
+    ID_arena INTEGER,
+    ID_arena_pack INTEGER,
+    or_ INTEGER,
+    PRIMARY KEY (ID_arena,ID_arena_pack),
+    FOREIGN KEY (ID_arena) REFERENCES Arena(ID_arena),
+    FOREIGN KEY (ID_arena_pack) REFERENCES Arena_pack(id_arena_pack)
 );
 
 -- Article: Cofre
@@ -289,10 +298,10 @@ CREATE TABLE Cofre (
 
 -- Relació Cofre - Carta
 CREATE TABLE cofre_carta(
-    ID_Art_Arena INTEGER,
+    ID_cofre INTEGER,
     nom_carta VARCHAR(255),
-    PRIMARY KEY (ID_Art_Arena,nom_carta),
-    FOREIGN KEY (ID_Art_Arena) REFERENCES Art_Arena(ID_Art_Arena) ON DELETE CASCADE,
+    PRIMARY KEY (ID_cofre,nom_carta),
+    FOREIGN KEY (ID_cofre) REFERENCES Cofre(id_cofre) ON DELETE CASCADE,
     FOREIGN KEY (nom_carta) REFERENCES Carta(nom) ON DELETE CASCADE
 );
 
@@ -516,7 +525,7 @@ CREATE TABLE Desbloquegen (
 	ID_arena INTEGER,
 	PRIMARY KEY (tag_jugador, ID_arena),
 	FOREIGN KEY (tag_jugador) REFERENCES Jugador (tag_jugador) ON DELETE CASCADE,
-	FOREIGN KEY (ID_arena) REFERENCES Art_Arena (ID_Art_Arena) ON DELETE CASCADE
+	FOREIGN KEY (ID_arena) REFERENCES Arena_pack (ID_arena_pack) ON DELETE CASCADE
 );
 
 -- Creació de la taula Aconsegueix
@@ -527,7 +536,7 @@ CREATE TABLE Aconsegueix (
 	PRIMARY KEY (tag_jugador, ID_assoliment, ID_arena),
 	FOREIGN KEY (tag_jugador) REFERENCES Jugador (tag_jugador) ON DELETE CASCADE,
 	FOREIGN KEY (ID_assoliment) REFERENCES Assoliment (ID_assoliment) ON DELETE CASCADE,
-	FOREIGN KEY (ID_arena) REFERENCES Art_Arena (ID_Art_Arena) ON DELETE CASCADE
+	FOREIGN KEY (ID_arena) REFERENCES Arena_pack (ID_arena_pack) ON DELETE CASCADE
 );
 
 -- Creació de la taula Amics
