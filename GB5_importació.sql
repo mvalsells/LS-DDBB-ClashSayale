@@ -416,6 +416,7 @@ SELECT qa.quest_id, qa.arena_id,pq.player_tag,qa.gold, qa.experience,pq.unlock
 FROM quests_arenas AS qa, players_quests AS pq
 WHERE qa.quest_id = pq.quest_id;
 
+
 DROP TABLE quests_arenas;
 
 --player_purchase csv
@@ -492,8 +493,13 @@ DELIMITER ','
 CSV HEADER;
 
 --Afegim a assoliments
-INSERT INTO assoliment(titol, recompensa_gemmes, descripcio, data)
-SELECT name,gems,description,date
+INSERT INTO assoliment(titol, recompensa_gemmes, descripcio)
+SELECT name,gems,description
+FROM playersachievements;
+
+--Afegim a aconsegueixen
+INSERT INTO aconsegueix(tag_jugador,id_arena, data)
+SELECT player, arena, date
 FROM playersachievements;
 
 --Players badge csv

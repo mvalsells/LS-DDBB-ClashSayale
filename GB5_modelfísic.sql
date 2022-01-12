@@ -504,7 +504,6 @@ CREATE TABLE Assoliment (
 	titol VARCHAR(255),
 	recompensa_gemmes INTEGER,
 	descripcio VARCHAR(255),
-	data DATE,
 	PRIMARY KEY (ID_assoliment),
 	FOREIGN KEY (ID_assoliment) REFERENCES Assoliment (ID_assoliment) ON DELETE CASCADE
 );
@@ -521,12 +520,13 @@ CREATE TABLE Desbloquegen (
 -- Creació de la taula Aconsegueix
 CREATE TABLE Aconsegueix (
 	tag_jugador VARCHAR (255),
-	ID_assoliment INTEGER,
+	ID_assoliment SERIAL,
 	ID_arena INTEGER,
+	data DATE,
 	PRIMARY KEY (tag_jugador, ID_assoliment, ID_arena),
 	FOREIGN KEY (tag_jugador) REFERENCES Jugador (tag_jugador) ON DELETE CASCADE,
 	FOREIGN KEY (ID_assoliment) REFERENCES Assoliment (ID_assoliment) ON DELETE CASCADE,
-	FOREIGN KEY (ID_arena) REFERENCES Art_Arena (ID_Art_Arena) ON DELETE CASCADE
+	FOREIGN KEY (ID_arena) REFERENCES Arena (ID_arena) ON DELETE CASCADE
 );
 
 -- Creació de la taula Amics
