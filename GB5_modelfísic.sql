@@ -480,13 +480,14 @@ CREATE TABLE Missio (
 
 -- Creació de la taula Completen
 CREATE TABLE Completen (
+    ID_completen SERIAL,
 	ID_missio INTEGER,
 	ID_arena INTEGER,
 	tag_jugador VARCHAR(255),
 	or_ INTEGER,
 	experiencia INTEGER,
 	desbloqueja DATE,
-	PRIMARY KEY (ID_missio, ID_arena,tag_jugador),
+	PRIMARY KEY (ID_completen),
 	FOREIGN KEY (ID_missio) REFERENCES Missio (ID_missio) ON DELETE CASCADE,
 	FOREIGN KEY (ID_arena) REFERENCES Arena (ID_arena) ON DELETE CASCADE,
 	FOREIGN KEY (tag_jugador) REFERENCES Jugador (tag_jugador) ON DELETE CASCADE

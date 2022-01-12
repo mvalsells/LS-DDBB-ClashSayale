@@ -410,10 +410,10 @@ FROM 'C:\Users\Public\Datasets\quests_arenas.csv'
 DELIMITER ','
 CSV HEADER;
 
---INSERT INTO completen(id_missio, id_arena, tag_jugador,or_, experiencia,desbloqueja)
---SELECT qa.quest_id, qa.arena_id,pq.player_tag,qa.gold, qa.experience,pq.unlock
---FROM quests_arenas AS qa, players_quests AS pq
---WHERE qa.quest_id = pq.quest_id;
+INSERT INTO completen(id_missio, id_arena, tag_jugador,or_, experiencia,desbloqueja)
+SELECT qa.quest_id, qa.arena_id,pq.player_tag,qa.gold, qa.experience,pq.unlock
+FROM quests_arenas AS qa, players_quests AS pq
+WHERE qa.quest_id = pq.quest_id;
 
 DROP TABLE quests_arenas;
 
