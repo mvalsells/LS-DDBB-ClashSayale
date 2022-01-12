@@ -107,7 +107,6 @@ CREATE TABLE Arena (
 	titol VARCHAR(255),
 	nombre_min INTEGER,
 	nombre_max INTEGER,
-	recompenses VARCHAR(255),
 	PRIMARY KEY (ID_arena)
 );
 
@@ -199,12 +198,10 @@ CREATE TABLE Pila (
     tag_jugador VARCHAR (255),
     ID_pila INTEGER,
     nom VARCHAR(255),
-	nom_carta VARCHAR (255),
 	descripcio TEXT,
 	data_creacio DATE,
 	PRIMARY KEY (ID_pila),
 	FOREIGN KEY (tag_jugador) REFERENCES Jugador (tag_jugador) ON DELETE CASCADE,
-	FOREIGN KEY (nom_carta) REFERENCES Carta(nom) ON DELETE CASCADE
 );
 
 -- Creació de la taula Formen
@@ -315,7 +312,6 @@ CREATE TABLE Compren (
 -- Taula Missatge
 CREATE TABLE Missatge (
   ID_Missatge INTEGER,
-  Titol VARCHAR(255),
   Cos TEXT,
   data_ DATE,
   ID_resposta INTEGER,

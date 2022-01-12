@@ -99,7 +99,8 @@ FROM technologies;
 
 INSERT INTO requereix_tecnologia(id_tecnologia_nova, id_tecnologia_requerida, nivell_prerequisit)
 SELECT technology,prerequisite, prereq_level
-FROM technologies;
+FROM technologies
+WHERE prerequisite IS NOT NULL ;
 
 DROP TABLE technologies;
 
@@ -132,8 +133,8 @@ FROM buildings;
 
 INSERT INTO requereix_estructura(id_estructura_nova, id_estructura_requerida)
 SELECT building, prerequisite
-FROM buildings;
-
+FROM buildings
+WHERE prerequisite IS NOT NULL ;
 
 DROP TABLE buildings;
 
