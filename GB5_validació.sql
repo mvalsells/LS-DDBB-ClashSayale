@@ -20,6 +20,10 @@ SELECT guanya.id_pila, perd.id_pila, guanya.num_trofeus, perd.num_trofeus, batal
 FROM batalla
 JOIN guanya ON batalla.id_batalla = guanya.id_batalla
 JOIN perd ON batalla.id_batalla = perd.id_batalla;
+
+SELECT tag_clan, id_batalla, data_inici, data_fi
+FROM lluiten;
+
 -- Validació entorn a Arenes
 
 -- Validació entorn a Missions
