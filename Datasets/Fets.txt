@@ -37,15 +37,15 @@ VALIDACIÓ:
     - clan_battles.csv (Albert)
     - players.csv (Albert)
     - friends.csv (Albert)
-    - playersdecks.csv (Albert)
     - shared_decks.csv (Albert)
-    - messages_between_players.csv (Albert)
 
 -- FALTEN --
     - cards.csv (Marc V.)
+    - playersdecks.csv (Marc V.)
     - players_quests.csv (Marc V.)
     - playerscards.csv (Marc V.)
     - quests_arenas.csv (Marc V.)
+    - messages_between_players.csv (Marc V.)
 
     - arenas.csv (Marc G.)
     - clan_tech_structures.csv (Marc G.)

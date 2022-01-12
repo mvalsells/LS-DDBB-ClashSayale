@@ -337,13 +337,13 @@ SELECT date, duration
 FROM battle;
 
 -- Afegim a guanyador
-INSERT INTO guanya(tag_jugador, num_trofeus)
-SELECT (SELECT tag_jugador FROM pila WHERE id_pila = battle.winner), battle.winner_score
+INSERT INTO guanya(tag_jugador, ID_pila, num_trofeus)
+SELECT (SELECT tag_jugador FROM pila WHERE id_pila = battle.winner), (SELECT ID_pila FROM pila WHERE id_pila = battle.winner), battle.winner_score
 FROM battle;
 
 -- Afegim a perdedor
-INSERT INTO perd(tag_jugador, num_trofeus)
-SELECT (SELECT tag_jugador FROM pila WHERE id_pila = battle.loser), battle.loser_score
+INSERT INTO perd(tag_jugador, ID_pila, num_trofeus)
+SELECT (SELECT tag_jugador FROM pila WHERE id_pila = battle.loser), (SELECT ID_pila FROM pila WHERE id_pila = battle.loser), battle.loser_score
 FROM battle;
 
 -- Fem aquí el drop table de playersdeck ja que si no no existeix la taula per fer comparació

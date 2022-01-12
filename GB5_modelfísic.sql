@@ -545,20 +545,24 @@ CREATE TABLE Amics (
 CREATE TABLE Guanya (
 	tag_jugador VARCHAR (255),
 	ID_batalla SERIAL,
+	ID_pila INTEGER,
 	num_trofeus INTEGER,
-	PRIMARY KEY (tag_jugador, ID_batalla),
+	PRIMARY KEY (tag_jugador, ID_batalla, ID_pila),
 	FOREIGN KEY (tag_jugador) REFERENCES Jugador (tag_jugador) ON DELETE CASCADE,
-	FOREIGN KEY (ID_batalla) REFERENCES Batalla (ID_batalla) ON DELETE CASCADE
+	FOREIGN KEY (ID_batalla) REFERENCES Batalla (ID_batalla) ON DELETE CASCADE,
+	FOREIGN KEY (ID_pila) REFERENCES Pila (ID_pila) ON DELETE CASCADE
 );
 
 -- Creació de la taula Perd
 CREATE TABLE Perd (
     tag_jugador VARCHAR (255),
     ID_batalla SERIAL,
+    ID_pila INTEGER,
     num_trofeus INTEGER,
-    PRIMARY KEY (tag_jugador, ID_batalla),
+    PRIMARY KEY (tag_jugador, ID_batalla, ID_pila),
     FOREIGN KEY (tag_jugador) REFERENCES Jugador (tag_jugador) ON DELETE CASCADE,
-    FOREIGN KEY (ID_batalla) REFERENCES Batalla (ID_batalla) ON DELETE CASCADE
+    FOREIGN KEY (ID_batalla) REFERENCES Batalla (ID_batalla) ON DELETE CASCADE,
+    FOREIGN KEY (ID_pila) REFERENCES Pila (ID_pila) ON DELETE CASCADE
 );
 
 -- Creació de la taula Insignia
