@@ -2,6 +2,12 @@
 -- Validació
 
 -- Validació entorn a Jugadors
+SELECT tag_jugador, nom, experiencia, trofeus, targeta_credit, numero, caducitat
+FROM jugador as j
+JOIN targeta_credit AS tc ON j.targeta_credit = tc.numero;
+
+SELECT tag_jugador1, tag_jugador2
+FROM amics as a;
 
 -- Validació entorn a Cartes
 

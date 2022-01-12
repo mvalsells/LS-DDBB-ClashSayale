@@ -27,5 +27,34 @@ playerscalns - Marc G
 playerclansdonation - Marc G
 playersdeck - Albert
 quests_arena - Albert
-
 techonologies (a mitges) - Marc G
+
+
+VALIDACIÓ:
+
+-- FETS --
+    - battles.csv (Albert)
+    - clan_battles.csv (Albert)
+    - players.csv (Albert)
+    - friends.csv (Albert)
+    - playersdecks.csv (Albert)
+    - shared_decks.csv (Albert)
+    - messages_between_players.csv (Albert)
+
+-- FALTEN --
+    - cards.csv (Marc V.)
+    - players_quests.csv (Marc V.)
+    - playerscards.csv (Marc V.)
+    - quests_arenas.csv (Marc V.)
+
+    - arenas.csv (Marc G.)
+    - clan_tech_structures.csv (Marc G.)
+    - clans.csv (Marc G.)
+    - messages_to_clans.csv (Marc G.)
+    - playersClans.csv (Marc G.)
+    - playersClansdonations.csv (Marc G.)
+
+    - arena_pack.csv (Irina)
+    - player_purchases.csv (Irina)
+    - playersachievements.csv (Irina)
+    - playersbadge.csv (Irina)
