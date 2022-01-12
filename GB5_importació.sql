@@ -613,7 +613,7 @@ CSV HEADER;
 
 
 -- Arena pack
-CREATE TABLE arena_packTmp(
+CREATE TEMPORARY TABLE arena_packTmp(
     id INTEGER,
     arena INTEGER,
     gold INTEGER

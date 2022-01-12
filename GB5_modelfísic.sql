@@ -66,7 +66,6 @@ DROP TABLE IF EXISTS Temporada CASCADE;
 CREATE TABLE targeta_credit(
 	numero VARCHAR (255),
 	caducitat DATE,
-	CVV INTEGER,
 	PRIMARY KEY (numero)
 );
 
