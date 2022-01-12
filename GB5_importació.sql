@@ -9,7 +9,7 @@ DROP TABLE IF EXISTS jugadors_clans CASCADE;
 DROP TABLE IF EXISTS players CASCADE;
 DROP TABLE  IF EXISTS cards CASCADE;
 DROP TABLE IF EXISTS friend CASCADE;
-DROP TABLE IF EXISTS battle CASCADE;
+DROP TABLE IF EXISTS battleTmp CASCADE;
 DROP TABLE IF EXISTS clans_battle CASCADE;
 DROP TABLE IF EXISTS playersdeck CASCADE;
 DROP TABLE IF EXISTS quests_arenas CASCADE;
@@ -266,14 +266,14 @@ FROM 'C:\Users\Public\Datasets\cards.csv'
 DELIMITER ','
 CSV HEADER;
 
---Afegim a cartes
-INSERT INTO Carta(nom ,dany ,velocitat_atac)
-SELECT name,damage,hit_speed
-FROM cards;
-
 --Afegim a raresa
 INSERT INTO raresa(nom)
 SELECT DISTINCT rarity
+FROM cards;
+
+--Afegim a cartes
+INSERT INTO Carta(nom ,dany ,velocitat_atac,arena,raresa)
+SELECT name,damage,hit_speed,arena,rarity
 FROM cards;
 
 --Afegim a Edifici
@@ -317,7 +317,7 @@ SELECT DISTINCT player, deck, title, description, date
 FROM playersdeck;
 
 -- Afegim a Batalla
-CREATE TEMPORARY TABLE battle (
+CREATE TEMPORARY TABLE battleTmp (
     winner INTEGER,
     loser INTEGER,
     winner_score INTEGER,
@@ -327,25 +327,25 @@ CREATE TEMPORARY TABLE battle (
     clan_battle INTEGER
 );
 
-COPY battle
+COPY battleTmp
 FROM 'C:\Users\Public\Datasets\battles.csv'
 DELIMITER ','
 CSV HEADER;
 
 -- Afegim a batalla
-INSERT INTO batalla(data, durada)
-SELECT date, duration
-FROM battle;
+INSERT INTO batalla(data, durada,clan_battle)
+SELECT date, duration,clan_battle
+FROM battleTmp;
 
 -- Afegim a guanyador
 INSERT INTO guanya(tag_jugador, ID_pila, num_trofeus)
-SELECT (SELECT tag_jugador FROM pila WHERE id_pila = battle.winner), (SELECT ID_pila FROM pila WHERE id_pila = battle.winner), battle.winner_score
-FROM battle;
+SELECT (SELECT tag_jugador FROM pila WHERE id_pila = battleTmp.winner), (SELECT ID_pila FROM pila WHERE id_pila = battleTmp.winner), battleTmp.winner_score
+FROM battleTmp;
 
 -- Afegim a perdedor
 INSERT INTO perd(tag_jugador, ID_pila, num_trofeus)
-SELECT (SELECT tag_jugador FROM pila WHERE id_pila = battle.loser), (SELECT ID_pila FROM pila WHERE id_pila = battle.loser), battle.loser_score
-FROM battle;
+SELECT (SELECT tag_jugador FROM pila WHERE id_pila = battleTmp.loser), (SELECT ID_pila FROM pila WHERE id_pila = battleTmp.loser), battleTmp.loser_score
+FROM battleTmp;
 
 -- Fem aquí el drop table de playersdeck ja que si no no existeix la taula per fer comparació
 DROP TABLE playersdeck;
@@ -365,11 +365,12 @@ CSV HEADER;
 
 -- Afegim a lluiten
 INSERT INTO lluiten(tag_clan, ID_batalla, data_inici, data_fi)
-SELECT clan, (SELECT DISTINCT clan_battle FROM battle WHERE clans_battle.battle = battle.clan_battle), start_date, end_date
-FROM clans_battle;
+SELECT cb.clan,b.id_batalla , cb.start_date, cb.end_date
+FROM clans_battle AS cb
+JOIN batalla AS b ON cb.battle = b.clan_battle;
 
 DROP TABLE clans_battle;
-DROP TABLE battle;
+DROP TABLE battleTmp;
 
 --Player_quest csv
 CREATE TEMPORARY TABLE players_quests(
