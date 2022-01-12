@@ -30,4 +30,6 @@ FROM lluiten;
 
 -- Validació entorn a Assoliments
 
+
+
 -- Validació entorn a Botiga
