@@ -58,3 +58,21 @@ VALIDACIÓ:
     - player_purchases.csv (Irina)
     - playersachievements.csv (Irina)
     - playersbadge.csv (Irina)
+
+
+- Batalla(id_temporada,id_arena) - Crear csv (Marc G)
+- Clan(creador)
+- Cofre_carta(TOTES) - Crear csv (Irina)
+- Formen (TOTES) - Crear csv (afegir nivell) (Marc V)
+- Modifiquen (TOTES) - Dubtes
+- NivellCarta(multiplicador) - Crear csv (Albert)
+- Participen (TOTES) - Preguntar punts
+- Raresa (cost_pujar_nivell) - Crear csv (Albert)
+
+Bundle, emoticones i cofre el 1r surt null
+
+
+Dubtes
+- Insignies batalles???
+- Edificis, tecnologies modifquen una carta o en global
+- Punts temporada
