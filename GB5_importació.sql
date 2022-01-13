@@ -276,9 +276,9 @@ DELIMITER ','
 CSV HEADER;
 
 --Afegim a raresa
-INSERT INTO raresa(nom)
-SELECT DISTINCT rarity
-FROM cards;
+COPY raresa(nom, cost_pujar_nivell)
+FROM 'C:\Users\Public\Creats\raresa-carta.csv'
+DELIMITER ',';
 
 --Afegim a cartes
 INSERT INTO Carta(nom ,dany ,velocitat_atac,arena,raresa)
@@ -370,10 +370,6 @@ WHERE bt.id_batalla = batalla.id_batalla;
 */
 
 DROP TABLE IF EXISTS batalles_temporada;
-
-
-
-
 
 -- Afegim a guanyador
 INSERT INTO guanya(tag_jugador, ID_pila, num_trofeus)
@@ -625,6 +621,10 @@ JOIN msgPlayersTmp AS mpt ON mpt.id = -2147483648;
 
 -- ------------------------------------------
 -- -------------- Cartes --------------
+COPY nivellcarta(nivell, multiplicador)
+FROM 'C:\Users\Public\Creats\nivell_carta.csv'
+DELIMITER ',';
+
 CREATE TEMPORARY TABLE playerCardsTmp(
     player VARCHAR(255),
     id INTEGER,
@@ -638,10 +638,6 @@ COPY playerCardsTmp
 FROM 'C:\Users\Public\Datasets\playerscards.csv'
 DELIMITER ','
 CSV HEADER;
-
-INSERT INTO nivellcarta(nivell)
-SELECT DISTINCT level
-FROM playerCardsTmp;
 
 INSERT INTO pertany(nom_carta,tag_jugador,quantitat,data_desbolqueig, nivell)
 SELECT pct.name,pct.player,pct.amount,pct.date,pct.level
