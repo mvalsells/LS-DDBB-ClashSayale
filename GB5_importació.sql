@@ -25,6 +25,7 @@ DROP TABLE IF EXISTS playerCardsTmp CASCADE;
 DROP TABLE IF EXISTS playersbadge CASCADE;
 DROP TABLE IF EXISTS playersachievements CASCADE;
 DROP TABLE IF EXISTS arena_packTmp CASCADE;
+DROP TABLE IF EXISTS Cofre_Carta CASCADE;
 
 
 -- Eliminar importacions anteriors
@@ -62,6 +63,7 @@ DELETE FROM bundle WHERE 1 = 1;
 DELETE FROM depen WHERE 1 = 1;
 DELETE FROM assoliment WHERE 1 = 1;
 DELETE FROM insignia WHERE 1 = 1;
+DELETE FROM conte WHERE 1 = 1;
 
 
 -- Arena (arena.csv)
@@ -229,6 +231,11 @@ INSERT INTO forma_part(tag_jugador, tag_clan, id_rol, data)
 SELECT player, clan, rol.id_rol, date
 FROM rol JOIN jugadors_clans ON jugadors_clans.role = concat(rol.nom, ': ', rol.descripcio);
 
+UPDATE clan
+SET creador_clan = jc.player
+FROM jugadors_clans AS jc
+WHERE jc.role LIKE 'leader%' AND clan.tag_clan = jc.clan;
+
 
 
 DROP TABLE IF EXISTS jugadors_clans;
@@ -333,10 +340,39 @@ FROM 'C:\Users\Public\Datasets\battles.csv'
 DELIMITER ','
 CSV HEADER;
 
+
 -- Afegim a batalla
 INSERT INTO batalla(data, durada,clan_battle)
 SELECT date, duration,clan_battle
 FROM battleTmp;
+
+
+-- Batalles_temporada
+CREATE TEMPORARY TABLE batalles_temporada(
+    id_batalla INTEGER,
+    id_temporada VARCHAR(255),
+    id_arena FLOAT
+);
+
+COPY batalles_temporada
+FROM 'C:\Users\Public\Creats\batalles_temporada.csv'
+DELIMITER ','
+CSV HEADER;
+
+/*
+Preguntar a becaris
+
+UPDATE batalla
+SET id_temporada = bt.id_temporada, id_arena = bt.id_arena
+FROM batalles_temporada AS bt, battleTmp
+WHERE bt.id_batalla = batalla.id_batalla;
+*/
+
+DROP TABLE IF EXISTS batalles_temporada;
+
+
+
+
 
 -- Afegim a guanyador
 INSERT INTO guanya(tag_jugador, ID_pila, num_trofeus)
@@ -474,8 +510,8 @@ SELECT DISTINCT emote_name,emote_path
 FROM player_purchases;
 
 --Id_compren es duplica
-INSERT INTO compren(tag_jugador, num_targeta,data_,descompte)
-SELECT DISTINCT player,credit_card,date,discount
+INSERT INTO compren(tag_jugador, num_targeta,id_article,data_,descompte)
+SELECT DISTINCT player,credit_card,buy_id,date,discount
 FROM player_purchases;
 
 
@@ -522,6 +558,12 @@ CSV HEADER;
 INSERT INTO insignia(imatge, titol, data)
 SELECT img,name,date
 FROM playersbadge;
+
+--
+INSERT INTO batalla(id_arena)
+SELECT arena
+FROM playersbadge;
+
 
 -- -------------- MISSATGES --------------
 
@@ -628,5 +670,20 @@ INSERT INTO arena_pack_arena(id_arena, id_arena_pack, or_)
 SELECT arena,id,gold
 FROM arena_packTmp AS apt
 JOIN arena_pack AS ap ON ap.id_arena_pack = apt.id;
+
+CREATE TEMPORARY TABLE Cofre_Carta(
+    Id_cofre INTEGER,
+    Raresa VARCHAR(255)
+);
+
+COPY Cofre_Carta
+FROM 'C:\Users\Public\Creats\Cofre-Carta.csv'
+DELIMITER ','
+CSV HEADER;
+
+INSERT INTO conte(id_cofre, nom_carta)
+SELECT Id_cofre,Raresa
+FROM Cofre_Carta;
+
 
 
