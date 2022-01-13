@@ -474,8 +474,8 @@ SELECT DISTINCT emote_name,emote_path
 FROM player_purchases;
 
 --Id_compren es duplica
-INSERT INTO compren(tag_jugador, num_targeta,data_,descompte)
-SELECT DISTINCT player,credit_card,date,discount
+INSERT INTO compren(tag_jugador, num_targeta,id_article,data_,descompte)
+SELECT DISTINCT player,credit_card,buy_id,date,discount
 FROM player_purchases;
 
 
@@ -522,6 +522,12 @@ CSV HEADER;
 INSERT INTO insignia(imatge, titol, data)
 SELECT img,name,date
 FROM playersbadge;
+
+--
+INSERT INTO batalla(id_arena)
+SELECT arena
+FROM playersbadge;
+
 
 -- -------------- MISSATGES --------------
 

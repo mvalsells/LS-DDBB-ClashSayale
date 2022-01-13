@@ -75,7 +75,16 @@ LIMIT 10;
 -- FROM depen
 
 -- Validació entorn a Assoliments
+SELECT tag_jugador,titol,descripcio,id_arena,data,recompensa_gemmes
+FROM assoliment as a, aconsegueix as ac
+WHERE a.id_assoliment = ac.id_assoliment;
 
-
+--falta atribut arena que noe sta posat a cap taula
+--SELECT tag_jugador, i.titol, id_arena,data,imatge
+--FROM insignia as i, guanya as g, arena as a
+--WHERE i.
 
 -- Validació entorn a Botiga
+
+
+--arena pack?
