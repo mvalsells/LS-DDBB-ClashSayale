@@ -229,6 +229,11 @@ INSERT INTO forma_part(tag_jugador, tag_clan, id_rol, data)
 SELECT player, clan, rol.id_rol, date
 FROM rol JOIN jugadors_clans ON jugadors_clans.role = concat(rol.nom, ': ', rol.descripcio);
 
+UPDATE clan
+SET creador_clan = jc.player
+FROM jugadors_clans AS jc
+WHERE jc.role LIKE 'leader%' AND clan.tag_clan = jc.clan;
+
 
 
 DROP TABLE IF EXISTS jugadors_clans;
