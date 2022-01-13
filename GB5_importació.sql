@@ -25,6 +25,7 @@ DROP TABLE IF EXISTS playerCardsTmp CASCADE;
 DROP TABLE IF EXISTS playersbadge CASCADE;
 DROP TABLE IF EXISTS playersachievements CASCADE;
 DROP TABLE IF EXISTS arena_packTmp CASCADE;
+DROP TABLE IF EXISTS Cofre_Carta CASCADE;
 
 
 -- Eliminar importacions anteriors
@@ -62,6 +63,7 @@ DELETE FROM bundle WHERE 1 = 1;
 DELETE FROM depen WHERE 1 = 1;
 DELETE FROM assoliment WHERE 1 = 1;
 DELETE FROM insignia WHERE 1 = 1;
+DELETE FROM conte WHERE 1 = 1;
 
 
 -- Arena (arena.csv)
@@ -639,5 +641,20 @@ INSERT INTO arena_pack_arena(id_arena, id_arena_pack, or_)
 SELECT arena,id,gold
 FROM arena_packTmp AS apt
 JOIN arena_pack AS ap ON ap.id_arena_pack = apt.id;
+
+CREATE TEMPORARY TABLE Cofre_Carta(
+    Id_cofre INTEGER,
+    Raresa VARCHAR(255)
+);
+
+COPY Cofre_Carta
+FROM 'C:\Users\Public\Creats\Cofre-Carta.csv'
+DELIMITER ','
+CSV HEADER;
+
+INSERT INTO conte(id_cofre, nom_carta)
+SELECT Id_cofre,Raresa
+FROM Cofre_Carta;
+
 
 
