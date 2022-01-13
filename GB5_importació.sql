@@ -340,10 +340,36 @@ FROM 'C:\Users\Public\Datasets\battles.csv'
 DELIMITER ','
 CSV HEADER;
 
+
 -- Afegim a batalla
 INSERT INTO batalla(data, durada,clan_battle)
 SELECT date, duration,clan_battle
 FROM battleTmp;
+
+
+-- Batalles_temporada
+CREATE TEMPORARY TABLE batalles_temporada(
+    id_batalla INTEGER,
+    id_temporada VARCHAR(255),
+    id_arena INTEGER
+);
+
+COPY batalles_temporada
+FROM 'C:\Users\Public\Creats\batalles_temporada.csv'
+DELIMITER ','
+CSV HEADER;
+
+/*
+UPDATE batalla
+SET id_temporada = bt.id_temporada, id_arena = bt.id_arena
+FROM batalles_temporada AS bt, battleTmp
+WHERE bt.id_batalla = batalla.id_batalla;
+*/
+DROP TABLE IF EXISTS batalles_temporada;
+
+
+
+
 
 -- Afegim a guanyador
 INSERT INTO guanya(tag_jugador, ID_pila, num_trofeus)
