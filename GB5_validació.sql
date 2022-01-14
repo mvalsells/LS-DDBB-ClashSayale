@@ -30,6 +30,9 @@ FROM comparteixen;
 
 -- Validació entorn a Clans
 
+SELECT *
+FROM clan;
+
 -- Validació entorn a Batalles
 SELECT guanya.id_pila, perd.id_pila, guanya.num_trofeus, perd.num_trofeus, batalla.data, batalla.durada, batalla.clan_battle
 FROM batalla
