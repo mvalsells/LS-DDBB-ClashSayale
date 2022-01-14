@@ -27,6 +27,7 @@ DROP TABLE IF EXISTS playersachievements CASCADE;
 DROP TABLE IF EXISTS arena_packTmp CASCADE;
 DROP TABLE IF EXISTS Cofre_Carta CASCADE;
 DROP TABLE IF EXISTS batalles_temporada CASCADE;
+DROP TABLE IF EXISTS Conte_CartesCofre CASCADE;
 
 
 -- Eliminar importacions anteriors
@@ -655,20 +656,22 @@ SELECT arena,id,gold
 FROM arena_packTmp AS apt
 JOIN arena_pack AS ap ON ap.id_arena_pack = apt.id;
 
-CREATE TEMPORARY TABLE Cofre_Carta(
+CREATE TEMPORARY TABLE Conte_CartesCofre(
     Id_cofre INTEGER,
     Raresa VARCHAR(255)
 );
 
-COPY Cofre_Carta
-FROM 'C:\Users\Public\Creats\Cofre-Carta.csv'
+COPY Conte_CartesCofre
+FROM 'C:\Users\Public\Creats\Conte_Cartes-Cofre.csv'
 DELIMITER ','
 CSV HEADER;
 
+
 INSERT INTO conte(id_cofre, nom_carta)
 SELECT cc.Id_cofre,cc.Raresa
-FROM Cofre_Carta as cc, cofre as c
+FROM Conte_CartesCofre as cc, cofre as c
 WHERE cc.Id_cofre = c.id_cofre;
+
 
 
 
