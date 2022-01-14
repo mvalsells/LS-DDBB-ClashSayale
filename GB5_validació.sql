@@ -176,12 +176,7 @@ JOIN article as a  on a.id_article = c.id_article
 JOIN arena_pack as ap on ap.id_pack = a.id_article
 JOIN arena_pack_arena as apa on apa.id_arena_pack = ap.id_pack;
 
-SELECT DISTINCT j.tag_jugador as ID_Jugador,j.nom as Nom_Jugador, a.preu as Preu_Article,
-ap.id_pack AS Paquet_Arena_Id,apa.or_ as Paquet_Arena_Or
-FROM jugador as j JOIN compren c on j.tag_jugador = c.tag_jugador
-JOIN article as a  on a.id_article = c.id_article
-JOIN arena_pack as ap on ap.id_pack = a.id_article
-JOIN arena_pack_arena as apa on apa.id_arena_pack = ap.id_pack;
+
 
 
 
