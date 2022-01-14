@@ -28,9 +28,27 @@ JOIN raresa AS r on c.raresa = r.nom
 GROUP BY r.nom;
 
 -- Validació entorn a Clans
+SELECT clan.nom AS nom_clan, rol.nom AS rol, jugador.nom AS nom_jugador, jugador.experiencia AS experiencia, dona.quantitat
+FROM clan
+JOIN forma_part ON clan.tag_clan=forma_part.tag_clan
+JOIN rol ON forma_part.id_rol = rol.id_rol
+JOIN jugador ON forma_part.tag_jugador = jugador.tag_jugador
+JOIN dona ON dona.tag_jugador = forma_part.tag_jugador;
 
-SELECT *
-FROM clan;
+SELECT clan.nom, estructura.id_estructura, estructura.minim_trofeus, millora.descripcio
+FROM clan
+JOIN tenen_estructura ON clan.tag_clan = tenen_estructura.tag_clan
+JOIN estructura ON tenen_estructura.id_estructura = estructura.id_estructura
+JOIN millora ON millora.nom_millora = estructura.id_estructura
+ORDER BY clan.tag_clan;
+
+SELECT requereix_tecnologia.id_tecnologia_nova AS nova_millora, millora.cost, requereix_tecnologia.nivell_prerequisit, requereix_tecnologia.id_tecnologia_requerida AS tecnologia_requerida
+FROM tecnologia
+JOIN requereix_tecnologia ON tecnologia.id_tecnologia = requereix_tecnologia.id_tecnologia_nova
+JOIN millora ON millora.nom_millora = tecnologia.id_tecnologia
+ORDER BY millora.cost DESC
+LIMIT 20;
+
 
 -- Validació entorn a Batalles
 SELECT guanya.id_pila, perd.id_pila, guanya.num_trofeus, perd.num_trofeus, batalla.data, batalla.durada, batalla.clan_battle
@@ -49,6 +67,23 @@ JOIN insignia i on b.data = i.data;
 
 
 -- Validació entorn a Arenes
+
+SELECT arena.titol AS nom_arena, SUM(arena_pack_arena.or_) AS or_arena_total
+FROM arena
+JOIN arena_pack_arena ON arena.id_arena = arena_pack_arena.id_arena
+GROUP BY arena.id_arena
+ORDER BY or_arena_total DESC
+LIMIT 15;
+
+SELECT arena.titol, arena.nombre_min , carta.nom, carta.dany, carta.velocitat_atac, raresa.cost_pujar_nivell
+FROM arena
+JOIN carta ON arena.id_arena = carta.arena
+JOIN raresa ON carta.raresa = raresa.nom
+WHERE arena.nombre_min > 2000
+ORDER BY arena.nombre_min ASC
+LIMIT 10;
+
+
 
 -- Validació entorn a Missions
 SELECT j.tag_jugador AS tag_jugador, j.nom AS nom_jugador, count(c.id_missio) AS num_missions
