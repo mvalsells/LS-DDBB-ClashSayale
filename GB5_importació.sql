@@ -25,10 +25,8 @@ DROP TABLE IF EXISTS playerCardsTmp CASCADE;
 DROP TABLE IF EXISTS playersbadge CASCADE;
 DROP TABLE IF EXISTS playersachievements CASCADE;
 DROP TABLE IF EXISTS arena_packTmp CASCADE;
-DROP TABLE IF EXISTS Cofre_Carta CASCADE;
 DROP TABLE IF EXISTS batalles_temporada CASCADE;
 DROP TABLE IF EXISTS Conte_CartesCofre CASCADE;
-
 
 -- Eliminar importacions anteriors
 DELETE FROM arena WHERE 1 = 1;
@@ -66,7 +64,6 @@ DELETE FROM depen WHERE 1 = 1;
 DELETE FROM assoliment WHERE 1 = 1;
 DELETE FROM insignia WHERE 1 = 1;
 DELETE FROM conte WHERE 1 = 1;
-
 
 -- Arena (arena.csv)
 COPY arena(id_arena, titol, nombre_min, nombre_max)
@@ -665,7 +662,6 @@ COPY Conte_CartesCofre
 FROM 'C:\Users\Public\Creats\Conte_Cartes-Cofre.csv'
 DELIMITER ','
 CSV HEADER;
-
 
 INSERT INTO conte(id_cofre, nom_carta)
 SELECT cc.Id_cofre,cc.Raresa
