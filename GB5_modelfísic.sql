@@ -248,7 +248,7 @@ CREATE TABLE Article (
 
 -- Article: Emoticones
 CREATE TABLE Emoticones (
-	ID_emoticones SERIAL,
+	ID_emoticones INTEGER,
 	nom_imatge VARCHAR(255),
 	direccio_imatge VARCHAR(255),
 	PRIMARY KEY(ID_emoticones),
@@ -257,7 +257,7 @@ CREATE TABLE Emoticones (
 
 -- Article: Bundle
 CREATE TABLE Bundle(
-    ID_bundle SERIAL,
+    ID_bundle INTEGER,
     Or_ INTEGER,
     gemmes INTEGER,
     PRIMARY KEY (ID_bundle),
@@ -283,12 +283,11 @@ CREATE TABLE arena_pack_arena(
 
 -- Article: Cofre
 CREATE TABLE Cofre (
-    ID_cofre SERIAL,
+    ID_cofre INTEGER,
     nom_cofre VARCHAR(255),
     quantitat_cartes INTEGER,
     raresa VARCHAR(255),
     Temps INTEGER,
-    Gemmes INTEGER,
     PRIMARY KEY (ID_cofre),
     FOREIGN KEY (ID_cofre) REFERENCES Article(ID_article) ON DELETE CASCADE,
     FOREIGN KEY (raresa) REFERENCES Raresa(nom) ON DELETE CASCADE

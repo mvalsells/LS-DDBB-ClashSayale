@@ -78,9 +78,9 @@ LIMIT 10;
 -- FROM depen
 
 -- Validació entorn a Assoliments
-SELECT tag_jugador,titol,descripcio,id_arena,data,recompensa_gemmes
-FROM assoliment as a, aconsegueix as ac
-WHERE a.id_assoliment = ac.id_assoliment;
+
+SELECT ac.tag_jugador, a.titol, a.descripcio,ac.id_arena,ac.data,a.recompensa_gemmes
+FROM assoliment as a JOIN aconsegueix ac on a.id_assoliment = ac.id_assoliment;
 
 --Jugador en una arena determinada quantes gemmes(assoliment) te
 SELECT DISTINCT j.tag_jugador as ID_Jugador,j.nom as Nom_Jugador,a.id_arena as ID_Arena,
@@ -100,7 +100,7 @@ FROM compren AS c JOIN targeta_credit tc on c.num_targeta = tc.numero
 JOIN jugador j on c.tag_jugador = j.tag_jugador
 JOIN article a on c.id_article = a.id_article
 GROUP BY j.tag_jugador,j.nom
-ORDER BY j.nom asc
+ORDER BY articles desc
 LIMIT 10;
 
 --(Un jugador compra un article que es vegi la quantitat el preu i el seu nom, descompte)
