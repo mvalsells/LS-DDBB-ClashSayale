@@ -16,18 +16,17 @@ JOIN pertany AS p on j.tag_jugador = p.tag_jugador
 JOIN edifici AS ed ON ed.nom = p.nom_carta
 GROUP BY j.tag_jugador;
 
-SELECT j.tag_jugador, j.nom, COUNT(DISTINCT c.id_pila) AS num_piles_compartiedes
+SELECT j.tag_jugador, j.nom, COUNT(DISTINCT c.id_pila) AS piles_compartiedes
 FROM jugador AS j
 JOIN pila p on j.tag_jugador = p.tag_jugador
 JOIN comparteixen c on p.id_pila = c.id_pila
 GROUP BY j.tag_jugador;
 
-SELECT p.tag_jugador, c.nom, COUNT(f.nom_carta) AS total
+SELECT p.tag_jugador, c.nom AS nom_carta, COUNT(f.nom_carta) AS total
 FROM carta AS c
 JOIN formen AS f on c.nom = f.nom_carta
 JOIN pila p on f.id_pila = p.id_pila
-GROUP BY c.nom, p.tag_jugador
-ORDER BY total DESC;
+GROUP BY c.nom, p.tag_jugador;
 
 SELECT p.nom AS pila, COUNT(DISTINCT c.raresa) AS rareses_diferents
 FROM pila AS p
