@@ -665,6 +665,7 @@ FROM 'C:\Users\Public\Creats\Conte_Cartes-Cofre.csv'
 DELIMITER ','
 CSV HEADER;
 
+
 INSERT INTO conte(id_cofre, nom_carta)
 SELECT cc.Id_cofre,cc.Raresa
 FROM Conte_CartesCofre as cc, cofre as c
