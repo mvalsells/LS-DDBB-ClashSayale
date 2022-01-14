@@ -128,7 +128,6 @@ CREATE TABLE Batalla (
 -- IMPLEMENTACIÓ DEL MÒDUL 1:
 
 -- Creació de la taula Raresa
-
 CREATE TABLE Raresa (
 	nom VARCHAR (255),
 	cost_pujar_nivell INTEGER,

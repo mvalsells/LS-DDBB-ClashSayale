@@ -31,7 +31,7 @@ FROM comparteixen;
 -- Validació entorn a Clans
 
 -- Validació entorn a Batalles
-SELECT guanya.id_pila, perd.id_pila, guanya.num_trofeus, perd.num_trofeus, batalla.data, batalla.durada
+SELECT guanya.id_pila, perd.id_pila, guanya.num_trofeus, perd.num_trofeus, batalla.data, batalla.durada, batalla.clan_battle
 FROM batalla
 JOIN guanya ON batalla.id_batalla = guanya.id_batalla
 JOIN perd ON batalla.id_batalla = perd.id_batalla;
