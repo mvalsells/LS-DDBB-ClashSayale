@@ -10,14 +10,11 @@ SELECT tag_jugador1, tag_jugador2
 FROM amics;
 
 -- Validació entorn a Cartes
-SELECT j.tag_jugador, j.nom, COUNT(ed.nom) AS num_c_edifici --, COUNT(en.nom) AS num_c_encanteri, COUNT(t.nom) AS num_c_trop
+SELECT j.tag_jugador, j.nom, COUNT(ed.nom) AS num_c_edifici
 FROM jugador AS j
 JOIN pertany AS p on j.tag_jugador = p.tag_jugador
 JOIN edifici AS ed ON ed.nom = p.nom_carta
--- JOIN encanteri AS en on en.nom = p.nom_carta
--- JOIN tropa AS t ON t.nom = p.nom_carta
 GROUP BY j.tag_jugador;
-
 
 SELECT j.tag_jugador, j.nom, COUNT(DISTINCT c.id_pila) AS num_piles_compartiedes
 FROM jugador AS j
@@ -25,8 +22,10 @@ JOIN pila p on j.tag_jugador = p.tag_jugador
 JOIN comparteixen c on p.id_pila = c.id_pila
 GROUP BY j.tag_jugador;
 
-SELECT id_pila, tag_jugador
-FROM comparteixen;
+SELECT r.nom AS raresa, COUNT(c.raresa) AS quantitat_cartes
+FROM carta AS c
+JOIN raresa AS r on c.raresa = r.nom
+GROUP BY r.nom;
 
 -- Validació entorn a Clans
 
