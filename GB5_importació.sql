@@ -365,9 +365,6 @@ INSERT INTO perd(tag_jugador, ID_pila, num_trofeus)
 SELECT (SELECT tag_jugador FROM pila WHERE id_pila = battleTmp.loser), (SELECT ID_pila FROM pila WHERE id_pila = battleTmp.loser), battleTmp.loser_score
 FROM battleTmp;
 
--- Fem aquí el drop table de playersdeck ja que si no no existeix la taula per fer comparació
-DROP TABLE playersdeck;
-
 -- Afegim a batalla de clans
 CREATE TEMPORARY TABLE clans_battle (
     battle INTEGER,
@@ -627,6 +624,12 @@ INSERT INTO pertany(nom_carta,tag_jugador,quantitat,data_desbolqueig, nivell)
 SELECT pct.name,pct.player,pct.amount,pct.date,pct.level
 FROM playerCardsTmp AS pct
 JOIN carta AS c ON pct.name = c.nom;
+
+INSERT INTO formen(nom_carta, id_pila, nivell)
+SELECT DISTINCT pc.name, pd.deck, pd.level
+FROM playersdeck AS pd
+JOIN playerCardsTmp AS pc ON pc.id = pd.card
+JOIN carta AS c ON c.nom = pc.name; -- Afegit donat que algunes cartes només estan al csv playercards i no al de cards i per tant les hem d'ometre
 
 -- Decks compartits (shared_decks.csv)
 COPY comparteixen(id_pila, tag_jugador)

@@ -206,11 +206,14 @@ CREATE TABLE Pila (
 
 -- Creació de la taula Formen
 CREATE TABLE Formen (
+    ID_formen SERIAL,
 	nom_carta VARCHAR(255),
 	ID_pila INTEGER,
-	PRIMARY KEY (nom_carta, ID_pila),
+	nivell INTEGER,
+	PRIMARY KEY (ID_formen),
 	FOREIGN KEY (nom_carta) REFERENCES Carta (nom) ON DELETE CASCADE,
-	FOREIGN KEY (ID_pila) REFERENCES Pila (ID_pila) ON DELETE CASCADE
+	FOREIGN KEY (ID_pila) REFERENCES Pila (ID_pila) ON DELETE CASCADE,
+	FOREIGN KEY (nivell) REFERENCES NivellCarta(nivell) ON DELETE CASCADE
 );
 
 
@@ -277,8 +280,8 @@ CREATE TABLE arena_pack_arena(
     ID_arena_pack INTEGER,
     or_ INTEGER,
     PRIMARY KEY (ID_arena,ID_arena_pack),
-    FOREIGN KEY (ID_arena) REFERENCES Arena(ID_arena),
-    FOREIGN KEY (ID_arena_pack) REFERENCES Arena_pack(id_arena_pack)
+    FOREIGN KEY (ID_arena) REFERENCES Arena(ID_arena) ON DELETE CASCADE,
+    FOREIGN KEY (ID_arena_pack) REFERENCES Arena_pack(id_arena_pack) ON DELETE CASCADE
 );
 
 -- Article: Cofre
@@ -515,15 +518,6 @@ CREATE TABLE Assoliment (
 	FOREIGN KEY (ID_assoliment) REFERENCES Assoliment (ID_assoliment) ON DELETE CASCADE
 );
 
--- Creació de la taula Desbloquegen
-CREATE TABLE Desbloquegen (
-	tag_jugador VARCHAR (255),
-	ID_arena INTEGER,
-	PRIMARY KEY (tag_jugador, ID_arena),
-	FOREIGN KEY (tag_jugador) REFERENCES Jugador (tag_jugador) ON DELETE CASCADE,
-	FOREIGN KEY (ID_arena) REFERENCES Arena_pack (ID_arena_pack) ON DELETE CASCADE
-);
-
 -- Creació de la taula Aconsegueix
 CREATE TABLE Aconsegueix (
 	tag_jugador VARCHAR (255),
@@ -577,16 +571,4 @@ CREATE TABLE Insignia (
 	data DATE,
 	PRIMARY KEY (ID_insignia),
 	FOREIGN KEY (ID_insignia) REFERENCES Insignia (ID_insignia) ON DELETE CASCADE
-);
-
--- Creació de la taula Participen
-CREATE TABLE Participen (
-	ID_temporada VARCHAR(255),
-	tag_jugador VARCHAR (255),
-	num_victories INTEGER,
-	num_derrotes INTEGER,
-	punts INTEGER,
-	PRIMARY KEY (tag_jugador, ID_temporada),
-	FOREIGN KEY (tag_jugador) REFERENCES Jugador (tag_jugador) ON DELETE CASCADE,
-	FOREIGN KEY (ID_temporada) REFERENCES Temporada (ID_temporada) ON DELETE CASCADE
 );
