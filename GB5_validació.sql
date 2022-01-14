@@ -37,12 +37,17 @@ ORDER BY rareses_diferents;
 
 
 -- Validació entorn a Clans
-SELECT clan.nom AS nom_clan, rol.nom AS rol, jugador.nom AS nom_jugador, jugador.experiencia AS experiencia, dona.quantitat
+
+SELECT clan.nom as nom_clan, jugador.tag_jugador, jugador.nom, sum(dona.quantitat) AS total_donat
 FROM clan
-JOIN forma_part ON clan.tag_clan=forma_part.tag_clan
-JOIN rol ON forma_part.id_rol = rol.id_rol
-JOIN jugador ON forma_part.tag_jugador = jugador.tag_jugador
-JOIN dona ON dona.tag_jugador = forma_part.tag_jugador;
+JOIN forma_part ON forma_part.tag_clan = clan.tag_clan
+JOIN jugador ON jugador.tag_jugador = forma_part.tag_jugador
+JOIN dona ON dona.tag_jugador = jugador.tag_jugador
+JOIN rol ON rol.id_rol = forma_part.id_rol
+GROUP BY jugador.tag_jugador, clan.tag_clan
+ORDER BY total_donat DESC
+LIMIT 20;
+
 
 SELECT clan.nom, estructura.id_estructura, estructura.minim_trofeus, millora.descripcio
 FROM clan
