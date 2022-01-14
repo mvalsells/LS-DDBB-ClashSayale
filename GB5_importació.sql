@@ -490,19 +490,22 @@ FROM player_purchases
 WHERE arenapack_id IS NOT NULL;
 
 --Afegim a cofre
-INSERT INTO cofre(nom_cofre, temps, raresa, quantitat_cartes)
-SELECT DISTINCT chest_name, chest_unlock_time, chest_rarity, chest_num_cards
-FROM player_purchases;
+INSERT INTO cofre(ID_cofre,nom_cofre, temps, raresa, quantitat_cartes)
+SELECT DISTINCT buy_id, chest_name, chest_unlock_time, chest_rarity, chest_num_cards
+FROM player_purchases
+WHERE chest_name IS NOT NULL;
 
 --Afegim a bundle
-INSERT INTO bundle(or_, gemmes)
-SELECT DISTINCT bundle_gold, bundle_gems
-FROM player_purchases;
+INSERT INTO bundle(id_bundle,or_, gemmes)
+SELECT DISTINCT buy_id,bundle_gold, bundle_gems
+FROM player_purchases
+WHERE bundle_gems IS NOT NULL;
 
 --Afegim a emoticones
-INSERT INTO emoticones(nom_imatge, direccio_imatge)
-SELECT DISTINCT emote_name,emote_path
-FROM player_purchases;
+INSERT INTO emoticones(id_emoticones,nom_imatge, direccio_imatge)
+SELECT DISTINCT buy_id,emote_name,emote_path
+FROM player_purchases
+WHERE emote_name IS NOT NULL AND emote_path IS NOT NULL;
 
 --Id_compren es duplica
 INSERT INTO compren(tag_jugador, num_targeta,id_article,data_,descompte)
@@ -674,8 +677,9 @@ DELIMITER ','
 CSV HEADER;
 
 INSERT INTO conte(id_cofre, nom_carta)
-SELECT Id_cofre,Raresa
-FROM Cofre_Carta;
+SELECT cc.Id_cofre,cc.Raresa
+FROM Cofre_Carta as cc, cofre as c
+WHERE cc.Id_cofre = c.id_cofre;
 
 
 
