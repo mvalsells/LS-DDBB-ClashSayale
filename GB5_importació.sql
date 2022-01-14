@@ -352,7 +352,7 @@ FROM battleTmp;
 CREATE TEMPORARY TABLE batalles_temporada(
     id_batalla INTEGER,
     id_temporada VARCHAR(255),
-    id_arena FLOAT
+    id_arena INTEGER
 );
 
 COPY batalles_temporada
@@ -360,14 +360,12 @@ FROM 'C:\Users\Public\Creats\batalles_temporada.csv'
 DELIMITER ','
 CSV HEADER;
 
-/*
-Preguntar a becaris
 
 UPDATE batalla
 SET id_temporada = bt.id_temporada, id_arena = bt.id_arena
 FROM batalles_temporada AS bt, battleTmp
 WHERE bt.id_batalla = batalla.id_batalla;
-*/
+
 
 DROP TABLE IF EXISTS batalles_temporada;
 
@@ -556,10 +554,7 @@ INSERT INTO insignia(imatge, titol, data)
 SELECT img,name,date
 FROM playersbadge;
 
---
-INSERT INTO batalla(id_arena)
-SELECT arena
-FROM playersbadge;
+
 
 
 -- -------------- MISSATGES --------------

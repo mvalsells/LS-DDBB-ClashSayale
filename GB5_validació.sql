@@ -137,3 +137,6 @@ JOIN arena_pack_arena as apa on apa.id_arena_pack = ap.id_pack;
 
 
 
+
+
+
