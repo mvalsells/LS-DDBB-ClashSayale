@@ -49,6 +49,20 @@ JOIN millora ON millora.nom_millora = tecnologia.id_tecnologia
 ORDER BY millora.cost DESC
 LIMIT 20;
 
+SELECT p.tag_jugador, c.nom, COUNT(f.nom_carta) AS total
+FROM carta AS c
+JOIN formen AS f on c.nom = f.nom_carta
+JOIN pila p on f.id_pila = p.id_pila
+GROUP BY c.nom, p.tag_jugador
+ORDER BY total DESC;
+
+SELECT p.nom AS pila, COUNT(DISTINCT c.raresa) AS rareses_diferents
+FROM pila AS p
+JOIN formen f on p.id_pila = f.id_pila
+JOIN carta c on c.nom = f.nom_carta
+GROUP BY p.id_pila
+ORDER BY rareses_diferents;
+
 
 -- Validació entorn a Batalles
 SELECT guanya.id_pila, perd.id_pila, guanya.num_trofeus, perd.num_trofeus, batalla.data, batalla.durada, batalla.clan_battle

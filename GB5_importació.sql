@@ -27,6 +27,7 @@ DROP TABLE IF EXISTS playersachievements CASCADE;
 DROP TABLE IF EXISTS arena_packTmp CASCADE;
 DROP TABLE IF EXISTS Cofre_Carta CASCADE;
 DROP TABLE IF EXISTS batalles_temporada CASCADE;
+DROP TABLE IF EXISTS Conte_CartesCofre CASCADE;
 
 
 -- Eliminar importacions anteriors
