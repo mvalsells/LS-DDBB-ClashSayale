@@ -1,0 +1,2 @@
+-- BBDD GB5 - Marc Valsells, Marc Geremias, Irina Aynes i Albert Tomas
+-- Set 5 - Preguntes creuades

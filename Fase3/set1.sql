@@ -1,0 +1,2 @@
+-- BBDD GB5 - Marc Valsells, Marc Geremias, Irina Aynes i Albert Tomas
+-- Set1 - Les cartes són la guerra, disfressada d'esport

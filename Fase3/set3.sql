@@ -1,0 +1,2 @@
+-- BBDD GB5 - Marc Valsells, Marc Geremias, Irina Aynes i Albert Tomas
+-- Set 3 - Tingueu valor. Encara tenim el nostre clan. Sempre hi ha esperança.
