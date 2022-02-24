@@ -97,7 +97,6 @@ ORDER BY arena.nombre_min ASC
 LIMIT 10;
 
 
-
 -- Validació entorn a Missions
 SELECT j.tag_jugador AS tag_j, j.nom AS nom_j, count(c.id_missio) AS num_missions
 FROM completen AS c
