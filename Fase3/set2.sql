@@ -1,2 +1,82 @@
 -- BBDD GB5 - Marc Valsells, Marc Geremias, Irina Aynes i Albert Tomas
 -- Set 2 - No sóc un jugador, sóc un jugador de videojocs
+
+/* 1. Enumera els missatges (text i data) escrits pels jugadors que tenen més experiència que
+la mitjana dels jugadors que tenen una "A" en nom seu i pertanyen al clan "NoA". Donar
+la llista de ordenada dels missatges més antics als més nous.*/
+
+SELECT m.cos as text, m.data_ as data
+FROM missatge AS m
+JOIN conversen as c on c.id_missatge = m.id_missatge
+JOIN jugador as j on j.tag_jugador = c.tag_envia
+JOIN clan c2 on j.tag_jugador = c2.creador_clan
+WHERE j.experiencia > (SELECT AVG(j1.experiencia)
+                        FROM jugador as j1
+                        JOIN clan c1 on j1.tag_jugador = c1.creador_clan
+                        WHERE j1.nom LIKE '%a%' and c1.nom = 'NoA');
+
+
+/*2. Enumera el número de la targeta de crèdit, la data i el descompte utilitzat pels jugadors
+per comprar articles de Pack Arena amb un cost superior a 200 i per comprar articles
+que el seu nom contingui una "B".*/
+
+SELECT c.num_targeta, c.data_, c.descompte
+FROM compren as c
+JOIN article a on c.id_article = a.id_article
+JOIN arena_pack ap on a.id_article = ap.id_arena_pack
+WHERE a.preu > 200 AND a.nom LIKE '%b%';
+--Lo de la b NO HO FA
+
+/*3. Enumerar el nom i el nombre d’articles comprats, així com el cost total dels articles
+comprats i l’experiència dels jugadors que els van demanar. Filtra la sortida amb els 5
+articles en què els usuaris han gastat més diners.*/
+
+SELECT a.nom , COUNT(a.nom) as Quantitat, (a.preu*COUNT(a.nom)) as Cost_total, j.experiencia
+FROM article as a
+    JOIN compren c on a.id_article = c.id_article
+    JOIN jugador j on c.tag_jugador = j.tag_jugador
+GROUP BY a.nom,a.preu,j.experiencia
+ORDER BY Cost_total desc
+LIMIT 5;
+--Revisar
+
+--4. Donar els números de les targetes de crèdit que s'han utilitzat més.
+SELECT c.num_targeta, COUNT(c.num_targeta)
+FROM compren as c
+JOIN targeta_credit tc on c.num_targeta = tc.numero
+GROUP BY num_targeta
+ORDER BY COUNT(c.num_targeta) desc;
+
+--NO ENTENC PQ LES TARGETES NO EXISTEIXEN
+
+--5. Donar els descomptes totals de les emoticones comprades durant l'any 2020
+
+SELECT COUNT(c.descompte) as Descompte_Total, e.nom_imatge
+FROM compren as c
+JOIN article a on c.id_article = a.id_article
+JOIN emoticones e on a.id_article = e.id_emoticones
+WHERE c.data_ >= '2020-01-01' AND c.data_ <= '2020-12-31'
+GROUP BY e.nom_imatge;
+--Preguntar si es refereix a això
+
+/*6. Enumerar el nom, experiència i número de targeta de crèdit dels jugadors amb
+experiència superior a 150.000. Filtra les targetes de crèdit que no han estat utilitzades
+per comprar cap article. Donar dues consultes diferents per obtenir el mateix resultat.*/
+
+SELECT j.nom, j.experiencia, tc.numero
+FROM jugador as j
+JOIN targeta_credit tc on j.targeta_credit = tc.numero
+JOIN compren c on j.tag_jugador = c.tag_jugador
+WHERE j.experiencia > 150.000;
+--targetes de credit que no han estat usades per comprar articles? (left join/right join)?
+
+/*7. Retorna el nom dels articles comprats pels jugadors que tenen més de 105 cartes o pels
+jugadors que han escrit més de 4 missatges. Ordeneu els resultats segons el nom de
+l'article de més a menys valor.*/
+
+
+/*8. Retorna els missatges (text i data) enviats a l'any 2020 entre jugadors i que hagin estat
+respostos, o els missatges sense respostes enviats a un clan. Ordena els resultats
+segons la data del missatge i el text del missatge de més a menys valor.*/
+
+
