@@ -5,20 +5,28 @@
 superior a 200.000. Filtra la sortida per tenir els clans amb més trofeus requerits.
 */
 
-SELECT c.nom AS nom, c.descripcio AS descripcio, COUNT(j.tag_jugador) AS num_jugadors, trofeus_minims
+SELECT c.nom AS nom, c.descripcio AS descripcio, COUNT(j.tag_jugador) AS num_jugadors
 FROM clan AS c
     JOIN forma_part AS fp ON c.tag_clan = fp.tag_clan
     JOIN jugador AS j ON fp.tag_jugador = j.tag_jugador
 WHERE j.experiencia > 200000
 GROUP BY c.tag_clan, trofeus_minims
 ORDER BY c.trofeus_minims DESC;
+
 /*
 2. Llistar els 15 jugadors amb més experiència, la seva experiència i el nom del clan que
 pertany si el clan que ha investigat una tecnologia amb un cost superior a 1000.
 */
 
-SELECT j.nom, j.experiencia
+SELECT DISTINCT j.nom, j.experiencia, c.nom
 FROM jugador AS j
+    JOIN forma_part AS fp ON j.tag_jugador = fp.tag_jugador
+    JOIN clan AS c ON fp.tag_clan = c.tag_clan
+    JOIN tenen_tecnologia AS tt ON c.tag_clan = tt.tag_clan
+    JOIN tecnologia AS t ON tt.id_tecnologia = t.id_tecnologia
+    JOIN millora AS m ON t.id_tecnologia = m.nom_millora
+WHERE m.cost > 1000
+ORDER BY j.experiencia DESC
 LIMIT 15;
 
 /*
@@ -27,11 +35,12 @@ després del "01-01-2021" i en què van participar clans amb trofeus mínims sup
 6900. Donar només 5 batalles amb la major durada.
 */
 
-SELECT b.id_batalla, l.data_inici, b.durada
+SELECT b.id_batalla, l.data_inici, b.durada, b.data
 FROM batalla AS b
     JOIN lluiten AS l ON b.id_batalla = l.id_batalla
     JOIN clan AS c ON l.tag_clan = c.tag_clan
-WHERE c.trofeus_minims > 6900 /* AND b.data > TIMESTAMP(01012021) */
+WHERE c.trofeus_minims > 6900 AND b.data > '2021-01-01'
+ORDER BY b.durada DESC
 LIMIT 5;
 
 /*
