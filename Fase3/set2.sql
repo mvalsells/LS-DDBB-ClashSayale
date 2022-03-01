@@ -5,27 +5,25 @@
 la mitjana dels jugadors que tenen una "A" en nom seu i pertanyen al clan "NoA". Donar
 la llista de ordenada dels missatges més antics als més nous.*/
 
-SELECT m.cos as text, m.data_ as data
+SELECT m.cos as text, m.data_ as data, j.experiencia
 FROM missatge AS m
 JOIN conversen as c on c.id_missatge = m.id_missatge
 JOIN jugador as j on j.tag_jugador = c.tag_envia
-JOIN clan c2 on j.tag_jugador = c2.creador_clan
 WHERE j.experiencia > (SELECT AVG(j1.experiencia)
                         FROM jugador as j1
                         JOIN clan c1 on j1.tag_jugador = c1.creador_clan
-                        WHERE j1.nom LIKE '%a%' and c1.nom = 'NoA');
-
+                        WHERE j1.nom LIKE '%a%' and c1.nom = 'NoA')
+ORDER BY  m.data_ desc;
 
 /*2. Enumera el número de la targeta de crèdit, la data i el descompte utilitzat pels jugadors
 per comprar articles de Pack Arena amb un cost superior a 200 i per comprar articles
 que el seu nom contingui una "B".*/
 
-SELECT c.num_targeta, c.data_, c.descompte
-FROM compren as c
-JOIN article a on c.id_article = a.id_article
+SELECT c.num_targeta, c.data_, c.descompte,a.nom
+FROM article as a
+JOIN compren c on a.id_article = c.id_article
 JOIN arena_pack ap on a.id_article = ap.id_arena_pack
-WHERE a.preu > 200 AND a.nom LIKE '%b%';
---Lo de la b NO HO FA
+WHERE a.nom LIKE '%b%' AND a.preu > 200;
 
 /*3. Enumerar el nom i el nombre d’articles comprats, així com el cost total dels articles
 comprats i l’experiència dels jugadors que els van demanar. Filtra la sortida amb els 5
@@ -35,19 +33,19 @@ SELECT a.nom , COUNT(a.nom) as Quantitat, (a.preu*COUNT(a.nom)) as Cost_total, j
 FROM article as a
     JOIN compren c on a.id_article = c.id_article
     JOIN jugador j on c.tag_jugador = j.tag_jugador
-GROUP BY a.nom,a.preu,j.experiencia
+GROUP BY a.nom,a.preu,j.tag_jugador
 ORDER BY Cost_total desc
 LIMIT 5;
---Revisar
+--La quantitat conta el numero d'articles que s'han comprat amb aquell nom
+--Pero no conta els de cadascu, conta en general.
 
 --4. Donar els números de les targetes de crèdit que s'han utilitzat més.
 SELECT c.num_targeta, COUNT(c.num_targeta)
 FROM compren as c
-JOIN targeta_credit tc on c.num_targeta = tc.numero
-GROUP BY num_targeta
+--JOIN targeta_credit tc on c.num_targeta = tc.numero
+GROUP BY c.num_targeta
 ORDER BY COUNT(c.num_targeta) desc;
-
---NO ENTENC PQ LES TARGETES NO EXISTEIXEN
+--No funciona
 
 --5. Donar els descomptes totals de les emoticones comprades durant l'any 2020
 

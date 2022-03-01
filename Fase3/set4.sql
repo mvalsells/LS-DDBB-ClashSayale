@@ -42,15 +42,24 @@ WHERE t.data_inici >= '2019-01-01' AND t.data_fi <= '2019-12-31';
 /* 4. Enumerar els noms de les arenes en què els jugadors veterans (experiència superior a
 170.000) van obtenir insígnies després del "25-10-2021". Ordenar el resultat segons el
 nom de l’arena en ordre ascendent. */
-SELECT a.titol AS nom_arena FROM arena AS a
-
+SELECT DISTINCT a.titol AS nom_arena FROM arena AS a
+JOIN obte AS o ON a.id_arena = o.id_arena
+JOIN jugador AS j ON o.tag_jugador = j.tag_jugador
+JOIN insignia AS i ON o.id_insignia = i.id_insignia
+WHERE experiencia > 170000 AND i.data > '20211025'
+ORDER BY nom_arena ASC;
 
 
 /* 5. Enumerar el nom de la insígnia, els noms de les cartes i el dany de les cartes dels
 jugadors amb una experiència superior a 290.000 i obtingudes en arenes el nom de les
 quals comença per "A" o quan la insígnia no té imatge. Així, considera només els
 jugadors que tenen una carta el nom de la qual comença per "Lava". */
-
+SELECT DISTINCT i.titol, c.nom, c.dany, j.experiencia FROM insignia AS i, carta AS c
+JOIN pertany AS p on c.nom = p.nom_carta
+JOIN jugador AS j on p.tag_jugador = j.tag_jugador
+JOIN obte AS o on j.tag_jugador = o.tag_jugador
+JOIN arena AS a on c.arena = a.id_arena
+WHERE ((j.experiencia > 290000 AND a.titol LIKE 'A%') OR i.imatge IS NULL) AND c.nom LIKE 'Lava%';
 
 
 /* 6. Donar el nom de les missions que donen recompenses a totes les arenes el títol de les

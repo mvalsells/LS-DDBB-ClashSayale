@@ -55,6 +55,7 @@ DROP TABLE IF EXISTS Batalla CASCADE;
 DROP TABLE IF EXISTS Guanya CASCADE;
 DROP TABLE IF EXISTS Perd CASCADE;
 DROP TABLE IF EXISTS Insignia CASCADE;
+DROP TABLE IF EXISTS Obte CASCADE;
 DROP TABLE IF EXISTS Participen CASCADE;
 DROP TABLE IF EXISTS Temporada CASCADE;
 
@@ -571,4 +572,15 @@ CREATE TABLE Insignia (
 	data DATE,
 	PRIMARY KEY (ID_insignia),
 	FOREIGN KEY (ID_insignia) REFERENCES Insignia (ID_insignia) ON DELETE CASCADE
+);
+
+-- Creació de la taula Obté
+CREATE TABLE Obte (
+    ID_insignia SERIAL,
+    tag_jugador VARCHAR (255),
+    ID_arena INTEGER,
+    PRIMARY KEY (ID_insignia, tag_jugador, ID_arena),
+    FOREIGN KEY (ID_insignia) REFERENCES Insignia (ID_insignia) ON DELETE CASCADE,
+    FOREIGN KEY (tag_jugador) REFERENCES Jugador (tag_jugador) ON DELETE CASCADE,
+    FOREIGN KEY (ID_arena) REFERENCES Arena (ID_arena) ON DELETE CASCADE
 );

@@ -235,8 +235,6 @@ SET creador_clan = jc.player
 FROM jugadors_clans AS jc
 WHERE jc.role LIKE 'leader%' AND clan.tag_clan = jc.clan;
 
-
-
 DROP TABLE IF EXISTS jugadors_clans;
 
 -- Amics
@@ -538,9 +536,6 @@ INSERT INTO insignia(imatge, titol, data)
 SELECT img,name,date
 FROM playersbadge;
 
-
-
-
 -- -------------- MISSATGES --------------
 
 -- msg_between_players.csv
@@ -667,6 +662,11 @@ INSERT INTO conte(id_cofre, nom_carta)
 SELECT cc.Id_cofre,cc.Raresa
 FROM Conte_CartesCofre as cc, cofre as c
 WHERE cc.Id_cofre = c.id_cofre;
+
+INSERT INTO obte (tag_jugador, id_arena)
+SELECT pb.player, pb.arena
+FROM playersbadge AS pb;
+
 
 
 
