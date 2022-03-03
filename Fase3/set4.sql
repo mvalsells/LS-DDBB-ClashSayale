@@ -75,10 +75,15 @@ JOIN arena AS a on c.id_arena = a.id_arena
 WHERE a.titol LIKE 'T%' OR a.titol LIKE '%a'
 ORDER BY nom_missio;
 
+
 /* 7. Donar el nom de les arenes amb jugadors que al novembre o desembre de 2021 van
 obtenir insígnies si el nom de l’arena conté la paraula "Lliga", i les arenes tenen jugadors
 que al 2021 van obtenir èxits el nom dels quals conté la paraula "Friend". */
-SELECT
+SELECT a.titol AS nom_arena FROM arena AS a
+JOIN completen AS c on a.id_arena = c.id_arena
+JOIN jugador AS j on c.tag_jugador = j.tag_jugador
+
+-- "Lliga" no està a cap arena??
 
 
 /* 8. Retorna el nom de les cartes que pertanyen a jugadors que van completar missions el
@@ -89,3 +94,4 @@ JOIN pertany AS p ON c.nom = p.nom_carta
 JOIN jugador AS j on p.tag_jugador = j.tag_jugador
 JOIN completen AS c2 on j.tag_jugador = c2.tag_jugador
 
+-- La inserció a la taula missió no està ben feta ja que al .csv hi ha 1000 missions i nosaltres en guardem 200.
