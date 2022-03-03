@@ -20,14 +20,15 @@ pertany si el clan que ha investigat una tecnologia amb un cost superior a 1000.
 
 SELECT DISTINCT j.nom, j.experiencia, c.nom
 FROM jugador AS j
-    JOIN forma_part AS fp ON j.tag_jugador = fp.tag_jugador
-    JOIN clan AS c ON fp.tag_clan = c.tag_clan
-    JOIN tenen_tecnologia AS tt ON c.tag_clan = tt.tag_clan
-    JOIN tecnologia AS t ON tt.id_tecnologia = t.id_tecnologia
-    JOIN millora AS m ON t.id_tecnologia = m.nom_millora
+         JOIN forma_part AS fp ON j.tag_jugador = fp.tag_jugador
+         JOIN clan AS c ON fp.tag_clan = c.tag_clan
+         JOIN tenen_tecnologia AS tt ON c.tag_clan = tt.tag_clan
+         JOIN tecnologia AS t ON tt.id_tecnologia = t.id_tecnologia
+         JOIN millora AS m ON t.id_tecnologia = m.nom_millora
 WHERE m.cost > 1000
 ORDER BY j.experiencia DESC
 LIMIT 15;
+
 
 /*
 3. Enumera l’identificador, la data d'inici i la durada de les batalles que van començar
@@ -78,6 +79,17 @@ cost de les tecnologies que utilitzen els clans amb trofeus mínims superiors a 
 de trofeus mínims de tots els clans.
 */
 
+UPDATE millora AS m
+SET cost = m.cost*0.25 + m.cost
+FROM clan AS c
+    JOIN tenen_tecnologia tt ON c.tag_clan = tt.tag_clan
+    JOIN tecnologia AS t ON tt.id_tecnologia = t.id_tecnologia
+    JOIN millora AS mm ON t.id_tecnologia = mm.nom_millora
+WHERE c.trofeus_minims > (SELECT AVG(c.trofeus_minims)
+                            FROM clan AS c);
+-- ESTIC INCREMENTANT NOMES EL DE LES TECNOLOGIES O TMB EL DE LES ESTRUCTURES?
+
+
 --Subquerie s'ha de treure l'AVG
 
 /*
@@ -86,9 +98,23 @@ estructura "Monument" construïda després del "01-01-2021". Ordena les dades se
 el nom i la descripció de les tecnologies.
 */
 
+SELECT DISTINCT t.id_tecnologia AS nom_tecnologia, m.descripcio
+FROM clan AS c
+    JOIN tenen_tecnologia AS tt ON c.tag_clan = tt.tag_clan
+    JOIN tenen_estructura AS te ON c.tag_clan = te.tag_clan
+    JOIN tecnologia AS t ON tt.id_tecnologia = t.id_tecnologia
+    JOIN millora AS m ON m.nom_millora = t.id_tecnologia
+WHERE te.id_estructura LIKE 'Monument' AND te.data > '2021-01-01'
+ORDER BY t.id_tecnologia, m.descripcio;
+
 /*
 8. Enumera els clans amb un mínim de trofeus superior a 6900 i que hagin participat a
 totes les batalles de clans.
 */
-
--- Mirar amb ALL?
+SELECT c.nom, COUNT(DISTINCT ll.id_batalla) AS n_batalles
+FROM clan AS c
+    JOIN lluiten AS ll ON c.tag_clan = ll.tag_clan
+WHERE c.trofeus_minims > 6900 AND (SELECT COUNT(ll.tag_clan)
+                                    FROM lluiten AS ll
+                                    /*WHERE ll.tag_clan = */)
+GROUP BY c.tag_clan;
