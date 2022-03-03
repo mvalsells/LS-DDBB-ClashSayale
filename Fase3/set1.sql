@@ -34,14 +34,19 @@ ORDER BY pila, carta DESC;
 -- 4. Enumerar el nom i el dany de les cartes llegendàries de menor a major valor de dany
 -- que pertanyin a una pila creada l'1 de novembre del 2021. Filtrar la sortida per tenir les
 -- deu millors cartes.
-
-
--- TODO: Preguntar order by
-SELECT c.nom, c.dany
+SELECT DISTINCT c.nom, c.dany
 FROM formen AS f
 JOIN carta AS c on c.nom = f.nom_carta AND c.raresa = 'Legendary'
 JOIN pila AS p on p.id_pila = f.id_pila AND date(p.data_creacio) = '2021-11-01'
-ORDER BY c.dany DESC
+WHERE c.dany = ANY (
+    SELECT DISTINCT c.dany
+    FROM formen AS f
+    JOIN carta AS c on c.nom = f.nom_carta AND c.raresa = 'Legendary'
+    JOIN pila AS p on p.id_pila = f.id_pila AND date(p.data_creacio) = '2021-11-01'
+    ORDER BY c.dany DESC
+    LIMIT 10
+    )
+ORDER BY c.dany
 LIMIT 10;
 
 -- 5.Llistar les tres primeres cartes de tipus edifici (nom i dany) en funció del dany dels
@@ -56,24 +61,29 @@ JOIN jugador AS j on p.tag_jugador = j.tag_jugador AND j.experiencia > 250000
 ORDER BY c.dany
 LIMIT 3;
 
-
-
 -- 6. Els dissenyadors del joc volen canviar algunes coses a les dades. El nom d'una carta
 -- "Rascals" serà "Hal Roach's Rascals", la Raresa "Common" es dirà "Proletari".
 -- Proporcioneu les ordres SQL per fer les modificacions sense eliminar les dades i
 -- reimportar-les.
+-- TODO: A la memoria explicar els canvis en el model fisic
+UPDATE raresa
+SET nom = 'Proletari'
+WHERE nom = 'Common';
 
+UPDATE carta
+SET nom = 'Hal Roach''s Rascals'
+WHERE nom = 'Rascals';
 
 -- 7. Enumerar els noms de les cartes que no estan en cap pila i els noms de les cartes que
 -- només estan en una pila. Per validar els resultats de la consulta, proporcioneu dues
 -- consultes diferents per obtenir el mateix resultat
+-- TODO: Al fer la memoria justificar que no tenim cap carta que només està en una pila
 SELECT c.nom
 FROM carta AS c
 LEFT JOIN formen AS f on c.nom = f.nom_carta
 WHERE f.nom_carta IS NULL
 UNION
--- TODO: Aquesta query diria que està bé però no retorna cap resultat
-SELECT nom_carta--, count(nom_carta)
+SELECT nom_carta, count(nom_carta)
 FROM formen
 GROUP BY nom_carta
 HAVING count(nom_carta) = 1;
