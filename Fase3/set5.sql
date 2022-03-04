@@ -3,15 +3,38 @@
 
 -- 1. Mostrar el nombre de jugadors que té cada clan, però només considerant els jugadors
 -- amb nom de rol que contingui el text "elder". Restringir la sortida per als 5 primers clans
--- amb més jugadors.
+-- amb més jugadors. (MarcG)
 
+SELECT c.nom, COUNT(j.tag_jugador) AS num_jugadors
+FROM clan AS c
+    JOIN forma_part AS fp ON c.tag_clan = fp.tag_clan
+    JOIN jugador AS j ON fp.tag_jugador = j.tag_jugador
+    JOIN rol AS r ON fp.id_rol = r.id_rol
+WHERE r.nom = 'elder'
+GROUP BY c.tag_clan
+ORDER BY num_jugadors DESC
+LIMIT 5;
 
 -- 2. Mostrar el nom dels jugadors, el text dels missatges i la data dels missatges enviats pels
--- jugadors que tenen la carta Skeleton Army i han comprat articles abans del 01-01-2019.
+-- jugadors que tenen la carta Skeleton Army i han comprat articles abans del 01-01-2019. (MarcG)
+
+SELECT j.nom
+FROM jugador AS j;
 
 
 -- 3. Llistar els 10 primers jugadors amb experiència superior a 100.000 que han creat més
--- piles i han guanyat batalles a la temporada T7.
+-- piles i han guanyat batalles a la temporada T7. (MarcG)
+
+SELECT j.nom, j.experiencia
+FROM jugador AS j
+WHERE j.experiencia > 100000
+ORDER BY j.experiencia DESC;
+
+SELECT COUNT(p.id_pila) AS n_piles
+FROM jugador AS j JOIN pila AS p ON j.tag_jugador = p.tag_jugador
+GROUP BY j.tag_jugador
+ORDER BY n_piles DESC;
+--"Que han creat més piles han guanyat qualsevol batalla en la T7"
 
 
 -- 4. Enumera els articles que han estat comprats més vegades i el seu cost total.
