@@ -34,6 +34,7 @@ ORDER BY pila, carta DESC;
 -- 4. Enumerar el nom i el dany de les cartes llegendàries de menor a major valor de dany
 -- que pertanyin a una pila creada l'1 de novembre del 2021. Filtrar la sortida per tenir les
 -- deu millors cartes.
+-- TODO: revisar els temes dels distinct, amb aquestes dades funcionen, però amb altres potser no
 SELECT DISTINCT c.nom, c.dany
 FROM formen AS f
 JOIN carta AS c on c.nom = f.nom_carta AND c.raresa = 'Legendary'
@@ -52,7 +53,6 @@ LIMIT 10;
 -- 5.Llistar les tres primeres cartes de tipus edifici (nom i dany) en funció del dany dels
 -- jugadors amb experiència superior a 250.000
 
--- TODO: funció del dany x + o x -?
 SELECT DISTINCT c.nom, c.dany
 FROM pertany AS p
 JOIN carta AS c on p.nom_carta = c.nom
