@@ -56,7 +56,7 @@ FROM clan AS c
     JOIN estructura AS e ON te.id_estructura = e.id_estructura
     JOIN millora AS m ON e.id_estructura = m.nom_millora
 WHERE EXTRACT(YEAR FROM te.data) = 2020 AND e.minim_trofeus > 1200
-GROUP BY c.tag_clan, c.trofeus_minims
+GROUP BY c.tag_clan
 HAVING COUNT(te.id_estructura) > 2;
 
 /*
@@ -70,7 +70,8 @@ FROM clan AS c
     JOIN forma_part AS fp ON fp.tag_clan = c.tag_clan
     JOIN jugador AS j ON j.tag_jugador = fp.tag_jugador
     JOIN rol AS r ON fp.id_rol = r.id_rol
---Subquerie? WHERE r.nom = 'coLeader' AND j.experiencia > 200000
+WHERE r.nom = 'coLeader' AND j.experiencia > 200000
+GROUP BY c.tag_clan, c.trofeus_minims
 ORDER BY c.trofeus_minims ASC;
 
 /*
@@ -79,19 +80,16 @@ cost de les tecnologies que utilitzen els clans amb trofeus mínims superiors a 
 de trofeus mínims de tots els clans.
 */
 
+--TODO Comprovar
 UPDATE millora AS m
 SET cost = m.cost*0.25 + m.cost
 FROM clan AS c
-    JOIN tenen_tecnologia tt ON c.tag_clan = tt.tag_clan
+    JOIN tenen_tecnologia AS tt ON c.tag_clan = tt.tag_clan
     JOIN tecnologia AS t ON tt.id_tecnologia = t.id_tecnologia
-    JOIN millora AS mm ON t.id_tecnologia = mm.nom_millora
-WHERE c.trofeus_minims > (SELECT AVG(c.trofeus_minims)
+
+WHERE t.id_tecnologia = m.nom_millora
+  AND c.trofeus_minims > (SELECT AVG(c.trofeus_minims)
                             FROM clan AS c);
--- ESTIC INCREMENTANT NOMES EL DE LES TECNOLOGIES O TMB EL DE LES ESTRUCTURES?
-
-
---Subquerie s'ha de treure l'AVG
-
 /*
 7. Enumerar el nom i la descripció de la tecnologia utilitzada pels clans que tenen una
 estructura "Monument" construïda després del "01-01-2021". Ordena les dades segons
@@ -111,10 +109,15 @@ ORDER BY t.id_tecnologia, m.descripcio;
 8. Enumera els clans amb un mínim de trofeus superior a 6900 i que hagin participat a
 totes les batalles de clans.
 */
-SELECT c.nom, COUNT(DISTINCT ll.id_batalla) AS n_batalles
+
+SELECT c.nom
 FROM clan AS c
-    JOIN lluiten AS ll ON c.tag_clan = ll.tag_clan
-WHERE c.trofeus_minims > 6900 AND (SELECT COUNT(ll.tag_clan)
-                                    FROM lluiten AS ll
-                                    /*WHERE ll.tag_clan = */)
-GROUP BY c.tag_clan;
+    JOIN lluiten AS l ON c.tag_clan = l.tag_clan
+    JOIN batalla AS bb ON l.id_batalla = bb.id_batalla
+WHERE c.trofeus_minims > 6900
+GROUP BY c.tag_clan
+HAVING COUNT(DISTINCT l.id_batalla) = (SELECT COUNT(DISTINCT b.id_batalla)
+                                        FROM batalla AS b
+                                        JOIN lluiten AS ll ON b.id_batalla = ll.id_batalla);
+
+-- No surt res d'output pq no hi ha cap batalla que ha participat a totes les batalles de clan
