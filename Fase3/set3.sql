@@ -90,7 +90,6 @@ FROM clan AS c
 WHERE t.id_tecnologia = m.nom_millora
   AND c.trofeus_minims > (SELECT AVG(c.trofeus_minims)
                             FROM clan AS c);
-
 /*
 7. Enumerar el nom i la descripció de la tecnologia utilitzada pels clans que tenen una
 estructura "Monument" construïda després del "01-01-2021". Ordena les dades segons
@@ -105,19 +104,20 @@ FROM clan AS c
     JOIN millora AS m ON m.nom_millora = t.id_tecnologia
 WHERE te.id_estructura LIKE 'Monument' AND te.data > '2021-01-01'
 ORDER BY t.id_tecnologia, m.descripcio;
---TODO Potser fa falta GROUPBY
 
 /*
 8. Enumera els clans amb un mínim de trofeus superior a 6900 i que hagin participat a
 totes les batalles de clans.
 */
+
 SELECT c.nom
 FROM clan AS c
-    JOIN lluiten AS ll ON c.tag_clan = ll.tag_clan
+    JOIN lluiten AS l ON c.tag_clan = l.tag_clan
+    JOIN batalla AS bb ON l.id_batalla = bb.id_batalla
 WHERE c.trofeus_minims > 6900
 GROUP BY c.tag_clan
-HAVING COUNT(DISTINCT ll.id_batalla) = (SELECT COUNT(DISTINCT b.id_batalla) FROM batalla AS b);
+HAVING COUNT(DISTINCT l.id_batalla) = (SELECT COUNT(DISTINCT b.id_batalla)
+                                        FROM batalla AS b
+                                        JOIN lluiten AS ll ON b.id_batalla = ll.id_batalla);
 
--- TODO Revisar model relacional BATALLA DE CLANS
-SELECT COUNT(DISTINCT b.id_batalla)
-FROM batalla AS b;
+-- No surt res d'output pq no hi ha cap batalla que ha participat a totes les batalles de clan
