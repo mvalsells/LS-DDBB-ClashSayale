@@ -28,12 +28,11 @@ WHERE a.nom LIKE '%b%' AND a.preu > 200;
 /*3. Enumerar el nom i el nombre d’articles comprats, així com el cost total dels articles
 comprats i l’experiència dels jugadors que els van demanar. Filtra la sortida amb els 5
 articles en què els usuaris han gastat més diners.*/
-
 SELECT a.nom , COUNT(a.nom) as Quantitat, (a.preu*COUNT(a.nom)) as Cost_total, j.experiencia
 FROM article as a
     JOIN compren c on a.id_article = c.id_article
     JOIN jugador j on c.tag_jugador = j.tag_jugador
-GROUP BY a.nom,a.preu,j.tag_jugador
+GROUP BY c.id_article,a.nom, a.preu,j.tag_jugador
 ORDER BY Cost_total desc
 LIMIT 5;
 --La quantitat conta el numero d'articles que s'han comprat amb aquell nom
@@ -42,20 +41,18 @@ LIMIT 5;
 --4. Donar els números de les targetes de crèdit que s'han utilitzat més.
 SELECT c.num_targeta, COUNT(c.num_targeta)
 FROM compren as c
---JOIN targeta_credit tc on c.num_targeta = tc.numero
+JOIN targeta_credit tc on c.num_targeta = tc.numero
 GROUP BY c.num_targeta
 ORDER BY COUNT(c.num_targeta) desc;
---No funciona
+--Conta incorrecte i agafa targetes que no estan
 
 --5. Donar els descomptes totals de les emoticones comprades durant l'any 2020
-
 SELECT COUNT(c.descompte) as Descompte_Total, e.nom_imatge
 FROM compren as c
 JOIN article a on c.id_article = a.id_article
 JOIN emoticones e on a.id_article = e.id_emoticones
 WHERE c.data_ >= '2020-01-01' AND c.data_ <= '2020-12-31'
 GROUP BY e.nom_imatge;
---Preguntar si es refereix a això
 
 /*6. Enumerar el nom, experiència i número de targeta de crèdit dels jugadors amb
 experiència superior a 150.000. Filtra les targetes de crèdit que no han estat utilitzades
@@ -63,18 +60,37 @@ per comprar cap article. Donar dues consultes diferents per obtenir el mateix re
 
 SELECT j.nom, j.experiencia, tc.numero
 FROM jugador as j
-JOIN targeta_credit tc on j.targeta_credit = tc.numero
-JOIN compren c on j.tag_jugador = c.tag_jugador
-WHERE j.experiencia > 150.000;
---targetes de credit que no han estat usades per comprar articles? (left join/right join)?
+    left JOIN targeta_credit tc on j.targeta_credit = tc.numero
+    left JOIN compren c on j.tag_jugador = c.tag_jugador
+WHERE j.experiencia > 150.000 ;
+--Resoldre abans el 4 (s'assemblen)
 
 /*7. Retorna el nom dels articles comprats pels jugadors que tenen més de 105 cartes o pels
 jugadors que han escrit més de 4 missatges. Ordeneu els resultats segons el nom de
 l'article de més a menys valor.*/
+SELECT a.nom
+FROM article as a
+    JOIN jugador j on a.nom = j.nom
+    JOIN cofre c on a.id_article = c.id_cofre
+    JOIN conversen c2 on j.tag_jugador = c2.tag_envia
+    JOIN missatge m on c2.id_missatge = m.id_missatge
+GROUP BY a.nom,j.tag_jugador,c.quantitat_cartes
+HAVING c.quantitat_cartes > 105 OR COUNT(c2.tag_envia) > 4
+ORDER BY a.nom desc;
+--Les cartes son del cofre?
+--Resoldre el 3 abans
 
 
 /*8. Retorna els missatges (text i data) enviats a l'any 2020 entre jugadors i que hagin estat
 respostos, o els missatges sense respostes enviats a un clan. Ordena els resultats
 segons la data del missatge i el text del missatge de més a menys valor.*/
+SELECT m.cos as text, m.data_ as data
+FROM missatge AS m
+    left JOIN conversen as c on c.id_missatge = m.id_missatge
+    left JOIN jugador as j on j.tag_jugador = c.tag_envia
+    JOIN jugador as j2 on j2.tag_jugador = c.tag_rep
+    left JOIN clan c2 on j.tag_jugador = c2.creador_clan
+WHERE m.data_ >= '2020-01-01' AND m.data_ <= '2020-12-31'
+ORDER BY m.data_ desc, text desc;
 
 
