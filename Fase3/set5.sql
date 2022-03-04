@@ -90,10 +90,28 @@ ORDER BY c.nom DESC;
 -- res. Així, el nom, l'experiència i el número de trofeus dels jugadors que no han enviat
 -- cap missatge. Ordenar la sortida de menor a més valor en el nom del jugador.
 
+SELECT j.nom, j.experiencia, j.trofeus
+FROM jugador AS j
+LEFT JOIN compren AS c on j.tag_jugador = c.tag_jugador
+WHERE c.tag_jugador IS NULL
+UNION
+SELECT j.nom, j.experiencia, j.trofeus
+FROM jugador AS j
+LEFT JOIN conversen c on j.tag_jugador = c.tag_envia
+LEFT JOIN envia e on j.tag_jugador = e.tag_jugador
+WHERE e.tag_jugador IS NULL AND c.tag_envia IS NULL
+ORDER BY nom;
 
 -- 10.Llistar les cartes comunes que no estan incloses en cap pila i que pertanyen a jugadors
 -- amb experiència superior a 200.000. Ordena la sortida amb el nom de la carta.
 
+SELECT c.nom
+FROM carta AS c
+JOIN pertany AS p ON c.nom = p.nom_carta
+JOIN jugador AS j ON p.tag_jugador = j.tag_jugador
+LEFT JOIN formen AS f ON c.nom = f.nom_carta
+WHERE f.nom_carta IS NULL
+AND j.experiencia > 200000;
 
 -- 11.Llistar el nom dels jugadors que han sol·licitat amics, però no han estat sol·licitats com
 -- a amics.
