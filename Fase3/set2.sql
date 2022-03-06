@@ -19,10 +19,23 @@ ORDER BY  m.data_ desc;
 per comprar articles de Pack Arena amb un cost superior a 200 i per comprar articles
 que el seu nom contingui una "B".*/
 
-SELECT c.num_targeta, c.data_, c.descompte,a.nom
+SELECT c.num_targeta, c.data_, c.descompte
 FROM article as a
-JOIN compren c on a.id_article = c.id_article
-JOIN arena_pack ap on a.id_article = ap.id_arena_pack
+    JOIN compren c on a.id_article = c.id_article
+    JOIN arena_pack ap on a.id_article = ap.id_arena_pack
+WHERE a.nom LIKE '%b%' AND a.preu > 200;
+
+--Validacions
+SELECT c.num_targeta, c.data_, c.descompte,a.nom, a.preu
+FROM article as a
+    JOIN compren c on a.id_article = c.id_article
+    JOIN arena_pack ap on a.id_article = ap.id_arena_pack
+WHERE a.nom LIKE '%b%' AND a.preu > 200
+ORDER BY a.preu asc;
+
+SELECT a.nom
+FROM article as a
+    JOIN arena_pack ap on a.id_article = ap.id_arena_pack
 WHERE a.nom LIKE '%b%' AND a.preu > 200;
 
 /*3. Enumerar el nom i el nombre d’articles comprats, així com el cost total dels articles
@@ -49,7 +62,23 @@ FROM compren AS c
 where id_article = 164;
 
 --4. Donar els números de les targetes de crèdit que s'han utilitzat més.
-SELECT c.num_targeta, COUNT(c.num_targeta)
+SELECT c.num_targeta
+FROM compren as c
+GROUP BY c.num_targeta
+HAVING COUNT(c.num_targeta) >= (SELECT COUNT(c1.num_targeta)
+                        FROM compren as c1
+                        GROUP BY c1.num_targeta
+                        ORDER BY COUNT(c1.num_targeta) desc
+                        LIMIT 1);
+
+--Validacions
+SELECT COUNT(c1.num_targeta)
+FROM compren as c1
+GROUP BY c1.num_targeta
+ORDER BY COUNT(c1.num_targeta) desc
+LIMIT 1;
+
+SELECT c.num_targeta,COUNT(c.num_targeta)
 FROM compren as c
 GROUP BY c.num_targeta
 HAVING COUNT(c.num_targeta) >= (SELECT COUNT(c1.num_targeta)

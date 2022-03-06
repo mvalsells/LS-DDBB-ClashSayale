@@ -38,12 +38,43 @@ ORDER BY n_piles DESC;
 
 
 -- 4. Enumera els articles que han estat comprats més vegades i el seu cost total.
+SELECT a.nom ,COUNT(a.nom), (COUNT(a.nom)*a.preu) as cost_total
+FROM article as a
+JOIN compren c on a.id_article = c.id_article
+GROUP BY a.nom, a.preu
+HAVING COUNT(a.nom) >= (SELECT COUNT(a2.nom)
+                        FROM article a2
+                        JOIN compren c2 on a2.id_article = c2.id_article
+                        GROUP BY a2.nom,a2.preu
+                        ORDER BY COUNT(a2.nom) desc
+                        LIMIT 1);
 
+SELECT a.nom ,COUNT(a.nom), (COUNT(a.nom)*a.preu) as cost_total
+FROM article as a
+JOIN compren c on a.id_article = c.id_article
+GROUP BY a.nom, a.preu
+ORDER BY COUNT(a.nom) desc;
+--Et demana els més, osigui els unics o et demana ordenats?
 
 -- 5. Mostrar la identificació de les batalles, la durada, la data d'inici i la data de finalització
 -- dels clans que la seva descripció no contingui el text "Chuck Norris". Considera només
 -- les batalles amb una durada inferior a la durada mitjana de totes les batalles.
+SELECT b.id_batalla, b.durada, l.data_inici, l.data_fi, c.descripcio
+FROM batalla as b
+JOIN lluiten l on b.id_batalla = l.id_batalla
+JOIN clan c on l.tag_clan = c.tag_clan
+WHERE c.descripcio NOT LIKE '%Chuck Norris%'
+        AND b.durada < (SELECT AVG(b1.durada)
+                        FROM batalla as b1);
 
+--Comprovacio NOT LIKE
+SELECT  c.descripcio
+FROM batalla as b
+JOIN lluiten l on b.id_batalla = l.id_batalla
+JOIN clan c on l.tag_clan = c.tag_clan
+WHERE c.descripcio NOT LIKE '%Chuck Norris%';
+
+--Detecta "ChuckNorris" junt, tmb s'ha d'eliminar? o nomes el "Chuck Norris"separat?
 
 -- 6. Enumerar el nom i l'experiència dels jugadors que pertanyen a un clan que té una
 -- tecnologia el nom del qual conté la paraula "Militar" i aquests jugadors havien comprat
