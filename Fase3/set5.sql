@@ -151,8 +151,25 @@ AND j.experiencia > 200000;
 -- 12.Enumerar el nom dels jugadors i el nombre d'articles comprats que tenen un cost
 -- superior al cost mitjà de tots els articles. Ordenar el resultat de menor a major valor del
 -- nombre de comandes.
+SELECT j.nom, COUNT(a.id_article) AS nombre_articles FROM jugador AS j
+JOIN compren AS c on j.tag_jugador = c.tag_jugador
+JOIN article AS a on c.id_article = a.id_article
+WHERE a.preu > (
+    SELECT AVG(a2.preu) FROM article AS a2)
+GROUP BY j.nom
+ORDER BY nombre_articles DESC;
 
 
 -- 13.Poseu a zero els valors d'or i gemmes als jugadors que no han enviat cap missatge o
 -- que han enviat el mateix nombre de missatges que el jugador que més missatges ha
 -- enviat.
+SELECT j.nom, c2.or_, a2.recompensa_gemmes FROM jugador AS j
+JOIN conversen AS c on j.tag_jugador = c.tag_envia
+JOIN missatge AS m on c.id_missatge = m.id_missatge
+JOIN completen AS c2 on j.tag_jugador = c2.tag_jugador
+JOIN aconsegueix AS a on j.tag_jugador = a.tag_jugador
+JOIN assoliment AS a2 on a.id_assoliment = a2.id_assoliment
+GROUP BY j.nom, m.id_missatge, c2.or_, a2.recompensa_gemmes
+HAVING m.id_missatge IS NULL OR COUNT(m.id_missatge) >= (
+    SELECT COUNT(m.id_missatge) FROM missatge AS m
+    );
