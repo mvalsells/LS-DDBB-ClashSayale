@@ -102,6 +102,16 @@ CREATE TABLE Temporada (
 	PRIMARY KEY (ID_temporada)
 );
 
+-- Creació de la taula participen
+CREATE TABLE Participen (
+    tag_jugador VARCHAR (255),
+    punts INTEGER,
+    ID_temporada VARCHAR (255),
+    PRIMARY KEY (tag_jugador, ID_temporada),
+    FOREIGN KEY (tag_jugador) REFERENCES Jugador (tag_jugador),
+    FOREIGN KEY (ID_temporada) REFERENCES Temporada (ID_temporada)
+);
+
 -- Creació de la taula Arena
 CREATE TABLE Arena (
 	ID_arena INTEGER,
@@ -546,7 +556,6 @@ CREATE TABLE Guanya (
 	ID_batalla SERIAL,
 	ID_pila INTEGER,
 	num_trofeus INTEGER,
-	puntuacio INTEGER,
 	PRIMARY KEY (tag_jugador, ID_batalla, ID_pila),
 	FOREIGN KEY (tag_jugador) REFERENCES Jugador (tag_jugador) ON DELETE CASCADE ON UPDATE CASCADE,
 	FOREIGN KEY (ID_batalla) REFERENCES Batalla (ID_batalla) ON DELETE CASCADE ON UPDATE CASCADE,
@@ -559,7 +568,6 @@ CREATE TABLE Perd (
     ID_batalla SERIAL,
     ID_pila INTEGER,
     num_trofeus INTEGER,
-    puntuacio INTEGER,
     PRIMARY KEY (tag_jugador, ID_batalla, ID_pila),
     FOREIGN KEY (tag_jugador) REFERENCES Jugador (tag_jugador) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (ID_batalla) REFERENCES Batalla (ID_batalla) ON DELETE CASCADE ON UPDATE CASCADE,
