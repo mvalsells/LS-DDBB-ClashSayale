@@ -77,7 +77,7 @@ ORDER BY nom_missio;
 
 
 /* 7. Donar el nom de les arenes amb jugadors que al novembre o desembre de 2021 van
-obtenir insígnies si el nom de l’arena conté la paraula "Lliga", i les arenes tenen jugadors
+obtenir insígnies si el nom de la insígnia conté la paraula "Lliga", i les arenes tenen jugadors
 que al 2021 van obtenir èxits el nom dels quals conté la paraula "Friend". */
 SELECT a.titol AS nom_arena FROM arena AS a
 JOIN completen AS c on a.id_arena = c.id_arena
