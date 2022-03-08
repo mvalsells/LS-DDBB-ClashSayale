@@ -80,7 +80,6 @@ cost de les tecnologies que utilitzen els clans amb trofeus mínims superiors a 
 de trofeus mínims de tots els clans.
 */
 
---TODO Comprovar
 UPDATE millora AS m
 SET cost = m.cost*0.25 + m.cost
 FROM clan AS c
@@ -120,4 +119,3 @@ HAVING COUNT(DISTINCT l.id_batalla) = (SELECT COUNT(DISTINCT b.id_batalla)
                                         FROM batalla AS b
                                         JOIN lluiten AS ll ON b.id_batalla = ll.id_batalla);
 
--- No surt res d'output pq no hi ha cap batalla que ha participat a totes les batalles de clan

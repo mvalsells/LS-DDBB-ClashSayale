@@ -136,13 +136,12 @@ ORDER BY nom;
 -- 10.Llistar les cartes comunes que no estan incloses en cap pila i que pertanyen a jugadors
 -- amb experiència superior a 200.000. Ordena la sortida amb el nom de la carta.
 
-SELECT c.nom
+SELECT DISTINCT c.nom
 FROM carta AS c
 JOIN pertany AS p ON c.nom = p.nom_carta
-JOIN jugador AS j ON p.tag_jugador = j.tag_jugador
+JOIN jugador AS j ON p.tag_jugador = j.tag_jugador AND j.experiencia > 200000
 LEFT JOIN formen AS f ON c.nom = f.nom_carta
-WHERE f.nom_carta IS NULL
-AND j.experiencia > 200000;
+WHERE f.nom_carta IS NULL;
 
 -- 11.Llistar el nom dels jugadors que han sol·licitat amics, però no han estat sol·licitats com
 -- a amics.
