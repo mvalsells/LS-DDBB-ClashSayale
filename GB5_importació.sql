@@ -10,6 +10,7 @@ DROP TABLE IF EXISTS players CASCADE;
 DROP TABLE  IF EXISTS cards CASCADE;
 DROP TABLE IF EXISTS friend CASCADE;
 DROP TABLE IF EXISTS battleTmp CASCADE;
+DROP TABLE IF EXISTS puntuacions CASCADE;
 DROP TABLE IF EXISTS clans_battle CASCADE;
 DROP TABLE IF EXISTS playersdeck CASCADE;
 DROP TABLE IF EXISTS quests_arenas CASCADE;
@@ -349,16 +350,24 @@ SET id_temporada = temporada.id_temporada
 FROM temporada
 WHERE batalla.data <= temporada.data_fi AND batalla.data >= temporada.data_inici;
 
+CREATE TEMPORARY TABLE puntuacions (
+  tag_jugador VARCHAR (255),
+  puntuacio INTEGER
+);
 
+COPY puntuacions
+FROM 'C:\Users\Public\Creats\puntuacions.csv'
+DELIMITER ','
+CSV HEADER;
 
 -- Afegim a guanyador
-INSERT INTO guanya(tag_jugador, ID_pila, num_trofeus)
-SELECT (SELECT tag_jugador FROM pila WHERE id_pila = battleTmp.winner), (SELECT ID_pila FROM pila WHERE id_pila = battleTmp.winner), battleTmp.winner_score
+INSERT INTO guanya(tag_jugador, ID_pila, num_trofeus, puntuacio)
+SELECT (SELECT tag_jugador FROM pila WHERE id_pila = battleTmp.winner), (SELECT ID_pila FROM pila WHERE id_pila = battleTmp.winner), battleTmp.winner_score, (SELECT puntuacio FROM puntuacions)
 FROM battleTmp;
 
 -- Afegim a perdedor
-INSERT INTO perd(tag_jugador, ID_pila, num_trofeus)
-SELECT (SELECT tag_jugador FROM pila WHERE id_pila = battleTmp.loser), (SELECT ID_pila FROM pila WHERE id_pila = battleTmp.loser), battleTmp.loser_score
+INSERT INTO perd(tag_jugador, ID_pila, num_trofeus, puntuacio)
+SELECT (SELECT tag_jugador FROM pila WHERE id_pila = battleTmp.loser), (SELECT ID_pila FROM pila WHERE id_pila = battleTmp.loser), battleTmp.loser_score, (SELECT puntuacio FROM puntuacions)
 FROM battleTmp;
 
 -- Afegim a batalla de clans
@@ -382,6 +391,7 @@ JOIN batalla AS b ON cb.battle = b.clan_battle;
 
 DROP TABLE clans_battle;
 DROP TABLE battleTmp;
+DROP TABLE puntuacions;
 
 --Player_quest csv
 CREATE TEMPORARY TABLE players_quests(

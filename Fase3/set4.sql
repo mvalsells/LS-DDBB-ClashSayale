@@ -40,7 +40,7 @@ SELECT j.nom, j.trofeus AS puntuacio FROM jugador AS j
 JOIN guanya AS g ON j.tag_jugador = g.tag_jugador
 JOIN batalla AS b ON g.id_batalla = b.id_batalla
 JOIN temporada t ON b.id_temporada = t.id_temporada
-WHERE t.data_inici >= '20190101' AND t.data_fi <= '20191231';
+WHERE t.data_inici >= '2019-01-01' AND t.data_fi <= '2019-12-31';
 
 -- PUNTUACIÓ NO ESTÀ ALS DATASETS (HE SUPOSAT TROFEUS)
 
@@ -51,8 +51,8 @@ SELECT DISTINCT a.titol AS nom_arena FROM arena AS a
 JOIN obte AS o ON a.id_arena = o.id_arena
 JOIN jugador AS j ON o.tag_jugador = j.tag_jugador
 JOIN insignia AS i ON o.id_insignia = i.id_insignia
-WHERE j.experiencia > 170000 AND i.data > '20211025'
-ORDER BY nom_arena ASC;
+WHERE j.experiencia > 170000 AND i.data > '2021-10-25'
+ORDER BY nom_arena;
 
 
 /* 5. Enumerar el nom de la insígnia, els noms de les cartes i el dany de les cartes dels
@@ -81,9 +81,9 @@ obtenir insígnies si el nom de l’arena conté la paraula "Lliga", i les arene
 que al 2021 van obtenir èxits el nom dels quals conté la paraula "Friend". */
 SELECT a.titol AS nom_arena FROM arena AS a
 JOIN completen AS c on a.id_arena = c.id_arena
-JOIN jugador AS j on c.tag_jugador = j.tag_jugador
+JOIN jugador AS j on c.tag_jugador = j.tag_jugador;
 
--- "Lliga" no està a cap arena??
+-- "Lliga" no està a cap arena // Tampoc està "League"
 
 
 /* 8. Retorna el nom de les cartes que pertanyen a jugadors que van completar missions el
