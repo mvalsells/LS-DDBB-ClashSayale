@@ -29,51 +29,19 @@ WHERE buy.data_ < '2019-01-01' AND p.nom_carta LIKE 'Skeleton Army';
 -- 3. Llistar els 10 primers jugadors amb experiència superior a 100.000 que han creat més
 -- piles i han guanyat batalles a la temporada T7. (MarcG)
 
-SELECT DISTINCT j.nom, j.experiencia
+SELECT DISTINCT j.nom, j.experiencia, COUNT(DISTINCT p.id_pila) AS n_piles
 FROM jugador AS j
     JOIN pila AS p ON j.tag_jugador = p.tag_jugador
     JOIN guanya AS g ON j.tag_jugador = g.tag_jugador
     JOIN batalla AS b ON g.id_batalla = b.id_batalla
-    JOIN temporada AS t ON b.id_temporada = t.id_temporada
-WHERE j.experiencia > 100000 AND t.id_temporada LIKE 'T7'
-ORDER BY j.experiencia DESC;
-
-/*
-XDDDDDDDDDXDXDD
-
-SELECT DISTINCT j.nom, j.experiencia
-FROM jugador AS j
-    JOIN pila AS p ON j.tag_jugador = p.tag_jugador
-WHERE j.experiencia > 100000 AND j.tag_jugador IN (SELECT DISTINCT j.tag_jugador
-                                    FROM jugador AS j
-                                        JOIN guanya AS g ON j.tag_jugador = g.tag_jugador
-                                        JOIN batalla AS b ON g.id_batalla = b.id_batalla
-                                        JOIN temporada AS t ON b.id_temporada = t.id_temporada
-                                    WHERE t.id_temporada LIKE 'T7')
-ORDER BY j.experiencia DESC;
-*/
-
-
--- RETORNA EL NOMBRE DE PILES PER JUGADOR
-SELECT COUNT(p.id_pila) AS n_piles
-FROM jugador AS j
-    JOIN pila AS p ON j.tag_jugador = p.tag_jugador
+WHERE j.experiencia > 100000 AND b.id_temporada LIKE 'T7'
 GROUP BY j.tag_jugador
-ORDER BY n_piles DESC;
-
-
--- RETORNA ELS ID DELS JUGADORS QUE HAN GUAYAT ALGUNA BATALLA A LA T7
-SELECT DISTINCT j.tag_jugador, t.id_temporada
-FROM jugador AS j
-    JOIN guanya AS g ON j.tag_jugador = g.tag_jugador
-    JOIN batalla AS b ON g.id_batalla = b.id_batalla
-    JOIN temporada AS t ON b.id_temporada = t.id_temporada
-WHERE t.id_temporada LIKE 'T7';
-
-
-
-
-
+HAVING COUNT(DISTINCT p.id_pila) = (SELECT COUNT(id_pila) as a
+                                    FROM pila
+                                    GROUP BY tag_jugador
+                                    ORDER BY a DESC
+                                    LIMIT 1)
+ORDER BY j.experiencia DESC;
 
 
 
