@@ -44,8 +44,6 @@ HAVING COUNT(DISTINCT p.id_pila) = (SELECT COUNT(id_pila) as a
 ORDER BY j.experiencia DESC;
 
 
-
-
 -- 4. Enumera els articles que han estat comprats més vegades i el seu cost total.
 SELECT a.nom ,COUNT(a.nom), (COUNT(a.nom)*a.preu) as cost_total
 FROM article as a
@@ -58,13 +56,6 @@ HAVING COUNT(a.nom) >= (SELECT COUNT(a2.nom)
                         ORDER BY COUNT(a2.nom) desc
                         LIMIT 1);
 
-SELECT a.nom ,COUNT(a.nom), (COUNT(a.nom)*a.preu) as cost_total
-FROM article as a
-JOIN compren c on a.id_article = c.id_article
-GROUP BY a.nom, a.preu
-ORDER BY COUNT(a.nom) desc;
---Et demana els més, osigui els unics o et demana ordenats?
-
 -- 5. Mostrar la identificació de les batalles, la durada, la data d'inici i la data de finalització
 -- dels clans que la seva descripció no contingui el text "Chuck Norris". Considera només
 -- les batalles amb una durada inferior a la durada mitjana de totes les batalles.
@@ -76,19 +67,21 @@ WHERE c.descripcio NOT LIKE '%Chuck Norris%'
         AND b.durada < (SELECT AVG(b1.durada)
                         FROM batalla as b1);
 
---Comprovacio NOT LIKE
-SELECT  c.descripcio
-FROM batalla as b
-JOIN lluiten l on b.id_batalla = l.id_batalla
-JOIN clan c on l.tag_clan = c.tag_clan
-WHERE c.descripcio NOT LIKE '%Chuck Norris%';
-
---Detecta "ChuckNorris" junt, tmb s'ha d'eliminar? o nomes el "Chuck Norris"separat?
-
 -- 6. Enumerar el nom i l'experiència dels jugadors que pertanyen a un clan que té una
 -- tecnologia el nom del qual conté la paraula "Militar" i aquests jugadors havien comprat
 -- el 2021 més de 5 articles.
-
+SELECT j.tag_jugador, j.nom, j.experiencia, m.nom_millora
+FROM millora as m
+    JOIN tecnologia as t on t.id_tecnologia = m.nom_millora
+    JOIN tenen_tecnologia as tt on t.id_tecnologia = tt.id_tecnologia
+    JOIN clan as c on tt.tag_clan = c.tag_clan
+    JOIN jugador as j on c.creador_clan = j.tag_jugador
+WHERE m.nom_millora LIKE '%Militar%' AND 5 < (SELECT COUNT(a.nom)
+                                        FROM article as a
+                                        JOIN compren c3 on a.id_article = c3.id_article
+                                        JOIN jugador j2 on c3.tag_jugador = j2.tag_jugador
+                                        WHERE j.tag_jugador = j2.tag_jugador
+                                        AND (c3.data_ >= '2021-01-01' AND c3.data_ <= '2021-12-31')) ;
 
 -- 7. Indiqueu el nom dels jugadors que tenen totes les cartes amb el major valor de dany.
 
