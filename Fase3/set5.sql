@@ -101,29 +101,20 @@ WHERE c.dany = (
     FROM carta AS c
 );
 
-SELECT tag_clan, count(tag_jugador) AS m
-FROM forma_part
-GROUP BY tag_clan
-ORDER BY m DESC;
-
 -- 8. Retorna el nom de les cartes i el dany que pertanyen a les piles el nom de les quals
 -- conté la paraula "Madrid" i van ser creats per jugadors amb experiència superior a
 -- 150.000. Considereu només les cartes amb dany superior a 200 i els jugadors que van
 -- aconseguir un èxit en el 2021. Enumera el resultat des dels valors més alts del nom de
 -- la carta fins als valors més baixos del nom de la carta.
 
-
 SELECT DISTINCT c.nom, c.dany
 FROM carta AS c
 JOIN formen AS f on c.nom = f.nom_carta
-JOIN pila AS p on p.id_pila = f.id_pila
-JOIN jugador AS j on p.tag_jugador = j.tag_jugador
+JOIN pila AS p on p.id_pila = f.id_pila AND  p.nom LIKE '%Madrid%'
+JOIN jugador AS j on p.tag_jugador = j.tag_jugador AND j.experiencia > 150000
 JOIN obte AS o on j.tag_jugador = o.tag_jugador
-JOIN aconsegueix AS a on j.tag_jugador = a.tag_jugador
-WHERE p.nom LIKE '%Madrid%'
-    AND j.experiencia > 150000
-    AND c.dany > 200
-    AND EXTRACT(YEAR FROM a.data) = '2021'
+JOIN aconsegueix AS a on j.tag_jugador = a.tag_jugador AND EXTRACT(YEAR FROM a.data) = '2021'
+WHERE c.dany > 200
 ORDER BY c.nom DESC;
 
 -- 9. Enumerar el nom, l’experiència i el nombre de trofeus dels jugadors que no han comprat

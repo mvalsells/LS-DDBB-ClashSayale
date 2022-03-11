@@ -80,13 +80,19 @@ WHERE nom = 'Rascals';
 -- TODO: Al fer la memoria justificar que no tenim cap carta que només està en una pila
 SELECT c.nom
 FROM carta AS c
-LEFT JOIN formen AS f on c.nom = f.nom_carta
+LEFT JOIN formen AS f ON c.nom = f.nom_carta
 WHERE f.nom_carta IS NULL
 UNION
-SELECT nom_carta, count(nom_carta)
+SELECT nom_carta
 FROM formen
 GROUP BY nom_carta
 HAVING count(nom_carta) = 1;
+
+SELECT c.nom
+FROM carta AS c
+LEFT JOIN formen AS f ON c.nom = f.nom_carta
+GROUP BY c.nom
+HAVING c.nom IS NULL OR count(c.nom) = 1;
 
 -- 8. Enumera el nom i el dany de les cartes èpiques que tenen un dany superior al dany mitjà
 -- de les cartes llegendàries. Ordena els resultats segons el dany de les cartes de menys
