@@ -80,26 +80,16 @@ ORDER BY nom_missio;
 obtenir insígnies si el nom de la insígnia conté la paraula "Lliga", i les arenes tenen jugadors
 que al 2021 van obtenir èxits el nom dels quals conté la paraula "Friend". */
 SELECT a.titol AS nom_arena FROM arena AS a
-    JOIN completen AS c on a.id_arena = c.id_arena
-    JOIN jugador AS j on c.tag_jugador = j.tag_jugador
     JOIN obte AS o on a.id_arena = o.id_arena
+    JOIN jugador AS j on o.tag_jugador = j.tag_jugador
     JOIN insignia AS i on o.id_insignia = i.id_insignia
+WHERE i.data >= '2021-11-01' AND i.data <= '2021-12-31' AND i.titol LIKE '%League%'
+INTERSECT
+SELECT a.titol AS nom_arena FROM arena AS a
     JOIN aconsegueix AS a2 on a.id_arena = a2.id_arena
-    JOIN assoliment AS a3 on a2.id_assoliment = a3.id_assoliment
-WHERE ((i.data >= '2021-11-01' AND i.data >= '2021-12-31') AND i.titol LIKE '%League')
-    AND ((a2.data >= '2021-01-01' AND a2.data <= '2021-12-31') AND a3.titol LIKE '%Friend');
-
-SELECT DISTINCT a.titol AS nom_arena FROM arena AS a
-    JOIN completen AS c on a.id_arena = c.id_arena
-    JOIN jugador AS j on c.tag_jugador = j.tag_jugador
-    JOIN obte AS o on a.id_arena = o.id_arena
-    JOIN insignia AS i on o.id_insignia = i.id_insignia
-    JOIN aconsegueix AS a2 on a.id_arena = a2.id_arena
-    JOIN assoliment AS a3 on a2.id_assoliment = a3.id_assoliment;
-
-
-
-
+    JOIN assoliment AS a3 on a3.id_assoliment = a2.id_assoliment
+    JOIN jugador AS j on a2.tag_jugador = j.tag_jugador
+WHERE ((a2.data >= '2021-01-01' AND a2.data <= '2021-12-31') AND a3.titol LIKE '%Friend%');
 
 /* 8. Retorna el nom de les cartes que pertanyen a jugadors que van completar missions el
 nom de les quals inclou la paraula "Armer" i l'or de la missió és més gran que l'or mitjà

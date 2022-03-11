@@ -144,7 +144,6 @@ ORDER BY nom;
 
 -- 10.Llistar les cartes comunes que no estan incloses en cap pila i que pertanyen a jugadors
 -- amb experiència superior a 200.000. Ordena la sortida amb el nom de la carta.
-
 SELECT DISTINCT c.nom
 FROM carta AS c
 JOIN pertany AS p ON c.nom = p.nom_carta
