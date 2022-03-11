@@ -88,10 +88,10 @@ WHERE 105 < (SELECT COUNT(f.nom_carta)
                                     JOIN conversen as c2 on j.tag_jugador = c2.tag_envia
                                     WHERE j.tag_jugador = j3.tag_jugador)
 ORDER BY a.nom desc;
+-- Surten nomes els dels missatges, no hi ha cap jugador que tingui més de 105 cartes!!!
 
---Validacions
-
---Quins jugadors tenen més de 105 cartes:
+--Comprovacions
+--Mirem els jugadors quantes cartes tenen:
 SELECT  COUNT(f.nom_carta), j.tag_jugador
     FROM carta as c1
     JOIN  formen as f on c1.nom = f.nom_carta
@@ -100,13 +100,7 @@ SELECT  COUNT(f.nom_carta), j.tag_jugador
     JOIN jugador j on p.tag_jugador = j.tag_jugador
 GROUP BY j.tag_jugador;
 
---Mirem taula cartes de nivell
-SELECT *
-FROM carta
-join formen as f on carta.nom = f.nom_carta
-join nivellcarta as nv on f.nivell = nv.nivell ;
-
---Mirem quina id_pila te cada jugador
+--Agafem de mostra el jugador '#PJUJCVUR'
 SELECT  j.tag_jugador, COUNT(f.id_pila)
 FROM pila p
 JOIN formen as f on p.id_pila = f.id_pila
@@ -115,34 +109,6 @@ WHERE j.tag_jugador like '#PJUJCVUR'
 GROUP BY j.tag_jugador
 ORDER BY j.tag_jugador;
 
-SELECT  j.tag_jugador, p.id_pila
-FROM pila p
-JOIN formen as f on p.id_pila = f.id_pila
-JOIN jugador as j on p.tag_jugador = j.tag_jugador
-WHERE j.tag_jugador like '#PJUJCVUR'
---GROUP BY j.tag_jugador
-ORDER BY j.tag_jugador;
-
---Provem la consulta
-SELECT  j.tag_jugador
-FROM pila p
-JOIN formen as f on p.id_pila = f.id_pila
-JOIN jugador as j on p.tag_jugador = j.tag_jugador
-where (SELECT COUNT(f1.nom_carta)
-    FROM pila p1
-    JOIN formen as f1 on p1.id_pila = f1.id_pila
-    JOIN jugador as j1 on p1.tag_jugador = j1.tag_jugador
-    WHERE j.tag_jugador = j1.tag_jugador) > 105
-GROUP BY j.tag_jugador
-ORDER BY j.tag_jugador;
-
-SELECT COUNT(f1.nom_carta), j1.tag_jugador
-  FROM pila p1
-    JOIN formen as f1 on p1.id_pila = f1.id_pila
-    JOIN jugador as j1 on p1.tag_jugador = j1.tag_jugador
-GROUP BY j1.tag_jugador;
-
-
 --Quins jugadors han enviat mes de 4 missatges
 SELECT  j.tag_jugador, COUNT(c2.id_missatge)
 FROM jugador as j
@@ -150,8 +116,6 @@ FROM jugador as j
 GROUP BY j.tag_jugador
 HAVING COUNT(c2.id_missatge) > 4
 ORDER BY COUNT(c2.id_missatge) desc;
-
-
 
 /*8. Retorna els missatges (text i data) enviats a l'any 2020 entre jugadors i que hagin estat
 respostos, o els missatges sense respostes enviats a un clan. Ordena els resultats
