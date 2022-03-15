@@ -28,22 +28,12 @@ WHERE j.experiencia > 200000 AND (
         WHERE p1.tag_jugador = j.tag_jugador)
 GROUP BY t.id_temporada, j.nom, j.tag_jugador;
 
-SELECT j1.tag_jugador
-FROM jugador AS j1
-JOIN guanya g on j1.tag_jugador = g.tag_jugador
-JOIN perd p on j1.tag_jugador = p.tag_jugador
-WHERE (
-SELECT COUNT(g1.tag_jugador) FROM guanya AS g1
-WHERE g1.tag_jugador = j1.tag_jugador) > (
-SELECT COUNT(p1.tag_jugador) FROM perd AS p1
-WHERE p1.tag_jugador = j1.tag_jugador)
-GROUP BY j1.tag_jugador;
+-- Validació:
+SELECT COUNT(g1.tag_jugador) AS num_victories FROM guanya AS g1
+WHERE g1.tag_jugador = '#2J08RPLQ8';
 
-
-SELECT COUNT(g1.tag_jugador) FROM guanya AS g1
-WHERE g1.tag_jugador = '#YU28V0LP';
-SELECT COUNT(p1.tag_jugador) FROM perd AS p1
-WHERE p1.tag_jugador = '#YU28V0LP';
+SELECT COUNT(p1.tag_jugador) AS num_derrotes FROM perd AS p1
+WHERE p1.tag_jugador = '#2J08RPLQ8';
 
 /* 3. Llistar la puntuació total dels jugadors guanyadors de batalles de cada temporada. Filtrar
 la sortida per considerar només les temporades que han començat i acabat el 2019. */

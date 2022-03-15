@@ -137,6 +137,7 @@ WHERE f.nom_carta IS NULL;
 
 -- 11.Llistar el nom dels jugadors que han sol·licitat amics, però no han estat sol·licitats com
 -- a amics.
+SELECT j.nom FROM jugador AS j
 
 
 -- 12.Enumerar el nom dels jugadors i el nombre d'articles comprats que tenen un cost
