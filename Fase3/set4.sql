@@ -19,20 +19,31 @@ derrotes i la seva experiència és més gran de 200.000. */
 SELECT t.id_temporada AS nom_temporada, t.data_inici, t.data_fi, j.nom FROM temporada AS t
     JOIN batalla AS b ON t.id_temporada = b.id_temporada
     JOIN guanya AS g ON b.id_batalla = g.id_batalla
-    JOIN perd AS p ON b.id_batalla = p.id_batalla
     JOIN jugador AS j ON g.tag_jugador = j.tag_jugador
-WHERE j.experiencia > 200000
-GROUP BY t.id_temporada, j.nom, g.tag_jugador
-HAVING COUNT(g.tag_jugador) > (
-    SELECT COUNT(p2.tag_jugador) FROM perd AS p2
-    );
+WHERE j.experiencia > 200000 AND (
+        SELECT COUNT(g1.tag_jugador) FROM guanya AS g1
+        WHERE g1.tag_jugador = j.tag_jugador
+    ) > (
+        SELECT COUNT(p1.tag_jugador) FROM perd AS p1
+        WHERE p1.tag_jugador = j.tag_jugador)
+GROUP BY t.id_temporada, j.nom, j.tag_jugador;
 
-SELECT COUNT(g.tag_jugador) FROM guanya AS g
-GROUP BY g.tag_jugador;
+SELECT j1.tag_jugador
+FROM jugador AS j1
+JOIN guanya g on j1.tag_jugador = g.tag_jugador
+JOIN perd p on j1.tag_jugador = p.tag_jugador
+WHERE (
+SELECT COUNT(g1.tag_jugador) FROM guanya AS g1
+WHERE g1.tag_jugador = j1.tag_jugador) > (
+SELECT COUNT(p1.tag_jugador) FROM perd AS p1
+WHERE p1.tag_jugador = j1.tag_jugador)
+GROUP BY j1.tag_jugador;
 
--- NO SABEM EL NOMBRE DE VICTÒRIES I DERROTES I NO ESTÀ ALS DATASETS.
--- HE PROVAT FENT COUNTS DELS JUGADORS QUE GUANYEN I PERDEN (entre d'altres)
 
+SELECT COUNT(g1.tag_jugador) FROM guanya AS g1
+WHERE g1.tag_jugador = '#YU28V0LP';
+SELECT COUNT(p1.tag_jugador) FROM perd AS p1
+WHERE p1.tag_jugador = '#YU28V0LP';
 
 /* 3. Llistar la puntuació total dels jugadors guanyadors de batalles de cada temporada. Filtrar
 la sortida per considerar només les temporades que han començat i acabat el 2019. */
@@ -91,12 +102,26 @@ SELECT a.titol AS nom_arena FROM arena AS a
     JOIN jugador AS j on a2.tag_jugador = j.tag_jugador
 WHERE ((a2.data >= '2021-01-01' AND a2.data <= '2021-12-31') AND a3.titol LIKE '%Friend%');
 
+SELECT a.titol AS nom_arena, a3.titol AS titol_assoliment FROM arena AS a
+    JOIN aconsegueix AS a2 on a.id_arena = a2.id_arena
+    JOIN assoliment AS a3 on a3.id_assoliment = a2.id_assoliment
+    JOIN jugador AS j on a2.tag_jugador = j.tag_jugador
+WHERE ((a2.data >= '2021-01-01' AND a2.data <= '2021-12-31') AND a3.titol LIKE '%Friend%');
+
+SELECT a.titol AS nom_arena, i.titol AS titol_insignia FROM arena AS a
+    JOIN obte AS o on a.id_arena = o.id_arena
+    JOIN jugador AS j on o.tag_jugador = j.tag_jugador
+    JOIN insignia AS i on o.id_insignia = i.id_insignia
+WHERE i.data >= '2021-11-01' AND i.data <= '2021-12-31' AND i.titol LIKE '%League%';
+
 /* 8. Retorna el nom de les cartes que pertanyen a jugadors que van completar missions el
 nom de les quals inclou la paraula "Armer" i l'or de la missió és més gran que l'or mitjà
 recompensat en totes les missions de les arenes */
-SELECT c.nom FROM carta AS c
-JOIN pertany AS p ON c.nom = p.nom_carta
-JOIN jugador AS j on p.tag_jugador = j.tag_jugador
-JOIN completen AS c2 on j.tag_jugador = c2.tag_jugador
+SELECT DISTINCT c.nom, m.descripcio, c2.or_ FROM carta AS c
+    JOIN pertany AS p ON c.nom = p.nom_carta
+    JOIN jugador AS j on p.tag_jugador = j.tag_jugador
+    JOIN completen AS c2 on j.tag_jugador = c2.tag_jugador
+    JOIN missio AS m on c2.id_missio = m.id_missio
+WHERE m.descripcio LIKE '%Armer%' AND c2.or_ > (
+    SELECT AVG(c3.or_) AS or_mitja FROM completen AS c3);
 
--- La inserció a la taula missió no està ben feta ja que al .csv hi ha 1000 missions i nosaltres en guardem 200.
