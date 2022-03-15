@@ -53,7 +53,6 @@ FROM compren as c
     JOIN emoticones e on a.id_article = e.id_emoticones
 WHERE c.data_ >= '2020-01-01' AND c.data_ <= '2020-12-31';
 
-
 /*6. Enumerar el nom, experiència i número de targeta de crèdit dels jugadors amb
 experiència superior a 150.000. Filtra les targetes de crèdit que no han estat utilitzades
 per comprar cap article. Donar dues consultes diferents per obtenir el mateix resultat.*/
@@ -62,12 +61,12 @@ SELECT j.nom, j.experiencia, tc.numero
 FROM jugador as j
         JOIN targeta_credit tc on j.targeta_credit = tc.numero
 WHERE j.experiencia > 150000 AND tc.numero NOT IN (SELECT c2.num_targeta
-                                                FROM compren as c2);;
+                                                FROM compren as c2);
 
 SELECT j.nom, j.experiencia, tc.numero
 FROM jugador as j
-    left JOIN compren c on j.tag_jugador = c.tag_jugador
-    left JOIN targeta_credit tc on j.targeta_credit = tc.numero
+    LEFT JOIN compren c on j.tag_jugador = c.tag_jugador
+    LEFT JOIN targeta_credit tc on j.targeta_credit = tc.numero
 WHERE j.experiencia > 150000 AND tc.numero NOT IN (SELECT c2.num_targeta
                                                 FROM compren as c2);
 
@@ -75,57 +74,41 @@ WHERE j.experiencia > 150000 AND tc.numero NOT IN (SELECT c2.num_targeta
 jugadors que han escrit més de 4 missatges. Ordeneu els resultats segons el nom de
 l'article de més a menys valor.*/
 
-SELECT DISTINCT j3.tag_jugador, a.nom
+SELECT a.nom
 FROM article as a
     JOIN compren as c on a.id_article = c.id_article
     JOIN jugador j3 on c.tag_jugador = j3.tag_jugador
-WHERE 105 < (SELECT COUNT(f.nom_carta)
-    FROM pila as p
-    JOIN formen as f on p.id_pila = f.id_pila
-    JOIN jugador j2 on p.tag_jugador = j2.tag_jugador
+WHERE 105 < (SELECT COUNT(p.nom_carta)
+    FROM jugador as j2
+    JOIN pertany as p on j2.tag_jugador = p.tag_jugador
     WHERE j2.tag_jugador = j3.tag_jugador) OR 4 < (SELECT COUNT(c2.id_missatge)
                                     FROM jugador as j
                                     JOIN conversen as c2 on j.tag_jugador = c2.tag_envia
                                     WHERE j.tag_jugador = j3.tag_jugador)
 ORDER BY a.nom desc;
--- Surten nomes els dels missatges, no hi ha cap jugador que tingui més de 105 cartes!!!
-
---Comprovacions
---Mirem els jugadors quantes cartes tenen:
-SELECT  COUNT(f.nom_carta), j.tag_jugador
-    FROM carta as c1
-    JOIN  formen as f on c1.nom = f.nom_carta
-    JOIN nivellcarta as nv on f.nivell = nv.nivell
-    JOIN pila as p on f.id_pila = p.id_pila
-    JOIN jugador j on p.tag_jugador = j.tag_jugador
-GROUP BY j.tag_jugador;
-
---Agafem de mostra el jugador '#PJUJCVUR'
-SELECT  j.tag_jugador, COUNT(f.id_pila)
-FROM pila p
-JOIN formen as f on p.id_pila = f.id_pila
-JOIN jugador as j on p.tag_jugador = j.tag_jugador
-WHERE j.tag_jugador like '#PJUJCVUR'
-GROUP BY j.tag_jugador
-ORDER BY j.tag_jugador;
-
---Quins jugadors han enviat mes de 4 missatges
-SELECT  j.tag_jugador, COUNT(c2.id_missatge)
-FROM jugador as j
-    JOIN conversen as c2 on j.tag_jugador = c2.tag_envia
-GROUP BY j.tag_jugador
-HAVING COUNT(c2.id_missatge) > 4
-ORDER BY COUNT(c2.id_missatge) desc;
 
 /*8. Retorna els missatges (text i data) enviats a l'any 2020 entre jugadors i que hagin estat
 respostos, o els missatges sense respostes enviats a un clan. Ordena els resultats
 segons la data del missatge i el text del missatge de més a menys valor.*/
+
 SELECT m.cos as text, m.data_ as data
 FROM missatge AS m
-    join envia e on m.id_missatge = e.id_missatge
-    join clan c on e.tag_clan = c.tag_clan
-WHERE m.data_ >= '2020-01-01' AND m.data_ <= '2020-12-31'
+JOIN conversen c on m.id_missatge = c.id_missatge
+JOIN jugador j on c.tag_envia = j.tag_jugador
+JOIN jugador j2 on c.tag_rep = j2.tag_jugador
+WHERE (m.data_ >= '2020-01-01' AND m.data_ <= '2020-12-31')
+        AND (m.id_resposta IS NOT NULL
+        OR (SELECT m2.id_resposta
+            FROM missatge as m2
+            JOIN envia e on m2.id_missatge = e.id_missatge
+            JOIN clan c2 on e.tag_clan = c2.tag_clan
+            WHERE m.id_missatge = m2.id_missatge) is NULL)
 ORDER BY m.data_ desc, text desc;
+
+
+
+
+
 
 
 

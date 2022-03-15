@@ -70,7 +70,7 @@ WHERE c.descripcio NOT LIKE '%Chuck Norris%'
 -- 6. Enumerar el nom i l'experiència dels jugadors que pertanyen a un clan que té una
 -- tecnologia el nom del qual conté la paraula "Militar" i aquests jugadors havien comprat
 -- el 2021 més de 5 articles.
-SELECT j.tag_jugador, j.nom, j.experiencia, m.nom_millora
+SELECT j.nom, j.experiencia
 FROM millora as m
     JOIN tecnologia as t on t.id_tecnologia = m.nom_millora
     JOIN tenen_tecnologia as tt on t.id_tecnologia = tt.id_tecnologia
