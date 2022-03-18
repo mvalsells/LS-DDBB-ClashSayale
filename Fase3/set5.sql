@@ -61,6 +61,7 @@ HAVING COUNT(a.nom) >= (SELECT COUNT(a2.nom)
 -- 5. Mostrar la identificació de les batalles, la durada, la data d'inici i la data de finalització
 -- dels clans que la seva descripció no contingui el text "Chuck Norris". Considera només
 -- les batalles amb una durada inferior a la durada mitjana de totes les batalles.
+
 SELECT b.id_batalla, b.durada, l.data_inici, l.data_fi, c.descripcio
 FROM batalla as b
 JOIN lluiten l on b.id_batalla = l.id_batalla
@@ -72,6 +73,7 @@ WHERE c.descripcio NOT LIKE '%Chuck Norris%'
 -- 6. Enumerar el nom i l'experiència dels jugadors que pertanyen a un clan que té una
 -- tecnologia el nom del qual conté la paraula "Militar" i aquests jugadors havien comprat
 -- el 2021 més de 5 articles.
+
 SELECT j.nom, j.experiencia
 FROM millora as m
     JOIN tecnologia as t on t.id_tecnologia = m.nom_millora

@@ -74,7 +74,7 @@ WHERE j.experiencia > 150000 AND tc.numero NOT IN (SELECT c2.num_targeta
 jugadors que han escrit més de 4 missatges. Ordeneu els resultats segons el nom de
 l'article de més a menys valor.*/
 
-SELECT a.nom
+SELECT a.nom, j3.tag_jugador
 FROM article as a
     JOIN compren as c on a.id_article = c.id_article
     JOIN jugador j3 on c.tag_jugador = j3.tag_jugador
@@ -91,19 +91,21 @@ ORDER BY a.nom desc;
 respostos, o els missatges sense respostes enviats a un clan. Ordena els resultats
 segons la data del missatge i el text del missatge de més a menys valor.*/
 
-SELECT m.cos as text, m.data_ as data
+SELECT m.cos as text, m.data_ as data, m.id_missatge, m.id_resposta
 FROM missatge AS m
 JOIN conversen c on m.id_missatge = c.id_missatge
 JOIN jugador j on c.tag_envia = j.tag_jugador
 JOIN jugador j2 on c.tag_rep = j2.tag_jugador
-WHERE (m.data_ >= '2020-01-01' AND m.data_ <= '2020-12-31')
-        AND (m.id_resposta IS NOT NULL
-        OR (SELECT m2.id_resposta
-            FROM missatge as m2
-            JOIN envia e on m2.id_missatge = e.id_missatge
-            JOIN clan c2 on e.tag_clan = c2.tag_clan
-            WHERE m.id_missatge = m2.id_missatge) is NULL)
-ORDER BY m.data_ desc, text desc;
+WHERE (m.data_ >= '2020-01-01' AND m.data_ <= '2020-12-31') AND m.id_resposta IS NOT NULL
+UNION
+SELECT m.cos as text, m.data_ as data, m.id_missatge, m.id_resposta
+FROM missatge AS m
+JOIN envia as e on m.id_missatge = e.id_missatge
+JOIN clan as c on e.tag_clan = c.tag_clan
+WHERE (m.data_ >= '2020-01-01' AND m.data_ <= '2020-12-31') AND m.id_resposta IS NULL
+ORDER BY id_missatge desc;
+
+
 
 
 
