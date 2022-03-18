@@ -3,7 +3,7 @@
 
 -- 1. Mostrar el nombre de jugadors que té cada clan, però només considerant els jugadors
 -- amb nom de rol que contingui el text "elder". Restringir la sortida per als 5 primers clans
--- amb més jugadors. (MarcG)
+-- amb més jugadors.
 
 SELECT c.nom, COUNT(j.tag_jugador) AS num_jugadors
 FROM clan AS c
@@ -16,7 +16,7 @@ ORDER BY num_jugadors DESC
 LIMIT 5;
 
 -- 2. Mostrar el nom dels jugadors, el text dels missatges i la data dels missatges enviats pels
--- jugadors que tenen la carta Skeleton Army i han comprat articles abans del 01-01-2019. (MarcG)
+-- jugadors que tenen la carta Skeleton Army i han comprat articles abans del 01-01-2019.
 
 SELECT j.nom, m.cos AS text, m.data_ AS data
 FROM jugador AS j
@@ -26,10 +26,11 @@ FROM jugador AS j
     JOIN pertany AS p ON j.tag_jugador = p.tag_jugador
 WHERE buy.data_ < '2019-01-01' AND p.nom_carta LIKE 'Skeleton Army';
 
--- 3. Llistar els 10 primers jugadors amb experiència superior a 100.000 que han creat més
--- piles i han guanyat batalles a la temporada T7. (MarcG)
 
-SELECT DISTINCT j.nom, j.experiencia, COUNT(DISTINCT p.id_pila) AS n_piles
+-- 3. Llistar els 10 primers jugadors amb experiència superior a 100.000 que han creat més
+-- piles i han guanyat batalles a la temporada T7.
+
+SELECT j.nom, j.experiencia, COUNT(DISTINCT p.id_pila) AS n_piles
 FROM jugador AS j
     JOIN pila AS p ON j.tag_jugador = p.tag_jugador
     JOIN guanya AS g ON j.tag_jugador = g.tag_jugador
@@ -41,7 +42,8 @@ HAVING COUNT(DISTINCT p.id_pila) = (SELECT COUNT(id_pila) as a
                                     GROUP BY tag_jugador
                                     ORDER BY a DESC
                                     LIMIT 1)
-ORDER BY j.experiencia DESC;
+ORDER BY j.experiencia DESC
+LIMIT 10;
 
 
 -- 4. Enumera els articles que han estat comprats més vegades i el seu cost total.
