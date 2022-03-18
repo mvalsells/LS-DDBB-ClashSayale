@@ -26,10 +26,11 @@ FROM jugador AS j
     JOIN pertany AS p ON j.tag_jugador = p.tag_jugador
 WHERE buy.data_ < '2019-01-01' AND p.nom_carta LIKE 'Skeleton Army';
 
+
 -- 3. Llistar els 10 primers jugadors amb experiència superior a 100.000 que han creat més
 -- piles i han guanyat batalles a la temporada T7. (MarcG)
 
-SELECT DISTINCT j.nom, j.experiencia, COUNT(DISTINCT p.id_pila) AS n_piles
+SELECT j.nom, j.experiencia, COUNT(DISTINCT p.id_pila) AS n_piles
 FROM jugador AS j
     JOIN pila AS p ON j.tag_jugador = p.tag_jugador
     JOIN guanya AS g ON j.tag_jugador = g.tag_jugador
@@ -41,7 +42,8 @@ HAVING COUNT(DISTINCT p.id_pila) = (SELECT COUNT(id_pila) as a
                                     GROUP BY tag_jugador
                                     ORDER BY a DESC
                                     LIMIT 1)
-ORDER BY j.experiencia DESC;
+ORDER BY j.experiencia DESC
+LIMIT 10;
 
 
 
