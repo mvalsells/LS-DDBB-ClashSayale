@@ -137,8 +137,8 @@ WHERE f.nom_carta IS NULL;
 
 -- 11.Llistar el nom dels jugadors que han sol·licitat amics, però no han estat sol·licitats com
 -- a amics.
-SELECT j.nom FROM jugador AS j
-
+/*SELECT j.nom FROM jugador AS j
+JOIN amics AS a on j.tag_jugador = a.tag_jugador1*/
 
 -- 12.Enumerar el nom dels jugadors i el nombre d'articles comprats que tenen un cost
 -- superior al cost mitjà de tots els articles. Ordenar el resultat de menor a major valor del
@@ -157,13 +157,28 @@ SELECT AVG(a.preu) AS mitjana FROM article AS a;
 -- 13.Poseu a zero els valors d'or i gemmes als jugadors que no han enviat cap missatge o
 -- que han enviat el mateix nombre de missatges que el jugador que més missatges ha
 -- enviat.
-SELECT j.nom, c2.or_, a2.recompensa_gemmes FROM jugador AS j
-JOIN conversen AS c on j.tag_jugador = c.tag_envia
-JOIN missatge AS m on c.id_missatge = m.id_missatge
-JOIN completen AS c2 on j.tag_jugador = c2.tag_jugador
-JOIN aconsegueix AS a on j.tag_jugador = a.tag_jugador
-JOIN assoliment AS a2 on a.id_assoliment = a2.id_assoliment
-GROUP BY j.nom, m.id_missatge, c2.or_, a2.recompensa_gemmes
-HAVING m.id_missatge IS NULL OR COUNT(m.id_missatge) >= (
-    SELECT COUNT(m.id_missatge) FROM missatge AS m
-    );
+
+UPDATE jugador
+SET
+    or_ = 0,
+    gemmes = 0
+WHERE
+    tag_jugador IN (
+        SELECT j.tag_jugador FROM jugador AS j
+        LEFT JOIN conversen c on j.tag_jugador = c.tag_envia
+        LEFT JOIN envia e on j.tag_jugador = e.tag_jugador
+        WHERE e.tag_jugador IS NULL AND c.tag_envia IS NULL)
+OR
+    tag_jugador IN (
+        SELECT j.tag_jugador AS num FROM jugador AS j
+            LEFT JOIN conversen AS c on j.tag_jugador = c.tag_envia
+            LEFT JOIN envia AS e on j.tag_jugador = e.tag_jugador
+        GROUP BY j.tag_jugador
+        HAVING COUNT(j.tag_jugador) = (
+            SELECT COUNT(j.tag_jugador) AS num FROM jugador AS j
+                LEFT JOIN conversen AS c on j.tag_jugador = c.tag_envia
+            LEFT JOIN envia AS e on j.tag_jugador = e.tag_jugador
+            GROUP BY j.tag_jugador
+            ORDER BY num DESC
+            LIMIT 1)
+        );

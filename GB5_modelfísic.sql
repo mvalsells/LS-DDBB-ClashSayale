@@ -77,6 +77,8 @@ CREATE TABLE Jugador(
 	experiencia INTEGER,
 	trofeus INTEGER,
 	targeta_credit VARCHAR(255),
+	or_ INTEGER,
+	gemmes INTEGER,
 	PRIMARY KEY (tag_jugador),
 	FOREIGN KEY (targeta_credit) REFERENCES targeta_credit(numero) ON DELETE CASCADE ON UPDATE CASCADE
 );

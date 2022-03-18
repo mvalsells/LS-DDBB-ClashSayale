@@ -196,8 +196,8 @@ INSERT INTO targeta_credit(numero, caducitat)
 SELECT DISTINCT cardnumber, cardexpiry
 FROM players;
 
-INSERT INTO jugador(tag_jugador, nom, experiencia, trofeus, targeta_credit)
-SELECT tag, name, experience, trophies, cardnumber
+INSERT INTO jugador(tag_jugador, nom, experiencia, trofeus, targeta_credit, or_, gemmes)
+SELECT tag, name, experience, trophies, cardnumber, round(random()*(100000+1)), round(random()*(1000+1))
 FROM players;
 
 DROP TABLE IF EXISTS players;
