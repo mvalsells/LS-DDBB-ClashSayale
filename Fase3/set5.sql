@@ -139,8 +139,14 @@ WHERE f.nom_carta IS NULL;
 
 -- 11.Llistar el nom dels jugadors que han sol·licitat amics, però no han estat sol·licitats com
 -- a amics.
-/*SELECT j.nom FROM jugador AS j
-JOIN amics AS a on j.tag_jugador = a.tag_jugador1*/
+SELECT j.nom FROM jugador AS j
+JOIN amics AS a on j.tag_jugador = a.tag_requester
+WHERE tag_requester NOT IN (SELECT tag_requested FROM amics AS a2);
+
+-- Validació
+SELECT j.nom, tag_jugador FROM jugador AS j
+JOIN amics AS a on j.tag_jugador = a.tag_requester
+WHERE tag_requester NOT IN (SELECT tag_requested FROM amics AS a2);
 
 -- 12.Enumerar el nom dels jugadors i el nombre d'articles comprats que tenen un cost
 -- superior al cost mitjà de tots els articles. Ordenar el resultat de menor a major valor del
@@ -179,8 +185,17 @@ OR
         HAVING COUNT(j.tag_jugador) = (
             SELECT COUNT(j.tag_jugador) AS num FROM jugador AS j
                 LEFT JOIN conversen AS c on j.tag_jugador = c.tag_envia
-            LEFT JOIN envia AS e on j.tag_jugador = e.tag_jugador
+                LEFT JOIN envia AS e on j.tag_jugador = e.tag_jugador
             GROUP BY j.tag_jugador
             ORDER BY num DESC
-            LIMIT 1)
-        );
+            LIMIT 1
+        )
+);
+
+-- Validació:
+SELECT COUNT(j.tag_jugador) AS num, j.tag_jugador FROM jugador AS j
+    LEFT JOIN conversen AS c on j.tag_jugador = c.tag_envia
+    LEFT JOIN envia AS e on j.tag_jugador = e.tag_jugador
+GROUP BY j.tag_jugador
+ORDER BY num DESC
+LIMIT 1;
