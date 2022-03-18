@@ -238,21 +238,11 @@ WHERE jc.role LIKE 'leader%' AND clan.tag_clan = jc.clan;
 DROP TABLE IF EXISTS jugadors_clans;
 
 -- Amics
-CREATE TEMPORARY TABLE friend (
-    C1 VARCHAR (255),
-    C2 VARCHAR (255)
-);
-
-COPY friend(C1, C2)
+COPY amics(tag_requester, tag_requested)
     FROM 'C:\Users\Public\Datasets\friends.csv'
     DELIMITER ','
     CSV HEADER;
 
-INSERT INTO amics (tag_jugador1, tag_jugador2)
-SELECT C1, C2
-FROM friend;
-
-DROP TABLE friend;
 
 -- Cartes csv
 CREATE TEMPORARY TABLE cards (

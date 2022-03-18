@@ -543,11 +543,11 @@ CREATE TABLE Aconsegueix (
 
 -- Creació de la taula Amics
 CREATE TABLE Amics (
-	tag_jugador1 VARCHAR (255),
-	tag_jugador2 VARCHAR (255),
-	PRIMARY KEY (tag_jugador1, tag_jugador2),
-	FOREIGN KEY (tag_jugador1) REFERENCES Jugador (tag_jugador) ON DELETE CASCADE ON UPDATE CASCADE,
-	FOREIGN KEY (tag_jugador2) REFERENCES Jugador (tag_jugador) ON DELETE CASCADE ON UPDATE CASCADE
+	tag_requester VARCHAR (255),
+	tag_requested VARCHAR (255),
+	PRIMARY KEY (tag_requester, tag_requested),
+	FOREIGN KEY (tag_requester) REFERENCES Jugador (tag_jugador) ON DELETE CASCADE ON UPDATE CASCADE,
+	FOREIGN KEY (tag_requested) REFERENCES Jugador (tag_jugador) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 -- Creació de la taula Guanya
