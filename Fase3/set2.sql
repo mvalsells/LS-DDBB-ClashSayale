@@ -91,19 +91,19 @@ ORDER BY a.nom desc;
 respostos, o els missatges sense respostes enviats a un clan. Ordena els resultats
 segons la data del missatge i el text del missatge de més a menys valor.*/
 
-SELECT m.cos as text, m.data_ as data, m.id_missatge, m.id_resposta
+SELECT m.cos as text, m.data_ as data
 FROM missatge AS m
 JOIN conversen c on m.id_missatge = c.id_missatge
 JOIN jugador j on c.tag_envia = j.tag_jugador
 JOIN jugador j2 on c.tag_rep = j2.tag_jugador
 WHERE (m.data_ >= '2020-01-01' AND m.data_ <= '2020-12-31') AND m.id_resposta IS NOT NULL
 UNION
-SELECT m.cos as text, m.data_ as data, m.id_missatge, m.id_resposta
+SELECT m.cos as text, m.data_ as data
 FROM missatge AS m
 JOIN envia as e on m.id_missatge = e.id_missatge
 JOIN clan as c on e.tag_clan = c.tag_clan
 WHERE (m.data_ >= '2020-01-01' AND m.data_ <= '2020-12-31') AND m.id_resposta IS NULL
-ORDER BY id_missatge desc;
+ORDER BY data desc, text desc;
 
 
 
