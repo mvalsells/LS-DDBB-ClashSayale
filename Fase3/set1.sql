@@ -58,6 +58,14 @@ JOIN jugador AS j on p.tag_jugador = j.tag_jugador AND j.experiencia > 250000
 ORDER BY c.dany
 LIMIT 3;
 
+-- Consulta de validació
+SELECT DISTINCT c.nom, e.nom AS es_edifici, c.dany, j.experiencia
+FROM pertany AS p
+JOIN carta AS c on p.nom_carta = c.nom
+LEFT JOIN edifici AS e on c.nom = e.nom
+JOIN jugador AS j on p.tag_jugador = j.tag_jugador
+ORDER BY j.experiencia;
+
 -- 6. Els dissenyadors del joc volen canviar algunes coses a les dades. El nom d'una carta
 -- "Rascals" serà "Hal Roach's Rascals", la Raresa "Common" es dirà "Proletari".
 -- Proporcioneu les ordres SQL per fer les modificacions sense eliminar les dades i
