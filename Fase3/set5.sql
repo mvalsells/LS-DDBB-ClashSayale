@@ -104,7 +104,7 @@ WHERE c.dany = (
 -- aconseguir un èxit en el 2021. Enumera el resultat des dels valors més alts del nom de
 -- la carta fins als valors més baixos del nom de la carta.
 
-SELECT DISTINCT c.nom, c.dany
+SELECT DISTINCT c.nom, c.dany, p.nom, j.experiencia, a.data
 FROM carta AS c
 JOIN formen AS f on c.nom = f.nom_carta
 JOIN pila AS p on p.id_pila = f.id_pila AND  p.nom LIKE '%Madrid%'
@@ -112,6 +112,18 @@ JOIN jugador AS j on p.tag_jugador = j.tag_jugador AND j.experiencia > 150000
 JOIN obte AS o on j.tag_jugador = o.tag_jugador
 JOIN aconsegueix AS a on j.tag_jugador = a.tag_jugador AND EXTRACT(YEAR FROM a.data) = '2021'
 WHERE c.dany > 200
+ORDER BY c.nom DESC;
+
+-- Validació
+SELECT DISTINCT c.nom, c.dany, p.nom, min(j.experiencia) AS min_exp, min(a.data) AS min_data
+FROM carta AS c
+JOIN formen AS f on c.nom = f.nom_carta
+JOIN pila AS p on p.id_pila = f.id_pila AND  p.nom LIKE '%Madrid%'
+JOIN jugador AS j on p.tag_jugador = j.tag_jugador AND j.experiencia > 150000
+JOIN obte AS o on j.tag_jugador = o.tag_jugador
+JOIN aconsegueix AS a on j.tag_jugador = a.tag_jugador AND EXTRACT(YEAR FROM a.data) = '2021'
+WHERE c.dany > 200
+GROUP BY c.nom, p.nom
 ORDER BY c.nom DESC;
 
 -- 9. Enumerar el nom, l’experiència i el nombre de trofeus dels jugadors que no han comprat
@@ -138,6 +150,13 @@ JOIN pertany AS p ON c.nom = p.nom_carta
 JOIN jugador AS j ON p.tag_jugador = j.tag_jugador AND j.experiencia > 200000
 LEFT JOIN formen AS f ON c.nom = f.nom_carta
 WHERE f.nom_carta IS NULL;
+
+-- Validació
+SELECT DISTINCT c.nom AS nom_carta, j.experiencia AS exp_jugador
+FROM carta AS c
+JOIN pertany AS p ON c.nom = p.nom_carta
+JOIN jugador AS j ON p.tag_jugador = j.tag_jugador
+WHERE c.nom = 'Archer Tower' OR c.nom = 'Bomb';
 
 -- 11.Llistar el nom dels jugadors que han sol·licitat amics, però no han estat sol·licitats com
 -- a amics.
