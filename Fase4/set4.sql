@@ -1,0 +1,3 @@
+-- BBDD GB5 - Marc Valsells, Marc Geremias, Irina Aynés i Albert Tomàs
+-- Set 4 - M'agrada la competició. M'agraden els reptes...
+

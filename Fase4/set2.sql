@@ -1,0 +1,2 @@
+-- BBDD GB5 - Marc Valsells, Marc Geremias, Irina Aynes i Albert Tomas
+-- Set 2 - No sóc un jugador, sóc un jugador de videojocs
