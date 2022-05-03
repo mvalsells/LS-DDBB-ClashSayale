@@ -467,6 +467,7 @@ CREATE TABLE Forma_part (
 	tag_jugador VARCHAR (255),
 	ID_rol INTEGER,
 	data DATE,
+	jugadors_eliminats INTEGER,
 	PRIMARY KEY (ID_Forma_part),
 	FOREIGN KEY (tag_clan) REFERENCES Clan (tag_clan) ON DELETE CASCADE ON UPDATE CASCADE,
 	FOREIGN KEY (tag_jugador) REFERENCES Jugador (tag_jugador) ON DELETE CASCADE ON UPDATE CASCADE,
