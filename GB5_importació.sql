@@ -226,8 +226,8 @@ INSERT INTO rol(nom, descripcio)
 SELECT DISTINCT split_part(role,': ', 1), split_part(role,': ', 2)
 FROM jugadors_clans;
 
-INSERT INTO forma_part(tag_jugador, tag_clan, id_rol, data)
-SELECT player, clan, rol.id_rol, date
+INSERT INTO forma_part(tag_jugador, tag_clan, id_rol, data, jugadors_eliminats)
+SELECT player, clan, rol.id_rol, date, 0
 FROM rol JOIN jugadors_clans ON jugadors_clans.role = concat(rol.nom, ': ', rol.descripcio);
 
 UPDATE clan
