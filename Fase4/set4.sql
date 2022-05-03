@@ -50,13 +50,13 @@ FOR EACH ROW
 EXECUTE FUNCTION prerequisit();
 
 
-/*2) Per descomptat, cada cop que batallem amb un jugador, necessitem actualitzar els valors
-    i resultats d'una batalla. Cada vegada que inseriu una nova batalla a la base de dades,
-    haureu de realitzar tots els canvis necessaris per mantenir la consistència de la informació.
-    Això és:
-        - Actualitzar els trofeus dels jugadors
-        - Actualitzar l’arena on es troba el jugador, en cas que tinguis una taula que
-        emmagatzemi aquesta informació
+/* 2) Per descomptat, cada cop que batallem amb un jugador, necessitem actualitzar els valors
+   i resultats d'una batalla. Cada vegada que inseriu una nova batalla a la base de dades,
+   haureu de realitzar tots els canvis necessaris per mantenir la consistència de la informació.
+   Això és:
+   - Actualitzar els trofeus dels jugadors
+   - Actualitzar l’arena on es troba el jugador, en cas que tinguis una taula que
+     emmagatzemi aquesta informació
 */
 
 DROP FUNCTION IF EXISTS guanya_perd CASCADE;
@@ -77,3 +77,23 @@ DROP TRIGGER IF EXISTS battleCompleted ON batalla CASCADE;
 CREATE TRIGGER battleCompleted AFTER UPDATE ON batalla
 FOR EACH ROW
 EXECUTE FUNCTION guanya_perd();
+
+
+/* 3) Recentment la comunitat de ClashSayale ha trobat una bretxa al tallafocs del servidor i la
+   xarxa interna ha quedat exposada a informació alterada a algunes tècniques d'injecció que
+   explotaven una mecànica en què els hackers han anat esborrant totes les seves derrotes
+   de la nostra base de dades. La lògica de la base de dades interna permet als usuaris
+   pertànyer a un sol clan alhora i a un de sol, que té un màxim de donacions per dia;
+   tanmateix, d'alguna manera han trobat la manera de donar a clans a qui no pertanyen,
+   saltant-se aquesta restricció.
+   Comprova que la informació inserida és correcta abans de qualsevol inserció o actualització
+   a les taules de donacions, i si es troba alguna inconsistència, bolca tota la informació
+   rellevant sobre l'etiqueta del jugador, la taula de donacions i la data de la donació a la taula
+   de warnings perquè els becaris puguin comprovar-la posteriorment de manera manual una
+   per una.
+   Algunes de les incoherències que es poden comprovar són les donacions amb valors nuls,
+   les donacions a un clan on no s'està, o les donacions a un clan abans d'unir-s'hi o després
+   d'abandonar-lo. Un exemple de missatge d’error és el següent:
+   "S'ha realitzat una donació de <quantitat> d'or a " + <nom_del_clan> + " s'ha realitzat sense
+   pertànyer al clan"
+*/
