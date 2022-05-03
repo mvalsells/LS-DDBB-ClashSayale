@@ -19,13 +19,15 @@
 
 DROP function IF EXISTS prerequisit;
 
-/*CREATE OR REPLACE FUNCTION prerequisit()
+CREATE OR REPLACE FUNCTION prerequisit()
 RETURNS trigger AS $$
+BEGIN
 
-$$ LANGUAGE plpgsql;*/
+END;
+$$ LANGUAGE plpgsql;
 
 
-DROP function IF EXISTS update_gold_experience;
+DROP FUNCTION IF EXISTS update_gold_experience;
 
 CREATE OR REPLACE FUNCTION update_gold_experience ()
 RETURNS trigger AS $$
@@ -34,7 +36,7 @@ UPDATE jugador SET
     or_ = or_ + (SELECT or_ FROM completen, missio
                 WHERE jugador.tag_jugador = completen.tag_jugador
                 AND completen.id_missio = missio.id_missio),
-    experiencia = experiencia + (SELECT or_ FROM completen, missio
+    experiencia = experiencia + (SELECT experiencia FROM completen, missio
                 WHERE jugador.tag_jugador = completen.tag_jugador
                 AND completen.id_missio = missio.id_missio);
 END;
@@ -46,3 +48,32 @@ DROP TRIGGER IF EXISTS missionComplete ON completen CASCADE;
 CREATE TRIGGER missionComplete AFTER UPDATE ON completen
 FOR EACH ROW
 EXECUTE FUNCTION prerequisit();
+
+
+/*2) Per descomptat, cada cop que batallem amb un jugador, necessitem actualitzar els valors
+    i resultats d'una batalla. Cada vegada que inseriu una nova batalla a la base de dades,
+    haureu de realitzar tots els canvis necessaris per mantenir la consistència de la informació.
+    Això és:
+        - Actualitzar els trofeus dels jugadors
+        - Actualitzar l’arena on es troba el jugador, en cas que tinguis una taula que
+        emmagatzemi aquesta informació
+*/
+
+DROP FUNCTION IF EXISTS guanya_perd CASCADE;
+
+CREATE OR REPLACE FUNCTION guanya_perd()
+RETURNS trigger AS $$
+BEGIN
+UPDATE jugador SET
+    trofeus = trofeus + (SELECT num_trofeus FROM guanya, perd
+                        WHERE jugador.tag_jugador = guanya.tag_jugador
+                        OR jugador.tag_jugador = perd.tag_jugador);
+END;
+$$ LANGUAGE plpgsql;
+
+
+DROP TRIGGER IF EXISTS battleCompleted ON batalla CASCADE;
+
+CREATE TRIGGER battleCompleted AFTER UPDATE ON batalla
+FOR EACH ROW
+EXECUTE FUNCTION guanya_perd();
