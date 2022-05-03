@@ -14,6 +14,8 @@ DROP TABLE IF EXISTS Formen CASCADE;
 DROP TABLE IF EXISTS Pila CASCADE;
 DROP TABLE IF EXISTS Comparteixen CASCADE;
 DROP TABLE IF EXISTS Modifiquen CASCADE;
+DROP TABLE IF EXISTS Warnings CASCADE;
+
 -- Módul 2
 DROP TABLE IF EXISTS Jugador CASCADE;
 DROP TABLE IF EXISTS targeta_credit CASCADE;
@@ -596,4 +598,12 @@ CREATE TABLE Obte (
     FOREIGN KEY (ID_insignia) REFERENCES Insignia (ID_insignia) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (tag_jugador) REFERENCES Jugador (tag_jugador) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (ID_arena) REFERENCES Arena (ID_arena) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- Creació taula Warning per a la fase 4
+CREATE TABLE Warnings (
+    affected_table VARCHAR(255),
+    error_message VARCHAR(255),
+    date DATE,
+    username VARCHAR(255)
 );
