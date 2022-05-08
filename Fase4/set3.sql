@@ -1,6 +1,39 @@
 -- BBDD GB5 - Marc Valsells, Marc Geremias, Irina Aynes i Albert Tomas
 -- Set 3 - Tingueu valor. Encara tenim el nostre clan. Sempre hi ha esperança.
 
+
+-- Funcions per diversos triggers
+CREATE OR REPLACE FUNCTION f_selNewLeader(VARCHAR)
+RETURNS trigger AS $$
+DECLARE
+    countColeader INTEGER;
+    leaderID INTEGER = (SELECT id_rol FROM rol WHERE nom = 'leader');
+    coLeaderID INTEGER = (SELECT id_rol FROM rol WHERE nom = 'coLeader');
+BEGIN
+    SELECT count(id_forma_part) INTO countColeader
+        FROM forma_part WHERE id_rol = coLeaderID AND tag_clan = $1;
+
+    IF countColeader > 0
+    THEN
+        INSERT INTO forma_part(tag_clan, tag_jugador, id_rol, data, jugadors_eliminats)
+            VALUES ($1,(SELECT tag_jugador
+                            FROM forma_part
+                            WHERE id_rol = coLeaderID AND tag_clan = $1
+                            OFFSET floor(random() * countColeader)
+                            LIMIT 1),
+                    leaderID,now(),0);
+    ELSE
+        INSERT INTO forma_part(tag_clan, tag_jugador, id_rol, data, jugadors_eliminats)
+        VALUES ($1,(SELECT tag_jugador
+                        FROM forma_part
+                        WHERE id_rol = (SELECT id_rol FROM rol WHERE nom = 'member') AND tag_clan = $1
+                        OFFSET floor(random() * (SELECT count(id_rol) FROM rol WHERE nom = 'member'))
+                        LIMIT 1),
+                leaderID,now(),0);
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
 -- 3.1) "Cop d'efecte"
 -- De vegades, la propietat d'un clan es transfereix de jugadors que ja no juguen tan sovint
 -- com abans a altres més implicats, i com que els clans estan formats per molts jugadors de
@@ -18,7 +51,7 @@ DROP function IF EXISTS f_CopdEfecte;
 CREATE OR REPLACE FUNCTION f_CopdEfecte()
 RETURNS trigger AS $$
 DECLARE
-    newestLeader serial;
+    newestLeader INTEGER;
     countColeader INTEGER;
     leaderID INTEGER = (SELECT id_rol FROM rol WHERE nom = 'leader');
     coLeaderID INTEGER = (SELECT id_rol FROM rol WHERE nom = 'coLeader');
@@ -40,12 +73,12 @@ BEGIN
         THEN
             -- Desfer canvis
             -- TODO Acabar de desfer canvis
-            (SELECT tag_jugador
+            /*(SELECT tag_jugador
             FROM forma_part
             WHERE tag_clan = OLD.tag_clan
               AND id_rol = NULL
               AND (data - interval '24 hours') < 0);
-
+*/
             -- Downgrade
             SELECT count(id_forma_part) INTO countColeader
                 FROM forma_part WHERE id_rol = coLeaderID;
@@ -61,7 +94,7 @@ BEGIN
                     INSERT INTO forma_part(tag_clan, tag_jugador, id_rol, data, jugadors_eliminats)
                     VALUES (OLD.tag_clan,(SELECT tag_jugador
                             FROM forma_part
-                            WHERE id_rol = coLeaderID
+                            WHERE id_rol = coLeaderID AND tag_clan = OLD.tag_clan
                             OFFSET floor(random() * countColeader)
                             LIMIT 1),leaderID,now(),0);
 
@@ -69,7 +102,7 @@ BEGIN
                     INSERT INTO forma_part(tag_clan, tag_jugador, id_rol, data, jugadors_eliminats)
                     VALUES (OLD.tag_clan,(SELECT tag_jugador
                             FROM forma_part
-                            WHERE id_rol = (SELECT id_rol FROM rol WHERE nom = 'member')
+                            WHERE id_rol = (SELECT id_rol FROM rol WHERE nom = 'member') AND tag_clan = OLD.tag_clan
                             OFFSET floor(random() * (SELECT count(id_rol) FROM rol WHERE nom = 'member'))
                             LIMIT 1),leaderID,now(),0);
                 END IF;
