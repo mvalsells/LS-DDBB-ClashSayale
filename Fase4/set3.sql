@@ -4,7 +4,7 @@
 
 -- Funcions per diversos triggers
 CREATE OR REPLACE FUNCTION f_selNewLeader(VARCHAR)
-RETURNS trigger AS $$
+RETURNS void AS $$
 DECLARE
     countColeader INTEGER;
     leaderID INTEGER = (SELECT id_rol FROM rol WHERE nom = 'leader');
@@ -57,11 +57,11 @@ DECLARE
     coLeaderID INTEGER = (SELECT id_rol FROM rol WHERE nom = 'coLeader');
 BEGIN
     SELECT id_forma_part INTO newestLeader
-    FROM forma_part
-    WHERE tag_clan = OLD.tag_clan
-    AND id_rol = leaderID
-    ORDER BY data desc
-    LIMIT 1;
+        FROM forma_part
+        WHERE tag_clan = OLD.tag_clan
+        AND id_rol = leaderID
+        ORDER BY data desc
+        LIMIT 1;
 
     IF (((SELECT data FROM forma_part WHERE id_forma_part = newestLeader) - interval '24 hours') < 0)
     THEN
@@ -80,6 +80,8 @@ BEGIN
               AND (data - interval '24 hours') < 0);
 */
             -- Downgrade
+            SELECT f_selNewLeader(OLD.tag_clan);
+            /*
             SELECT count(id_forma_part) INTO countColeader
                 FROM forma_part WHERE id_rol = coLeaderID;
 
@@ -106,7 +108,7 @@ BEGIN
                             OFFSET floor(random() * (SELECT count(id_rol) FROM rol WHERE nom = 'member'))
                             LIMIT 1),leaderID,now(),0);
                 END IF;
-             END IF;
+             END IF;*/
         END IF;
     END IF;
 END;
@@ -133,7 +135,30 @@ EXECUTE FUNCTION f_CopdEfecte();
 -- coliders queden, i si no n'hi ha, triar un membre a l'atzar que pertanyi al clan perquè sigui
 -- el líder.
 
+DROP function IF EXISTS f_minTrofeus;
+CREATE OR REPLACE FUNCTION f_minTrofeus()
+RETURNS trigger AS $$
+DECLARE
+    currentClan VARCHAR;
+BEGIN
+    SELECT tag_clan INTO currentClan
+        FROM forma_part
+        WHERE tag_jugador = NEW.tag_jugador
+        ORDER BY data desc
+        LIMIT 1;
 
+    IF (SELECT trofeus_minims FROM clan WHERE tag_clan = currentClan) < NEW.trofeus
+    THEN
+        DELETE FROM forma_part WHERE tag_jugador = NEW.tag_jugador AND tag_clan = currentClan;
+        SELECT f_selNewLeader(currentClan);
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS minTrofeus ON jugador;
+CREATE TRIGGER minTrofeus
+    AFTER UPDATE OF trofeus ON jugador
+    EXECUTE FUNCTION f_minTrofeus();
 
 -- 3.3) Mals perdedors
 -- Després d'un atac de pisin al domini de correu electrònic de ClashSayale, molts dels
