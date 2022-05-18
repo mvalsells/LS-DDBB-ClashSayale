@@ -17,7 +17,14 @@
    + <nom_de_la_quest> + " prerequisit"
 */
 
-DROP FUNCTION IF EXISTS update_gold_experience;
+DROP TRIGGER IF EXISTS missionComplete ON completen CASCADE;
+
+CREATE TRIGGER missionComplete AFTER INSERT ON completen
+FOR EACH ROW
+EXECUTE FUNCTION update_gold_experience();
+
+
+DROP FUNCTION IF EXISTS update_gold_experience CASCADE;
 
 CREATE OR REPLACE FUNCTION update_gold_experience ()
 RETURNS trigger AS $$
@@ -27,12 +34,8 @@ BEGIN
                                              WHERE tag_jugador = NEW.tag_jugador)
     THEN
         UPDATE jugador SET
-            or_ = or_ + (SELECT or_ FROM completen, missio
-                        WHERE jugador.tag_jugador = completen.tag_jugador
-                        AND completen.id_missio = missio.id_missio),
-            experiencia = experiencia + (SELECT experiencia FROM completen, missio
-                        WHERE jugador.tag_jugador = completen.tag_jugador
-                        AND completen.id_missio = missio.id_missio);
+            or_ = or_ + NEW.or_,
+            experiencia = experiencia + NEW.experiencia;
     ELSE
         INSERT INTO warnings (affected_table, error_message, date, username)
         VALUES ('completen',
@@ -47,13 +50,6 @@ BEGIN
     END IF;
 END $$
 LANGUAGE plpgsql;
-
-
-DROP TRIGGER IF EXISTS missionComplete ON completen CASCADE;
-
-CREATE TRIGGER missionComplete AFTER INSERT ON completen
-FOR EACH ROW
-EXECUTE FUNCTION update_gold_experience();
 
 /* Comprovació del primer trigger*/
 /* Fem un SELECT per veure l'or i l'experiència d'un jugador en concret*/
@@ -73,6 +69,8 @@ WHERE id_missio2 = 103 OR id_missio2 = 190;
 /* Fem l'insert per veure si es fa l'update*/
 INSERT INTO completen (id_missio, id_arena, tag_jugador, or_, experiencia, desbloqueja)
 VALUES (50, 54000057, '#202C2CU0U', 28, 3, CURRENT_DATE);
+/* Mirem les dades de la taula warnings*/
+SELECT * FROM warnings;
 
 
 
