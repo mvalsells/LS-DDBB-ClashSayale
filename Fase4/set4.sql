@@ -17,37 +17,63 @@
    + <nom_de_la_quest> + " prerequisit"
 */
 
-DROP function IF EXISTS prerequisit;
-
-CREATE OR REPLACE FUNCTION prerequisit()
-RETURNS trigger AS $$
-BEGIN
-
-END;
-$$ LANGUAGE plpgsql;
-
-
 DROP FUNCTION IF EXISTS update_gold_experience;
 
 CREATE OR REPLACE FUNCTION update_gold_experience ()
 RETURNS trigger AS $$
 BEGIN
-UPDATE jugador SET
-    or_ = or_ + (SELECT or_ FROM completen, missio
-                WHERE jugador.tag_jugador = completen.tag_jugador
-                AND completen.id_missio = missio.id_missio),
-    experiencia = experiencia + (SELECT experiencia FROM completen, missio
-                WHERE jugador.tag_jugador = completen.tag_jugador
-                AND completen.id_missio = missio.id_missio);
-END;
-$$ LANGUAGE plpgsql;
+    IF (SELECT id_missio2 FROM depen
+        WHERE id_missio1 = NEW.id_missio) IN (SELECT id_missio FROM completen
+                                             WHERE tag_jugador = NEW.tag_jugador)
+    THEN
+        UPDATE jugador SET
+            or_ = or_ + (SELECT or_ FROM completen, missio
+                        WHERE jugador.tag_jugador = completen.tag_jugador
+                        AND completen.id_missio = missio.id_missio),
+            experiencia = experiencia + (SELECT experiencia FROM completen, missio
+                        WHERE jugador.tag_jugador = completen.tag_jugador
+                        AND completen.id_missio = missio.id_missio);
+    ELSE
+        INSERT INTO warnings (affected_table, error_message, date, username)
+        VALUES ('completen',
+                'L''entrada de la quest per a "' || (SELECT titol FROM missio
+                                                     WHERE id_missio = NEW.id_missio) ||
+                '" s''ha realitzat sense completar el "' || (SELECT titol FROM missio AS m
+                                                             JOIN depen AS d ON m.id_missio = d.id_missio2
+                                                             WHERE d.id_missio1 = NEW.id_missio) ||
+                '" prerequisit',
+                CURRENT_DATE,
+                NEW.tag_jugador);
+    END IF;
+END $$
+LANGUAGE plpgsql;
 
 
 DROP TRIGGER IF EXISTS missionComplete ON completen CASCADE;
 
-CREATE TRIGGER missionComplete AFTER UPDATE ON completen
+CREATE TRIGGER missionComplete AFTER INSERT ON completen
 FOR EACH ROW
-EXECUTE FUNCTION prerequisit();
+EXECUTE FUNCTION update_gold_experience();
+
+/* Comprovació del primer trigger*/
+/* Fem un SELECT per veure l'or i l'experiència d'un jugador en concret*/
+SELECT * FROM jugador
+WHERE tag_jugador = '#202C2CU0U';
+/* Mirem les missions que el jugador no hagi completat*/
+SELECT DISTINCT * FROM missio
+WHERE missio.id_missio NOT IN (SELECT id_missio FROM completen
+                               WHERE tag_jugador = '#202C2CU0U');
+/* Mirem les missions que el jugador hagi completat*/
+SELECT DISTINCT * FROM missio
+WHERE missio.id_missio IN (SELECT id_missio FROM completen
+                               WHERE tag_jugador = '#202C2CU0U');
+/* Mirem si alguna missió depen de les missions que ha completat el jugador*/
+SELECT * FROM depen
+WHERE id_missio2 = 103 OR id_missio2 = 190;
+/* Fem l'insert per veure si es fa l'update*/
+INSERT INTO completen (id_missio, id_arena, tag_jugador, or_, experiencia, desbloqueja)
+VALUES (50, 54000057, '#202C2CU0U', 28, 3, CURRENT_DATE);
+
 
 
 /* 2) Per descomptat, cada cop que batallem amb un jugador, necessitem actualitzar els valors
