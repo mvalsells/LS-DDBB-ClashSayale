@@ -83,27 +83,6 @@ SELECT * FROM warnings;
      emmagatzemi aquesta informació
 */
 
-DROP FUNCTION IF EXISTS batallaGuanyada CASCADE;
-
-CREATE OR REPLACE FUNCTION batallaGuanyada()
-RETURNS trigger AS $$
-BEGIN
-UPDATE jugador SET
-    trofeus = trofeus + NEW.trofeus;
-END;
-$$ LANGUAGE plpgsql;
-
-DROP FUNCTION IF EXISTS batallaPerduda CASCADE;
-
-CREATE OR REPLACE FUNCTION batallaPerduda()
-RETURNS trigger AS $$
-BEGIN
-UPDATE jugador SET
-    trofeus = trofeus + NEW.trofeus;
-END;
-$$ LANGUAGE plpgsql;
-
-
 DROP TRIGGER IF EXISTS battleWon ON guanya CASCADE;
 
 CREATE TRIGGER battleWon AFTER INSERT ON guanya
@@ -116,8 +95,41 @@ CREATE TRIGGER battleLost AFTER INSERT ON perd
 FOR EACH ROW
 EXECUTE FUNCTION batallaPerduda();
 
-/* Comprovació del segon trigger*/
+DROP FUNCTION IF EXISTS batallaGuanyada CASCADE;
 
+CREATE OR REPLACE FUNCTION batallaGuanyada()
+RETURNS trigger AS $$
+BEGIN
+UPDATE jugador
+SET
+    trofeus = trofeus + NEW.num_trofeus
+WHERE tag_jugador = NEW.tag_jugador;
+END $$
+LANGUAGE plpgsql;
+
+DROP FUNCTION IF EXISTS batallaPerduda CASCADE;
+
+CREATE OR REPLACE FUNCTION batallaPerduda()
+RETURNS trigger AS $$
+BEGIN
+UPDATE jugador
+SET
+    trofeus = trofeus + NEW.num_trofeus
+WHERE tag_jugador = NEW.tag_jugador;
+END $$
+LANGUAGE plpgsql;
+
+
+/* Comprovació del segon trigger*/
+/* Inserim una nova batalla a la taula batalla*/
+INSERT INTO batalla (data, durada, id_temporada)
+VALUES (CURRENT_DATE, '05:02:00', 'T1');
+/* Inserim un guanyador a la taula guanya*/
+INSERT INTO guanya (tag_jugador, id_batalla, id_pila, num_trofeus)
+VALUES ('#VGR9CL0G', 9923, 193, 30);
+/* Inserim un perdedor a la taula perd*/
+INSERT INTO perd (tag_jugador, id_batalla, id_pila, num_trofeus)
+VALUES ('#LRUQQPVU', 9922, 1760, -33);
 
 
 /* 3) Recentment la comunitat de ClashSayale ha trobat una bretxa al tallafocs del servidor i la
