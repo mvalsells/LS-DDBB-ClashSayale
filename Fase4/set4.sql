@@ -83,24 +83,41 @@ SELECT * FROM warnings;
      emmagatzemi aquesta informació
 */
 
-DROP FUNCTION IF EXISTS guanya_perd CASCADE;
+DROP FUNCTION IF EXISTS batallaGuanyada CASCADE;
 
-CREATE OR REPLACE FUNCTION guanya_perd()
+CREATE OR REPLACE FUNCTION batallaGuanyada()
 RETURNS trigger AS $$
 BEGIN
 UPDATE jugador SET
-    trofeus = trofeus + (SELECT num_trofeus FROM guanya, perd
-                        WHERE jugador.tag_jugador = guanya.tag_jugador
-                        OR jugador.tag_jugador = perd.tag_jugador);
+    trofeus = trofeus + NEW.trofeus;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP FUNCTION IF EXISTS batallaPerduda CASCADE;
+
+CREATE OR REPLACE FUNCTION batallaPerduda()
+RETURNS trigger AS $$
+BEGIN
+UPDATE jugador SET
+    trofeus = trofeus + NEW.trofeus;
 END;
 $$ LANGUAGE plpgsql;
 
 
-DROP TRIGGER IF EXISTS battleCompleted ON batalla CASCADE;
+DROP TRIGGER IF EXISTS battleWon ON guanya CASCADE;
 
-CREATE TRIGGER battleCompleted AFTER UPDATE ON batalla
+CREATE TRIGGER battleWon AFTER INSERT ON guanya
 FOR EACH ROW
-EXECUTE FUNCTION guanya_perd();
+EXECUTE FUNCTION batallaGuanyada();
+
+DROP TRIGGER IF EXISTS battleLost ON perd CASCADE;
+
+CREATE TRIGGER battleLost AFTER INSERT ON perd
+FOR EACH ROW
+EXECUTE FUNCTION batallaPerduda();
+
+/* Comprovació del segon trigger*/
+
 
 
 /* 3) Recentment la comunitat de ClashSayale ha trobat una bretxa al tallafocs del servidor i la
