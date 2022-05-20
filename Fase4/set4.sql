@@ -29,13 +29,14 @@ DROP FUNCTION IF EXISTS update_gold_experience CASCADE;
 CREATE OR REPLACE FUNCTION update_gold_experience ()
 RETURNS trigger AS $$
 BEGIN
-    IF (SELECT id_missio2 FROM depen
+    IF ((SELECT id_missio2 FROM depen
         WHERE id_missio1 = NEW.id_missio) IN (SELECT id_missio FROM completen
-                                             WHERE tag_jugador = NEW.tag_jugador)
+                                             WHERE tag_jugador = NEW.tag_jugador))
     THEN
         UPDATE jugador SET
             or_ = or_ + NEW.or_,
-            experiencia = experiencia + NEW.experiencia;
+            experiencia = experiencia + NEW.experiencia
+        WHERE tag_jugador = NEW.tag_jugador;
     ELSE
         INSERT INTO warnings (affected_table, error_message, date, username)
         VALUES ('completen',
@@ -190,11 +191,11 @@ THEN
                 CURRENT_DATE,
                 NEW.tag_jugador);
 END IF;
-/*IF (totOK = true)
+IF (totOK = false)
 THEN
-    INSERT INTO dona (tag_jugador, tag_clan, quantitat, data)
-    VALUES (NEW.tag_jugador, NEW.tag_clan, NEW.quantitat, NEW.data);
-END IF;*/
+    DELETE FROM dona
+    WHERE id_donacio = NEW.id_donacio;
+END IF;
     RETURN NULL;
 END $$
 LANGUAGE plpgsql;
@@ -202,7 +203,7 @@ LANGUAGE plpgsql;
 
 DROP TRIGGER IF EXISTS comprovaDonacio ON dona CASCADE;
 
-CREATE TRIGGER comprovaDonacio BEFORE INSERT OR UPDATE ON dona
+CREATE TRIGGER comprovaDonacio AFTER INSERT OR UPDATE ON dona
 FOR EACH ROW
 EXECUTE FUNCTION comprova();
 
