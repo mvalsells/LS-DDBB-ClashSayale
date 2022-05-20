@@ -150,3 +150,63 @@ VALUES ('#LRUQQPVU', 9922, 1760, -33);
    "S'ha realitzat una donació de <quantitat> d'or a " + <nom_del_clan> + " s'ha realitzat sense
    pertànyer al clan"
 */
+
+DROP FUNCTION IF EXISTS comprova CASCADE;
+
+CREATE OR REPLACE FUNCTION comprova()
+RETURNS trigger AS $$
+DECLARE totOK boolean:= true;
+BEGIN
+IF (NEW.quantitat IS NULL)
+THEN
+    totOK = false;
+    INSERT INTO warnings (affected_table, error_message, date, username)
+        VALUES ('dona',
+                'S''ha intentat fer una donació nul·la',
+                CURRENT_DATE,
+                NEW.tag_jugador);
+END IF;
+IF (NEW.tag_clan <> (SELECT tag_clan FROM forma_part
+                     WHERE tag_jugador = NEW.tag_jugador))
+THEN
+    totOK = false;
+    INSERT INTO warnings (affected_table, error_message, date, username)
+        VALUES ('dona',
+                'S''ha realitzat una donació de ' || NEW.quantitat ||
+                'd''or a ' || NEW.tag_clan ||
+                'sense pertànyer al clan',
+                CURRENT_DATE,
+                NEW.tag_jugador);
+END IF;
+IF ((SELECT jugadors_eliminats FROM forma_part
+    WHERE tag_jugador = NEW.tag_jugador) = 1)
+THEN
+    totOK = false;
+    INSERT INTO warnings (affected_table, error_message, date, username)
+        VALUES ('dona',
+                'S''ha realitzat una donació de ' || NEW.quantitat ||
+                'd''or a ' || NEW.tag_clan ||
+                'i el jugador va ser expulsat d''aquest',
+                CURRENT_DATE,
+                NEW.tag_jugador);
+END IF;
+/*IF (totOK = true)
+THEN
+    INSERT INTO dona (tag_jugador, tag_clan, quantitat, data)
+    VALUES (NEW.tag_jugador, NEW.tag_clan, NEW.quantitat, NEW.data);
+END IF;*/
+    RETURN NULL;
+END $$
+LANGUAGE plpgsql;
+
+
+DROP TRIGGER IF EXISTS comprovaDonacio ON dona CASCADE;
+
+CREATE TRIGGER comprovaDonacio BEFORE INSERT OR UPDATE ON dona
+FOR EACH ROW
+EXECUTE FUNCTION comprova();
+
+/* Comprovació del tercer trigger*/
+/* Posem una quantitat nul·la i veiem que s'afegeix a la taula warnings*/
+INSERT INTO dona (tag_jugador, tag_clan, quantitat, data)
+VALUES ('#QV2PYL', '#8LGRYC', null, CURRENT_DATE);
