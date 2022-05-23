@@ -17,12 +17,6 @@
    + <nom_de_la_quest> + " prerequisit"
 */
 
-DROP TRIGGER IF EXISTS missionComplete ON completen CASCADE;
-
-CREATE TRIGGER missionComplete AFTER INSERT ON completen
-FOR EACH ROW
-EXECUTE FUNCTION update_gold_experience();
-
 
 DROP FUNCTION IF EXISTS update_gold_experience CASCADE;
 
@@ -49,8 +43,17 @@ BEGIN
                 CURRENT_DATE,
                 NEW.tag_jugador);
     END IF;
+
+    RETURN NULL;
 END $$
 LANGUAGE plpgsql;
+
+
+DROP TRIGGER IF EXISTS missionComplete ON completen CASCADE;
+
+CREATE TRIGGER missionComplete AFTER INSERT ON completen
+FOR EACH ROW
+EXECUTE FUNCTION update_gold_experience();
 
 /* Comprovació del primer trigger*/
 /* Fem un SELECT per veure l'or i l'experiència d'un jugador en concret*/
@@ -69,11 +72,14 @@ SELECT * FROM depen
 WHERE id_missio2 = 103 OR id_missio2 = 190;
 /* Fem l'insert per veure si es fa l'update*/
 INSERT INTO completen (id_missio, id_arena, tag_jugador, or_, experiencia, desbloqueja)
-VALUES (50, 54000057, '#202C2CU0U', 28, 3, CURRENT_DATE);
+VALUES (50, 54000057, '#202C2CU0U', 89, 60, CURRENT_DATE);
 /* Mirem les dades de la taula warnings*/
 SELECT * FROM warnings;
 
-
+SELECT id_missio2 FROM depen
+        WHERE id_missio1 = 10
+        AND id_missio2 IN (SELECT id_missio FROM completen
+                                             WHERE tag_jugador = '#202C2CU0U')
 
 /* 2) Per descomptat, cada cop que batallem amb un jugador, necessitem actualitzar els valors
    i resultats d'una batalla. Cada vegada que inseriu una nova batalla a la base de dades,
