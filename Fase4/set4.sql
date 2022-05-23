@@ -55,31 +55,37 @@ CREATE TRIGGER missionComplete AFTER INSERT ON completen
 FOR EACH ROW
 EXECUTE FUNCTION update_gold_experience();
 
-/* Comprovació del primer trigger*/
-/* Fem un SELECT per veure l'or i l'experiència d'un jugador en concret*/
+/* Comprovacions del primer trigger
+
+-- Fem un SELECT per veure l'or i l'experiència d'un jugador en concret
 SELECT * FROM jugador
-WHERE tag_jugador = '#202C2CU0U';
-/* Mirem les missions que el jugador no hagi completat*/
+WHERE tag_jugador = '#J8QPJY8Q';
+-- Mirem les missions que el jugador no hagi completat
 SELECT DISTINCT * FROM missio
 WHERE missio.id_missio NOT IN (SELECT id_missio FROM completen
-                               WHERE tag_jugador = '#202C2CU0U');
-/* Mirem les missions que el jugador hagi completat*/
+                               WHERE tag_jugador = '#J8QPJY8Q');
+-- Mirem les missions que el jugador hagi completat
 SELECT DISTINCT * FROM missio
 WHERE missio.id_missio IN (SELECT id_missio FROM completen
-                               WHERE tag_jugador = '#202C2CU0U');
-/* Mirem si alguna missió depen de les missions que ha completat el jugador*/
+                               WHERE tag_jugador = '#J8QPJY8Q');
+-- Mirem si alguna missió depen de les missions que ha completat el jugador
 SELECT * FROM depen
 WHERE id_missio2 = 103 OR id_missio2 = 190;
-/* Fem l'insert per veure si es fa l'update*/
+-- Fem l'insert per veure si es fa l'update
 INSERT INTO completen (id_missio, id_arena, tag_jugador, or_, experiencia, desbloqueja)
-VALUES (50, 54000057, '#202C2CU0U', 89, 60, CURRENT_DATE);
-/* Mirem les dades de la taula warnings*/
+VALUES (170, 54000057, '#J8QPJY8Q', 100, 2000, CURRENT_DATE);
+-- Mirem les dades de la taula warnings
 SELECT * FROM warnings;
+
+DELETE FROM warnings
+WHERE username = '#J8QPJY8Q';
 
 SELECT id_missio2 FROM depen
         WHERE id_missio1 = 10
         AND id_missio2 IN (SELECT id_missio FROM completen
-                                             WHERE tag_jugador = '#202C2CU0U')
+                                             WHERE tag_jugador = '#202C2CU0U');
+ */
+
 
 /* 2) Per descomptat, cada cop que batallem amb un jugador, necessitem actualitzar els valors
    i resultats d'una batalla. Cada vegada que inseriu una nova batalla a la base de dades,
@@ -90,53 +96,49 @@ SELECT id_missio2 FROM depen
      emmagatzemi aquesta informació
 */
 
+DROP FUNCTION IF EXISTS updateTrophies CASCADE;
+
+CREATE OR REPLACE FUNCTION updateTrophies()
+RETURNS trigger AS $$
+BEGIN
+UPDATE jugador
+SET
+    trofeus = trofeus + NEW.num_trofeus
+WHERE tag_jugador = NEW.tag_jugador;
+RETURN NULL;
+END $$
+LANGUAGE plpgsql;
+
+
 DROP TRIGGER IF EXISTS battleWon ON guanya CASCADE;
 
 CREATE TRIGGER battleWon AFTER INSERT ON guanya
 FOR EACH ROW
-EXECUTE FUNCTION batallaGuanyada();
+EXECUTE FUNCTION updateTrophies();
 
 DROP TRIGGER IF EXISTS battleLost ON perd CASCADE;
 
 CREATE TRIGGER battleLost AFTER INSERT ON perd
 FOR EACH ROW
-EXECUTE FUNCTION batallaPerduda();
+EXECUTE FUNCTION updateTrophies();
 
-DROP FUNCTION IF EXISTS batallaGuanyada CASCADE;
+/* Comprovacions del segon trigger
 
-CREATE OR REPLACE FUNCTION batallaGuanyada()
-RETURNS trigger AS $$
-BEGIN
-UPDATE jugador
-SET
-    trofeus = trofeus + NEW.num_trofeus
-WHERE tag_jugador = NEW.tag_jugador;
-END $$
-LANGUAGE plpgsql;
-
-DROP FUNCTION IF EXISTS batallaPerduda CASCADE;
-
-CREATE OR REPLACE FUNCTION batallaPerduda()
-RETURNS trigger AS $$
-BEGIN
-UPDATE jugador
-SET
-    trofeus = trofeus + NEW.num_trofeus
-WHERE tag_jugador = NEW.tag_jugador;
-END $$
-LANGUAGE plpgsql;
-
-
-/* Comprovació del segon trigger*/
-/* Inserim una nova batalla a la taula batalla*/
+-- Inserim una nova batalla a la taula batalla
 INSERT INTO batalla (data, durada, id_temporada)
-VALUES (CURRENT_DATE, '05:02:00', 'T1');
-/* Inserim un guanyador a la taula guanya*/
+VALUES (CURRENT_DATE, '02:45:00', 'T4');
+
+SELECT * FROM batalla WHERE data = CURRENT_DATE;
+
+-- Inserim un guanyador a la taula guanya
 INSERT INTO guanya (tag_jugador, id_batalla, id_pila, num_trofeus)
-VALUES ('#VGR9CL0G', 9923, 193, 30);
-/* Inserim un perdedor a la taula perd*/
+VALUES ('#LRUQQPVU', 9923, 193, 30);
+-- Inserim un perdedor a la taula perd
 INSERT INTO perd (tag_jugador, id_batalla, id_pila, num_trofeus)
-VALUES ('#LRUQQPVU', 9922, 1760, -33);
+VALUES ('#VGR9CL0G', 9923, 1760, -30);
+
+SELECT * FROM jugador WHERE tag_jugador = '#VGR9CL0G' OR tag_jugador = '#LRUQQPVU';
+ */
 
 
 /* 3) Recentment la comunitat de ClashSayale ha trobat una bretxa al tallafocs del servidor i la
@@ -213,7 +215,17 @@ CREATE TRIGGER comprovaDonacio AFTER INSERT OR UPDATE ON dona
 FOR EACH ROW
 EXECUTE FUNCTION comprova();
 
-/* Comprovació del tercer trigger*/
-/* Posem una quantitat nul·la i veiem que s'afegeix a la taula warnings*/
+
+/* Comprovació del tercer trigger
+
+-- Posem una quantitat nul·la i veiem que s'afegeix a la taula warnings
 INSERT INTO dona (tag_jugador, tag_clan, quantitat, data)
-VALUES ('#QV2PYL', '#8LGRYC', null, CURRENT_DATE);
+VALUES ('#QV2PYL', '#8LGRYC', 10, CURRENT_DATE);
+
+-- Posem una quantitat nul·la i veiem que s'afegeix a la taula warnings
+INSERT INTO dona (tag_jugador, tag_clan, quantitat, data)
+VALUES ('#QV2PYL', '#2CQQVQCU', 10, CURRENT_DATE);
+
+-- Fem un select de la taula warnings
+SELECT * FROM warnings;
+ */
