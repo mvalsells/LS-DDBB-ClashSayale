@@ -1,6 +1,7 @@
 -- BBDD GB5 - Marc Valsells, Marc Geremias, Irina Aynés i Albert Tomàs
 -- Set 4 - M'agrada la competició. M'agraden els reptes...
 
+
 /* 1) Cada vegada que un jugador completa una missió, necessitem actualitzar la informació a la base
    de dades. Per tant, cal preparar un trigger per cada vegada que s'afegeixi una entrada a la taula
    Jugadors-Quest (el nom pot variar depenent de la base de dades), perquè la informació de l'or i
@@ -16,7 +17,6 @@
    "L'entrada de la quest per a " + <nom_de_la_quest> + " s'ha realitzat sense completar el "
    + <nom_de_la_quest> + " prerequisit"
 */
-
 
 DROP FUNCTION IF EXISTS update_gold_experience CASCADE;
 
@@ -55,6 +55,7 @@ CREATE TRIGGER missionComplete AFTER INSERT ON completen
 FOR EACH ROW
 EXECUTE FUNCTION update_gold_experience();
 
+
 /* Comprovacions del primer trigger
 
 -- Fem un SELECT per veure l'or i l'experiència d'un jugador en concret
@@ -85,6 +86,7 @@ SELECT id_missio2 FROM depen
         AND id_missio2 IN (SELECT id_missio FROM completen
                                              WHERE tag_jugador = '#202C2CU0U');
  */
+
 
 
 /* 2) Per descomptat, cada cop que batallem amb un jugador, necessitem actualitzar els valors
@@ -122,6 +124,7 @@ CREATE TRIGGER battleLost AFTER INSERT ON perd
 FOR EACH ROW
 EXECUTE FUNCTION updateTrophies();
 
+
 /* Comprovacions del segon trigger
 
 -- Inserim una nova batalla a la taula batalla
@@ -139,6 +142,7 @@ VALUES ('#VGR9CL0G', 9923, 1760, -30);
 
 SELECT * FROM jugador WHERE tag_jugador = '#VGR9CL0G' OR tag_jugador = '#LRUQQPVU';
  */
+
 
 
 /* 3) Recentment la comunitat de ClashSayale ha trobat una bretxa al tallafocs del servidor i la
@@ -216,7 +220,7 @@ FOR EACH ROW
 EXECUTE FUNCTION comprova();
 
 
-/* Comprovació del tercer trigger
+/* Comprovacions del tercer trigger
 
 -- Posem una quantitat nul·la i veiem que s'afegeix a la taula warnings
 INSERT INTO dona (tag_jugador, tag_clan, quantitat, data)
