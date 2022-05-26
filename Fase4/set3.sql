@@ -12,28 +12,28 @@ DECLARE
     randColeader VARCHAR;
     randMember VARCHAR;
     countColeader INTEGER;
+
 BEGIN
-    -- Setting values to variables
+
     SELECT count(id_forma_part) INTO countColeader
         FROM forma_part WHERE id_rol = coLeaderID AND tag_clan = $1;
-    SELECT tag_jugador INTO randColeader
-        FROM forma_part
-        WHERE id_rol = coLeaderID AND tag_clan = $1
-        OFFSET floor(random() * countColeader)
-        LIMIT 1;
-    SELECT tag_jugador INTO randMember
-        FROM forma_part
-        WHERE id_rol = memberID AND tag_clan = $1
-        OFFSET floor(random() * (SELECT count(id_forma_part) FROM forma_part WHERE id_rol = memberID AND tag_clan = $1))
-        LIMIT 1;
 
-    -- Function logic
     IF countColeader > 0
     THEN
+        SELECT tag_jugador INTO randColeader
+            FROM forma_part
+            WHERE id_rol = coLeaderID AND tag_clan = $1
+            OFFSET floor(random() * countColeader)
+            LIMIT 1;
         UPDATE forma_part
             SET id_rol = leaderID
             WHERE tag_clan = $1 AND tag_jugador = randColeader AND id_rol = coLeaderID;
     ELSE
+        SELECT tag_jugador INTO randMember
+            FROM forma_part
+            WHERE id_rol = memberID AND tag_clan = $1
+            OFFSET floor(random() * (SELECT count(id_forma_part) FROM forma_part WHERE id_rol = memberID AND tag_clan = $1))
+            LIMIT 1;
         UPDATE forma_part
             SET id_rol = leaderID
             WHERE tag_clan = $1 AND tag_jugador = randMember AND id_rol = memberID;
@@ -53,41 +53,57 @@ $$ LANGUAGE plpgsql;
 -- ha cap, a qualsevol membre de l'atzar que quedi. Es pot considerar els jugadors que han
 -- estat expulsats d'un clan sempre que els seus rols a les taules de jugadors del clan s'hagin
 -- establert com a nuls.
+DROP TABLE IF EXISTS logDeletes;
+CREATE TABLE logDeletes(
+    id SERIAL,
+    tag_removed VARCHAR,
+    tag_clan VARCHAR,
+    id_rol VARCHAR,
+    tag_leader VARCHAR,
+    removed_date date
+);
 
-DROP function IF EXISTS f_CopdEfecte;
 CREATE OR REPLACE FUNCTION f_CopdEfecte()
 RETURNS trigger AS $$
 DECLARE
     newestLeader INTEGER;
-    leaderID INTEGER = (SELECT id_rol FROM rol WHERE nom = 'leader');
-    coLeaderID INTEGER = (SELECT id_rol FROM rol WHERE nom = 'coLeader');
+    item INTEGER;
 BEGIN
-
-    IF (NEW.id_rol == NULL)
-    THEN
+   -- IF (NEW.id_rol = NULL)
+    --THEN
+        INSERT INTO dummylog VALUES ('NULL',now());
         SELECT id_forma_part INTO newestLeader
             FROM forma_part
             WHERE tag_clan = OLD.tag_clan
-            AND id_rol = leaderID
+            AND id_rol = (SELECT id_rol FROM rol WHERE nom = 'leader')
             ORDER BY data desc
             LIMIT 1;
 
-        IF (((SELECT data FROM forma_part WHERE id_forma_part = newestLeader) - interval '24 hours') < 0)
+        INSERT INTO logDeletes VALUES (OLD.tag_jugador, OLD.tag_clan, OLD.id_rol, newestLeader, now());
+
+
+        IF (((SELECT data FROM forma_part WHERE id_forma_part = newestLeader) - interval '24 hours') < now())
         THEN
-            UPDATE forma_part
-            SET jugadors_eliminats = jugadors_eliminats+1
-            WHERE id_forma_part = newestLeader;
+            INSERT INTO dummylog VALUES ('less than 24h',now());
+            /*UPDATE forma_part
+            SET jugadors_eliminats = 3
+            WHERE id_forma_part = newestLeader;*/
 
             IF ((SELECT jugadors_eliminats FROM forma_part WHERE id_forma_part = newestLeader) > 5)
             THEN
                 -- Desfer canvis
-                -- TODO Acabar de desfer canvis
-                /*(SELECT tag_jugador
-                FROM forma_part
-                WHERE tag_clan = OLD.tag_clan
-                  AND id_rol = NULL
-                  AND (data - interval '24 hours') < 0);
-    */
+
+                -- Deleting logs older than 24h that aren't relevant and it is unnecessary storing them
+                DELETE FROM logDeletes
+                WHERE (removed_date - interval '24 hours') > 0;
+
+                FOR item IN SELECT id FROM logDeletes WHERE tag_leader = newestLeader AND tag_clan = $1
+                LOOP
+                    UPDATE forma_part
+                    SET id_rol = (SELECT id_rol FROM logDeletes WHERE id = item)
+                    WHERE tag_clan = $1 AND tag_jugador = (SELECT tag_removed FROM logDeletes WHERE id = item);
+                END LOOP;
+
                 -- Downgrade
                 UPDATE forma_part
                     SET id_rol = NULL
@@ -96,16 +112,16 @@ BEGIN
 
             END IF;
         END IF;
-    END IF;
+    --END IF;
+    RETURN NULL;
 END;
 $$ LANGUAGE plpgsql;
 
 DROP TRIGGER IF EXISTS CopdEfecte ON forma_part;
 CREATE TRIGGER CopdEfecte
 AFTER UPDATE ON forma_part
+FOR EACH ROW
 EXECUTE FUNCTION f_CopdEfecte();
-
-
 
 
 -- 3.2) Hipocresia de trofeus minims
