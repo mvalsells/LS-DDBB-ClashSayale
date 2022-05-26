@@ -55,7 +55,7 @@ $$ LANGUAGE plpgsql;
 -- establert com a nuls.
 DROP TABLE IF EXISTS logDeletes;
 CREATE TABLE logDeletes(
-    id SERIAL,
+    id SERIAL PRIMARY KEY ,
     tag_removed VARCHAR,
     tag_clan VARCHAR,
     id_rol VARCHAR,
@@ -66,53 +66,51 @@ CREATE TABLE logDeletes(
 CREATE OR REPLACE FUNCTION f_CopdEfecte()
 RETURNS trigger AS $$
 DECLARE
-    newestLeader INTEGER;
+    newestLeader INTEGER = (SELECT id_forma_part
+                                FROM forma_part
+                                WHERE tag_clan = OLD.tag_clan
+                                AND id_rol = (SELECT id_rol FROM rol WHERE nom = 'leader')
+                                ORDER BY data desc
+                                LIMIT 1);
     item INTEGER;
 BEGIN
-   -- IF (NEW.id_rol = NULL)
-    --THEN
-        INSERT INTO dummylog VALUES ('NULL',now());
-        SELECT id_forma_part INTO newestLeader
-            FROM forma_part
-            WHERE tag_clan = OLD.tag_clan
-            AND id_rol = (SELECT id_rol FROM rol WHERE nom = 'leader')
-            ORDER BY data desc
-            LIMIT 1;
+    IF NEW.id_rol IS NULL
+    THEN
 
-        INSERT INTO logDeletes VALUES (OLD.tag_jugador, OLD.tag_clan, OLD.id_rol, newestLeader, now());
-
+        INSERT INTO logDeletes(tag_removed, tag_clan, id_rol, tag_leader, removed_date) VALUES (OLD.tag_jugador, OLD.tag_clan, OLD.id_rol, newestLeader, now());
 
         IF (((SELECT data FROM forma_part WHERE id_forma_part = newestLeader) - interval '24 hours') < now())
         THEN
-            INSERT INTO dummylog VALUES ('less than 24h',now());
-            /*UPDATE forma_part
-            SET jugadors_eliminats = 3
-            WHERE id_forma_part = newestLeader;*/
+            UPDATE forma_part
+            SET jugadors_eliminats = jugadors_eliminats + 1
+            WHERE id_forma_part = newestLeader;
 
             IF ((SELECT jugadors_eliminats FROM forma_part WHERE id_forma_part = newestLeader) > 5)
             THEN
+            INSERT INTO dummylog VALUES ('more than 5',now());
+
                 -- Desfer canvis
 
                 -- Deleting logs older than 24h that aren't relevant and it is unnecessary storing them
                 DELETE FROM logDeletes
-                WHERE (removed_date - interval '24 hours') > 0;
+                WHERE (removed_date - interval '24 hours') > now();
 
-                FOR item IN SELECT id FROM logDeletes WHERE tag_leader = newestLeader AND tag_clan = $1
+                FOR item IN (SELECT id FROM logDeletes WHERE tag_leader = (SELECT tag_leader FROM forma_part WHERE id_forma_part = newestLeader) AND tag_clan = OLD.tag_clan)
                 LOOP
                     UPDATE forma_part
                     SET id_rol = (SELECT id_rol FROM logDeletes WHERE id = item)
-                    WHERE tag_clan = $1 AND tag_jugador = (SELECT tag_removed FROM logDeletes WHERE id = item);
+                    WHERE tag_clan = OLD.tag_clan AND tag_jugador = (SELECT tag_removed FROM logDeletes WHERE id = item);
                 END LOOP;
 
                 -- Downgrade
-                UPDATE forma_part
+               UPDATE forma_part
                     SET id_rol = NULL
-                    WHERE tag_clan = OLD.tag_clan AND tag_jugador = newestLeader;
-                SELECT f_selNewLeader(OLD.tag_clan);
+                    WHERE tag_clan = OLD.tag_clan AND id_forma_part = newestLeader;
+                PERFORM f_selNewLeader(OLD.tag_clan);
 
             END IF;
         END IF;
-    --END IF;
+    END IF;
     RETURN NULL;
 END;
 $$ LANGUAGE plpgsql;
