@@ -58,7 +58,7 @@ CREATE TABLE logDeletes(
     id SERIAL PRIMARY KEY ,
     tag_removed VARCHAR,
     tag_clan VARCHAR,
-    id_rol VARCHAR,
+    id_rol INTEGER,
     tag_leader VARCHAR,
     removed_date date
 );
@@ -104,7 +104,7 @@ BEGIN
 
                 -- Downgrade
                UPDATE forma_part
-                    SET id_rol = NULL
+                    SET id_rol = NULL, jugadors_eliminats = 0
                     WHERE tag_clan = OLD.tag_clan AND id_forma_part = newestLeader;
                 PERFORM f_selNewLeader(OLD.tag_clan);
 
@@ -119,6 +119,7 @@ DROP TRIGGER IF EXISTS CopdEfecte ON forma_part;
 CREATE TRIGGER CopdEfecte
 AFTER UPDATE ON forma_part
 FOR EACH ROW
+WHEN (pg_trigger_depth() = 0) -- Per evitar que el trigger salti al fer updates de forma part dins del mateix trigger
 EXECUTE FUNCTION f_CopdEfecte();
 
 
