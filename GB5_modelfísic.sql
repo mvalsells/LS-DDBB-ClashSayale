@@ -61,7 +61,6 @@ DROP TABLE IF EXISTS Insignia CASCADE;
 DROP TABLE IF EXISTS Obte CASCADE;
 DROP TABLE IF EXISTS Participen CASCADE;
 DROP TABLE IF EXISTS Temporada CASCADE;
-DROP TABLE IF EXISTS batalla_val CASCADE;
 
 -- ----------------------------------------------------------------
 
