@@ -18,8 +18,6 @@ la taula de Cartes afectada a la vostra camp corresponent, al costat del següen
 Al contrari, si es respecten les proporcions, no cal fer res.
 */
 
--- despres de canviar la taula? un trigger per cada tipus? -> INSERT, DELATE O ALTER
-
 
 CREATE OR REPLACE FUNCTION f_proporcionsRares()
 RETURNS trigger AS $$
@@ -127,7 +125,7 @@ CREATE TRIGGER proporcionsRares
 /*
 TESTING:
 INSERT INTO carta(nom, dany, velocitat_atac, raresa, arena)
-VALUES ('UESAS', 12, 12, 'Champion', 54000000);
+VALUES ('xdxd', 12, 12, 'Champion', 54000000);
 */
 
 
@@ -164,11 +162,13 @@ EXECUTE FUNCTION f_setMaxlevel();
 /*
  TESTING:
 INSERT INTO pertany(quantitat, data_desbolqueig, id_pertany, tag_jugador, nom_carta, nivell)
-VALUES (637,'2021-04-04',91943,'#QV2PYL','Battle Ram',11);
+VALUES (637,'2021-04-04',91943,'#QV2PYL','Battle Ram',11);*/
+
+/*
+SELECT *
+FROM pertany
+WHERE id_pertany = 91943;
 */
-
-
-
 
 
 
@@ -192,13 +192,6 @@ la llista negra la setmana anterior, reduïu tots els seus valors en un 1%.
 */
 
 
-DROP TABLE IF EXISTS OPCardBlackList CASCADE;
-
-CREATE TABLE OPCardBlackList (
-	nom VARCHAR(255),
-	--TODO S'HA DE GUARDAR EL DATE TMB
-	FOREIGN KEY (nom) REFERENCES Carta(nom)
-);
 
 
 CREATE OR REPLACE FUNCTION f_targetesOp()
@@ -212,7 +205,7 @@ BEGIN
                                         JOIN pila AS p ON f.id_pila = p.id_pila
                                         JOIN perd ON p.id_pila = perd.id_pila
                                         WHERE c.nom = c2.nom
-                                        GROUP BY c2.nom))
+                                        GROUP BY c2.nom))--, CURRENT_DATE
 
     FROM carta AS c
     JOIN formen AS f ON c.nom = f.nom_carta
@@ -228,9 +221,10 @@ BEGIN
                                         WHERE c.nom = c2.nom
                                         GROUP BY c2.nom)) > 90;
 
+
     UPDATE carta
     SET dany = dany * 0.99
-    /*TODO WHERE comprovar si existeix dins la taula OPCardBlackList*/;
+    WHERE nom IN (SELECT op.nom FROM OPCardBlackList AS op WHERE op.date + interval '7 day' < now());
 
 
 RETURN NULL;
