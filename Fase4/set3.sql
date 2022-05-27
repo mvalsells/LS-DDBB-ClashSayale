@@ -2,34 +2,41 @@
 -- Set 3 - Tingueu valor. Encara tenim el nostre clan. Sempre hi ha esperança.
 
 
--- Funcions per diversos triggers
+-- Funció que donat un clan escolleix un nou leader aleatoriament dels
 CREATE OR REPLACE FUNCTION f_selNewLeader(VARCHAR)
 RETURNS void AS $$
 DECLARE
-    countColeader INTEGER;
     leaderID INTEGER = (SELECT id_rol FROM rol WHERE nom = 'leader');
     coLeaderID INTEGER = (SELECT id_rol FROM rol WHERE nom = 'coLeader');
+    memberID INTEGER = (SELECT id_rol FROM rol WHERE nom = 'member');
+    randColeader VARCHAR;
+    randMember VARCHAR;
+    countColeader INTEGER;
+
 BEGIN
+
     SELECT count(id_forma_part) INTO countColeader
         FROM forma_part WHERE id_rol = coLeaderID AND tag_clan = $1;
 
     IF countColeader > 0
     THEN
-        INSERT INTO forma_part(tag_clan, tag_jugador, id_rol, data, jugadors_eliminats)
-            VALUES ($1,(SELECT tag_jugador
-                            FROM forma_part
-                            WHERE id_rol = coLeaderID AND tag_clan = $1
-                            OFFSET floor(random() * countColeader)
-                            LIMIT 1),
-                    leaderID,now(),0);
+        SELECT tag_jugador INTO randColeader
+            FROM forma_part
+            WHERE id_rol = coLeaderID AND tag_clan = $1
+            OFFSET floor(random() * countColeader)
+            LIMIT 1;
+        UPDATE forma_part
+            SET id_rol = leaderID, data = now()
+            WHERE tag_clan = $1 AND tag_jugador = randColeader AND id_rol = coLeaderID;
     ELSE
-        INSERT INTO forma_part(tag_clan, tag_jugador, id_rol, data, jugadors_eliminats)
-        VALUES ($1,(SELECT tag_jugador
-                        FROM forma_part
-                        WHERE id_rol = (SELECT id_rol FROM rol WHERE nom = 'member') AND tag_clan = $1
-                        OFFSET floor(random() * (SELECT count(id_rol) FROM rol WHERE nom = 'member'))
-                        LIMIT 1),
-                leaderID,now(),0);
+        SELECT tag_jugador INTO randMember
+            FROM forma_part
+            WHERE id_rol = memberID AND tag_clan = $1
+            OFFSET floor(random() * (SELECT count(id_forma_part) FROM forma_part WHERE id_rol = memberID AND tag_clan = $1))
+            LIMIT 1;
+        UPDATE forma_part
+            SET id_rol = leaderID, data = now()
+            WHERE tag_clan = $1 AND tag_jugador = randMember AND id_rol = memberID;
     END IF;
 END;
 $$ LANGUAGE plpgsql;
@@ -46,80 +53,74 @@ $$ LANGUAGE plpgsql;
 -- ha cap, a qualsevol membre de l'atzar que quedi. Es pot considerar els jugadors que han
 -- estat expulsats d'un clan sempre que els seus rols a les taules de jugadors del clan s'hagin
 -- establert com a nuls.
+DROP TABLE IF EXISTS logDeletes;
+CREATE TABLE logDeletes(
+    id SERIAL PRIMARY KEY ,
+    tag_removed VARCHAR,
+    tag_clan VARCHAR,
+    id_rol INTEGER,
+    tag_leader VARCHAR,
+    removed_date date
+);
 
-DROP function IF EXISTS f_CopdEfecte;
 CREATE OR REPLACE FUNCTION f_CopdEfecte()
 RETURNS trigger AS $$
 DECLARE
-    newestLeader INTEGER;
-    countColeader INTEGER;
-    leaderID INTEGER = (SELECT id_rol FROM rol WHERE nom = 'leader');
-    coLeaderID INTEGER = (SELECT id_rol FROM rol WHERE nom = 'coLeader');
+    newestLeader INTEGER = (SELECT id_forma_part
+                                FROM forma_part
+                                WHERE tag_clan = OLD.tag_clan
+                                AND id_rol = (SELECT id_rol FROM rol WHERE nom = 'leader')
+                                ORDER BY data desc
+                                LIMIT 1);
+    item INTEGER;
 BEGIN
-    SELECT id_forma_part INTO newestLeader
-        FROM forma_part
-        WHERE tag_clan = OLD.tag_clan
-        AND id_rol = leaderID
-        ORDER BY data desc
-        LIMIT 1;
-
-    IF (((SELECT data FROM forma_part WHERE id_forma_part = newestLeader) - interval '24 hours') < 0)
+    IF NEW.id_rol IS NULL
     THEN
-        UPDATE forma_part
-        SET jugadors_eliminats = jugadors_eliminats+1
-        WHERE id_forma_part = newestLeader;
 
-        IF ((SELECT jugadors_eliminats FROM forma_part WHERE id_forma_part = newestLeader) > 5)
+        INSERT INTO logDeletes(tag_removed, tag_clan, id_rol, tag_leader, removed_date) VALUES (OLD.tag_jugador, OLD.tag_clan, OLD.id_rol, newestLeader, now());
+
+        IF ((SELECT data + interval '1 day' FROM forma_part WHERE id_forma_part = newestLeader)  > now())
         THEN
-            -- Desfer canvis
-            -- TODO Acabar de desfer canvis
-            /*(SELECT tag_jugador
-            FROM forma_part
-            WHERE tag_clan = OLD.tag_clan
-              AND id_rol = NULL
-              AND (data - interval '24 hours') < 0);
-*/
-            -- Downgrade
-            SELECT f_selNewLeader(OLD.tag_clan);
-            /*
-            SELECT count(id_forma_part) INTO countColeader
-                FROM forma_part WHERE id_rol = coLeaderID;
+            UPDATE forma_part
+            SET jugadors_eliminats = jugadors_eliminats + 1
+            WHERE id_forma_part = newestLeader;
 
-            IF countColeader == 1
+            IF ((SELECT jugadors_eliminats FROM forma_part WHERE id_forma_part = newestLeader) > 5)
             THEN
-                UPDATE forma_part
-                SET id_rol = leaderID
-                WHERE id_rol = coLeaderID;
-            ELSE
-                IF countColeader > 1
-                THEN
-                    INSERT INTO forma_part(tag_clan, tag_jugador, id_rol, data, jugadors_eliminats)
-                    VALUES (OLD.tag_clan,(SELECT tag_jugador
-                            FROM forma_part
-                            WHERE id_rol = coLeaderID AND tag_clan = OLD.tag_clan
-                            OFFSET floor(random() * countColeader)
-                            LIMIT 1),leaderID,now(),0);
+            INSERT INTO dummylog VALUES ('more than 5',now());
 
-                ELSE
-                    INSERT INTO forma_part(tag_clan, tag_jugador, id_rol, data, jugadors_eliminats)
-                    VALUES (OLD.tag_clan,(SELECT tag_jugador
-                            FROM forma_part
-                            WHERE id_rol = (SELECT id_rol FROM rol WHERE nom = 'member') AND tag_clan = OLD.tag_clan
-                            OFFSET floor(random() * (SELECT count(id_rol) FROM rol WHERE nom = 'member'))
-                            LIMIT 1),leaderID,now(),0);
-                END IF;
-             END IF;*/
+                -- Desfer canvis
+
+                -- Deleting logs older than 24h that aren't relevant and it is unnecessary storing them
+                DELETE FROM logDeletes
+                WHERE (removed_date - interval '24 hours') > now();
+
+                FOR item IN (SELECT id FROM logDeletes WHERE tag_leader = (SELECT tag_leader FROM forma_part WHERE id_forma_part = newestLeader) AND tag_clan = OLD.tag_clan)
+                LOOP
+                    UPDATE forma_part
+                    SET id_rol = (SELECT id_rol FROM logDeletes WHERE id = item)
+                    WHERE tag_clan = OLD.tag_clan AND tag_jugador = (SELECT tag_removed FROM logDeletes WHERE id = item);
+                END LOOP;
+
+                -- Downgrade
+               UPDATE forma_part
+                    SET id_rol = NULL, jugadors_eliminats = 0
+                    WHERE tag_clan = OLD.tag_clan AND id_forma_part = newestLeader;
+                PERFORM f_selNewLeader(OLD.tag_clan);
+
+            END IF;
         END IF;
     END IF;
+    RETURN NULL;
 END;
 $$ LANGUAGE plpgsql;
 
 DROP TRIGGER IF EXISTS CopdEfecte ON forma_part;
 CREATE TRIGGER CopdEfecte
-AFTER DELETE ON forma_part
+AFTER UPDATE ON forma_part
+FOR EACH ROW
+WHEN (pg_trigger_depth() = 0) -- Per evitar que el trigger salti al fer updates de forma part dins del mateix trigger
 EXECUTE FUNCTION f_CopdEfecte();
-
-
 
 
 -- 3.2) Hipocresia de trofeus minims
@@ -140,6 +141,7 @@ CREATE OR REPLACE FUNCTION f_minTrofeus()
 RETURNS trigger AS $$
 DECLARE
     currentClan VARCHAR;
+    idFormaPart INTEGER;
 BEGIN
     SELECT tag_clan INTO currentClan
         FROM forma_part
@@ -147,10 +149,22 @@ BEGIN
         ORDER BY data desc
         LIMIT 1;
 
+    SELECT id_forma_part INTO idFormaPart
+        FROM forma_part
+        WHERE tag_jugador = NEW.tag_jugador
+        ORDER BY data desc
+        LIMIT 1;
+
+
     IF (SELECT trofeus_minims FROM clan WHERE tag_clan = currentClan) < NEW.trofeus
     THEN
-        DELETE FROM forma_part WHERE tag_jugador = NEW.tag_jugador AND tag_clan = currentClan;
-        SELECT f_selNewLeader(currentClan);
+        IF (SELECT id_rol FROM forma_part WHERE id_forma_part = idFormaPart) = (SELECT id_rol FROM rol WHERE nom = 'leader')
+        THEN
+            SELECT f_selNewLeader(currentClan);
+        end if;
+        UPDATE forma_part
+        SET id_rol = NULL
+        WHERE id_forma_part = idFormaPart;
     END IF;
 END;
 $$ LANGUAGE plpgsql;
@@ -158,6 +172,7 @@ $$ LANGUAGE plpgsql;
 DROP TRIGGER IF EXISTS minTrofeus ON jugador;
 CREATE TRIGGER minTrofeus
     AFTER UPDATE OF trofeus ON jugador
+    FOR EACH ROW
     EXECUTE FUNCTION f_minTrofeus();
 
 -- 3.3) Mals perdedors
@@ -176,3 +191,5 @@ CREATE TRIGGER minTrofeus
 -- - Un missatge amb el següent format:
 -- "S'ha intentat esborrar la batalla " + <id_batalla> + " on l 'usuari " +
 -- <etiqueta_jugador_perdedor> + " va perdre " + <puntuació_perdedor> + " trofeus"
+
+
