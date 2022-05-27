@@ -1,26 +1,5 @@
 -- BBDD GB5 - Marc Valsells, Marc Geremias, Irina Aynes i Albert Tomas
 -- Set 2 - No sóc un jugador, sóc un jugador de videojocs
-
--- Per borrar triggers --------- BORRAR -------------
-
-CREATE OR REPLACE FUNCTION strip_all_triggers() RETURNS text AS $$ DECLARE
-    triggNameRecord RECORD;
-    triggTableRecord RECORD;
-BEGIN
-    FOR triggNameRecord IN select distinct(trigger_name) from information_schema.triggers where trigger_schema = 'public' LOOP
-        FOR triggTableRecord IN SELECT distinct(event_object_table) from information_schema.triggers where trigger_name = triggNameRecord.trigger_name LOOP
-            RAISE NOTICE 'Dropping trigger: % on table: %', triggNameRecord.trigger_name, triggTableRecord.event_object_table;
-            EXECUTE 'DROP TRIGGER ' || triggNameRecord.trigger_name || ' ON ' || triggTableRecord.event_object_table || ';';
-        END LOOP;
-    END LOOP;
-
-    RETURN 'done';
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
-select strip_all_triggers();
-
-
 /*
  Comprar a la botiga és un procés senzill, simplement se selecciona l’article desitjat, es tria
 una targeta de crèdit i es realitza la compra. No obstant això, quan es tracta de la
@@ -36,26 +15,12 @@ que els compra. Un altre element que has de comprovar són els Packs d'Arena, qu
 diferents quantitats d'or en funció de l'Arena on el jugador puntuï. Realitza els triggers
 necessaris per actualitzar els atributs dels jugadors afectats en funció de les compres
  */
-
-SELECT jugador.tag_jugador, jugador.or_,jugador.gemmes from jugador  WHERE tag_jugador  like '#QV2PYL';
-
--- algo + null = null, fem update perque no passi
-UPDATE jugador
-            SET or_ = 0
-            WHERE  or_ IS NULL;
-
-UPDATE jugador
-        SET gemmes = 0
-        where gemmes IS NULL;
-
-SELECT jugador.tag_jugador, jugador.or_,jugador.gemmes from jugador  WHERE tag_jugador  like '#QV2PYL';
-
 DROP FUNCTION if exists suma_or_gemmes CASCADE;
 
 CREATE OR REPLACE FUNCTION suma_or_gemmes()
 RETURNS trigger as $$
 BEGIN
-        if (SELECT id_bundle from bundle where new.id_article = id_bundle) = new.id_article then
+        IF (SELECT id_bundle from bundle where new.id_article = id_bundle) = new.id_article then
             UPDATE jugador
                 SET or_  = (CASE WHEN jugador.or_ IS NULL THEN 0 ELSE jugador.or_ END)  + (SELECT (CASE WHEN b.or_ IS NULL
                             THEN 0 ELSE b.or_ END) from bundle as b
@@ -92,7 +57,6 @@ BEGIN
                         OR a.nombre_max < 32767 )
                     GROUP BY j2.tag_jugador, apa.or_)
             WHERE tag_jugador = new.tag_jugador;
-
         end if;
 
     RETURN NULL;
@@ -100,33 +64,21 @@ BEGIN
 END
 $$ LANGUAGE plpgsql;
 
--- disparador
 DROP TRIGGER IF EXISTS suma_trig ON compren;
 CREATE TRIGGER suma_trig AFTER INSERT ON compren
 FOR EACH ROW
 EXECUTE FUNCTION suma_or_gemmes();
 
 -- Validació
-
 -- BUNDLE
-INSERT INTO compren (tag_jugador, num_targeta, id_article, data_, descompte)
+/*INSERT INTO compren (tag_jugador, num_targeta, id_article, data_, descompte)
 VALUES ('#QV2PYL','0626997669324072',9, now(),0);
-
 -- PACK_ARENA
 INSERT INTO compren (tag_jugador, num_targeta, id_article, data_, descompte)
 VALUES ('#QV2PYL','0626966543536722',60,now(),0);
-
-SELECT *
-    from bundle
-where id_bundle = 9;
-
+--Comprovació
 SELECT  tag_jugador, jugador.or_, jugador.gemmes from jugador  WHERE tag_jugador  like '#QV2PYL';
-
-
----------------- AIXI FUNCIONA (No tocar)--------------------------------------------------
-INSERT INTO compren (tag_jugador, num_targeta, id_article, data_, descompte)
-VALUES ('#QV2PYL','0626966543536722',60,now(),0);
-
+--Comprovació resultats
 SELECT apa.or_ from arena_pack_arena as apa join
     arena a on apa.id_arena = a.id_arena join arena_pack ap on apa.id_arena_pack = ap.id_arena_pack
     join article a2 on ap.id_arena_pack = a2.id_article join compren c on a2.id_article = c.id_article
@@ -141,26 +93,11 @@ SELECT apa.or_ from arena_pack_arena as apa join
             WHERE j.tag_jugador like '#QV2PYL'
             GROUP BY j.tag_jugador)  <= a.nombre_max
             and (a.titol LIKE '%Arena_L10 - Ultimate Champion%'
-            OR a.nombre_max < 32767 );
-
-SELECT *
-    from arena;
-
-SELECT *
-    from arena_pack_arena
-        where id_arena = 54000002;
-
-SELECT *
-    from arena_pack
-        where id_arena_pack = 60;
-
-SELECT *
-
--------------------------------------------------------------------------------------------
-
+            OR a.nombre_max < 32767 );*/
 
 /*
- Des de fa poc, ClashSayale ha canviat els termes i les condicions, que molts jugadors no
+
+Des de fa poc, ClashSayale ha canviat els termes i les condicions, que molts jugadors no
 han llegit, i s'ha aplicat una política de tolerància zero respecte al sexisme, el racisme, la
 discriminació en general i la incitació a l'odi. Per això, cada vegada que s'insereixi un
 missatge a la base de dades cal comprovar si hi ha paraules ofensives. Si això passa,
@@ -179,18 +116,17 @@ del jugador que el va enviar i el format del missatge corresponent:
 <etiqueta_clan_receptor>
  */
 
--- creem taula missatges prohibits
 DROP TABLE IF EXISTS missatges_prohibits;
 CREATE TABLE missatges_prohibits(
     id_paraula SERIAL,
     paraula varchar(255),
     PRIMARY KEY (id_paraula)
 );
--- insertem paraules prohibides
+
 INSERT INTO missatges_prohibits (paraula)
 VALUES ('stupid'), ('silly'),('idiot');
 
-DROP FUNCTION if exists missatges_ofensius;
+DROP FUNCTION if exists missatges_ofensius CASCADE;
 
 CREATE OR REPLACE FUNCTION missatges_ofensius()
 RETURNS trigger as $$
@@ -220,26 +156,26 @@ BEGIN
 END
     $$ LANGUAGE plpgsql;
 
--- disparador
+
 DROP TRIGGER IF EXISTS ofen_trig ON conversen;
 CREATE TRIGGER ofen_trig AFTER INSERT ON conversen
 FOR EACH ROW
 EXECUTE FUNCTION missatges_ofensius();
 
 --Validació
-INSERT INTO missatge(id_missatge,cos, data_)
+/*INSERT INTO missatge(id_missatge,cos, data_)
 VALUES (3024,'You ara very stupid',CURRENT_DATE);
 INSERT INTO conversen (tag_envia, tag_rep,id_missatge)
 VALUES ('#P8CJYJ02','#2V20QJVR',3024);
-
+--Comprovació
 SELECT *
 from warnings;
-
+--Comprovació nom banejat
 SELECT nom
 from jugador
-where tag_jugador like '%#P8CJYJ02%';
+where tag_jugador like '%#P8CJYJ02%';*/
 
-DROP FUNCTION if exists missatges_clans;
+DROP FUNCTION if exists missatges_clans CASCADE;
 
 CREATE OR REPLACE FUNCTION missatges_clans()
 RETURNS trigger as $$
@@ -260,9 +196,9 @@ BEGIN
             VALUES ('missatge','Missatge d''odi enviat amb paraula/s ' || (Select paraula from missatges_prohibits where id_paraula = i-1)
             ||' al clan '|| new.tag_clan, (SELECT m.data_ from missatge as m where m.id_missatge = new.id_missatge) ,(SELECT c.nom FROM clan as c where c.tag_clan = new.tag_clan));
 
-        UPDATE clan
+        UPDATE jugador
                 SET nom = '_banned_ ' || nom
-                WHERE new.tag_clan = tag_clan;
+                WHERE new.tag_jugador = tag_jugador;
         end if;
 
         return null;
@@ -275,17 +211,18 @@ FOR EACH ROW
 EXECUTE FUNCTION missatges_clans();
 
 --Validació
-INSERT INTO missatge(id_missatge,cos, data_)
-VALUES (3061,'Hi idiot I hate you',CURRENT_DATE);
+/*INSERT INTO missatge(id_missatge,cos, data_)
+VALUES (3062,'Hi idiot I hate you',CURRENT_DATE);
 INSERT INTO envia (id_missatge, tag_clan, tag_jugador)
-VALUES (3061,'#8LGRYC','#2V20QJVR');
-
+VALUES (3062,'#8LGRYC','#2V20QJVR');
+--Comprovació
 SELECT *
 from warnings;
-
+--Comprovació nom banejat
 SELECT nom
-from clan
-where tag_clan like '%#8LGRYC%';
+from jugador
+where jugador.tag_jugador like '#2V20QJVR';
+ */
 
 /*
  Els anys de ClashSayale es divideixen en dues temporades: una temporada de tornada a
@@ -302,7 +239,6 @@ Si ja teniu una taula equivalent a la "Classificació", podeu utilitzar-la, nom�
 d'assegurar que el nom de la taula s'indiqui al vostre informe
  */
 
- --Creeem taula ranquing
 DROP TABLE IF EXISTS ranquing;
 CREATE TABLE ranquing(
     id_ranquing SERIAL,
@@ -372,53 +308,41 @@ FOR EACH ROW
 EXECUTE FUNCTION actualitza_ranquing();
 
 --Validació
+/*--Insert abans del trigger
 INSERT INTO temporada (id_temporada, data_inici, data_fi)
-VALUES ('T20','2031-01-01','2031-08-20');
+VALUES ('T11','2022-01-01','2022-08-20');
 INSERT INTO participen (tag_jugador, id_temporada)
-VALUES ('#QV2PYL','T19');
+VALUES ('#QV2PYL','T11');
 INSERT INTO batalla (data, durada,id_temporada)
-VALUES ('2030-01-02','03:52:00','T19');
-
-SELECT *
-from batalla ORDER BY data DESC;
+VALUES ('2022-01-02','03:52:00','T11');
 INSERT INTO guanya (tag_jugador, id_batalla,num_trofeus,id_pila)
-VALUES ('#QV2PYL',9924,80,102);
+VALUES ('#QV2PYL',9920,80,102);
 INSERT INTO perd (tag_jugador, id_batalla, id_pila, num_trofeus)
-VALUES ('#QV2PYL',9924,1113,-67);
+VALUES ('#QV2PYL',9920,1113,-67);
+-- Insert despres del trigger
+INSERT INTO temporada (id_temporada, data_inici, data_fi)
+VALUES ('T12','2023-01-01','2023-08-20');
 
-SELECT *
-from arena;
-
+-- Comprovació taula ranquing
 SELECT *
 from ranquing;
 
-SELECT *
-from temporada;
-
-------------------------------------COMENTARIS (per validacio)----------------------------
-/* Indicar que ho he fet amb una temporada anterior pq no tenim suficient informació de la
-   temporada que afegim
-
-   Ordre validaci´:
-   1- afegim els inserts amb T11
-   2- executem trigger
-   3- afegum insert nomes a temporada t12
-   4- ranquin
- */
-
--------------------------- FUNCIONA AQUI (no tocar)------------------------
+-- Comprovació del ranquing
 (SELECT((SELECT (CASE WHEN SUM(g.num_trofeus) IS NULL THEN 0 ELSE SUM(g.num_trofeus) END)
     from jugador as j join guanya g on j.tag_jugador = g.tag_jugador
      join batalla on g.id_batalla = batalla.id_batalla
-    WHERE batalla.data >= '2028-01-01' and batalla.data <= '2028-08-20'
-    and j.tag_jugador = '#QV2PYL') +  (SELECT (CASE WHEN SUM(p.num_trofeus) IS NULL THEN 0 ELSE SUM(p.num_trofeus) END)
+    WHERE batalla.data >= '2022-01-02' and batalla.data <= '2022-08-20'
+    and j.tag_jugador = '#QV2PYL') + (SELECT (CASE WHEN SUM(p.num_trofeus) IS NULL THEN 0 ELSE SUM(p.num_trofeus) END)
            from jugador as j join perd p on j.tag_jugador = p.tag_jugador
         join batalla as b2 on p.id_batalla = b2.id_batalla
-        WHERE b2.data >= '2028-01-01' and b2.data <= '2028-08-20'
-        and j.tag_jugador = '#QV2PYL'))
+        WHERE b2.data >= '2022-01-01' and b2.data <= '2022-08-20'
+        and j.tag_jugador = '#QV2PYL')) as suma
                     from jugador as j
                     where j.tag_jugador = '#QV2PYL'
                     GROUP BY j.tag_jugador);
+
+SELECT *
+from arena;*/
 
 
 
