@@ -192,20 +192,20 @@ la llista negra la setmana anterior, reduïu tots els seus valors en un 1%.
 */
 
 
+DROP TABLE IF EXISTS OPCardBlackList;
+
+CREATE TABLE OPCardBlackList (
+	nom VARCHAR(255),
+	date DATE
+);
 
 
 CREATE OR REPLACE FUNCTION f_targetesOp()
 RETURNS trigger AS $$
 BEGIN
 
-    INSERT INTO OPCardBlackList
-    SELECT c.nom, COUNT(id_batalla)*100 / (COUNT(id_batalla) + (SELECT COUNT(id_batalla)
-                                        FROM carta AS c2
-                                        JOIN formen AS f ON c2.nom = f.nom_carta
-                                        JOIN pila AS p ON f.id_pila = p.id_pila
-                                        JOIN perd ON p.id_pila = perd.id_pila
-                                        WHERE c.nom = c2.nom
-                                        GROUP BY c2.nom))--, CURRENT_DATE
+    INSERT INTO OPCardBlackList(nom, date)
+    SELECT c.nom, CURRENT_DATE
 
     FROM carta AS c
     JOIN formen AS f ON c.nom = f.nom_carta
