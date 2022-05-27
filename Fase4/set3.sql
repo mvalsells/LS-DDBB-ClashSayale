@@ -193,3 +193,22 @@ CREATE TRIGGER minTrofeus
 -- <etiqueta_jugador_perdedor> + " va perdre " + <puntuació_perdedor> + " trofeus"
 
 
+CREATE OR REPLACE FUNCTION f_malsPerdedors()
+RETURNS trigger AS $$
+DECLARE
+    warningMsg VARCHAR;
+BEGIN
+    IF NOT current_user = 'admin'
+    THEN
+        SELECT CONCAT('S''ha intentat esborrar la batalla ', OLD.id_batalla, ' on l''usuari ', (SELECT tag_jugador FROM perd WHERE id_batalla = OLD.id_batalla), ' va perdre ', (SELECT num_trofeus FROM perd WHERE id_batalla = OLD.id_batalla), ' trofeus') INTO warningMsg;
+        INSERT INTO warnings (affected_table, error_message, date, username)  VALUES ('batalla', warningMsg, now(),current_user);
+    END IF;
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS malsPerdedors ON jugador;
+CREATE TRIGGER malsPerdedors
+    BEFORE DELETE ON batalla
+    FOR EACH ROW
+    EXECUTE FUNCTION f_malsPerdedors();
