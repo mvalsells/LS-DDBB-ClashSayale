@@ -26,7 +26,7 @@ BEGIN
             OFFSET floor(random() * countColeader)
             LIMIT 1;
         UPDATE forma_part
-            SET id_rol = leaderID
+            SET id_rol = leaderID, data = now()
             WHERE tag_clan = $1 AND tag_jugador = randColeader AND id_rol = coLeaderID;
     ELSE
         SELECT tag_jugador INTO randMember
@@ -35,7 +35,7 @@ BEGIN
             OFFSET floor(random() * (SELECT count(id_forma_part) FROM forma_part WHERE id_rol = memberID AND tag_clan = $1))
             LIMIT 1;
         UPDATE forma_part
-            SET id_rol = leaderID
+            SET id_rol = leaderID, data = now()
             WHERE tag_clan = $1 AND tag_jugador = randMember AND id_rol = memberID;
     END IF;
 END;
@@ -79,7 +79,7 @@ BEGIN
 
         INSERT INTO logDeletes(tag_removed, tag_clan, id_rol, tag_leader, removed_date) VALUES (OLD.tag_jugador, OLD.tag_clan, OLD.id_rol, newestLeader, now());
 
-        IF (((SELECT data FROM forma_part WHERE id_forma_part = newestLeader) - interval '24 hours') < now())
+        IF ((SELECT data + interval '1 day' FROM forma_part WHERE id_forma_part = newestLeader)  > now())
         THEN
             UPDATE forma_part
             SET jugadors_eliminats = jugadors_eliminats + 1
@@ -141,6 +141,7 @@ CREATE OR REPLACE FUNCTION f_minTrofeus()
 RETURNS trigger AS $$
 DECLARE
     currentClan VARCHAR;
+    idFormaPart INTEGER;
 BEGIN
     SELECT tag_clan INTO currentClan
         FROM forma_part
@@ -148,10 +149,22 @@ BEGIN
         ORDER BY data desc
         LIMIT 1;
 
+    SELECT id_forma_part INTO idFormaPart
+        FROM forma_part
+        WHERE tag_jugador = NEW.tag_jugador
+        ORDER BY data desc
+        LIMIT 1;
+
+
     IF (SELECT trofeus_minims FROM clan WHERE tag_clan = currentClan) < NEW.trofeus
     THEN
-        DELETE FROM forma_part WHERE tag_jugador = NEW.tag_jugador AND tag_clan = currentClan;
-        SELECT f_selNewLeader(currentClan);
+        IF (SELECT id_rol FROM forma_part WHERE id_forma_part = idFormaPart) = (SELECT id_rol FROM rol WHERE nom = 'leader')
+        THEN
+            SELECT f_selNewLeader(currentClan);
+        end if;
+        UPDATE forma_part
+        SET id_rol = NULL
+        WHERE id_forma_part = idFormaPart;
     END IF;
 END;
 $$ LANGUAGE plpgsql;
@@ -159,6 +172,7 @@ $$ LANGUAGE plpgsql;
 DROP TRIGGER IF EXISTS minTrofeus ON jugador;
 CREATE TRIGGER minTrofeus
     AFTER UPDATE OF trofeus ON jugador
+    FOR EACH ROW
     EXECUTE FUNCTION f_minTrofeus();
 
 -- 3.3) Mals perdedors
@@ -177,3 +191,5 @@ CREATE TRIGGER minTrofeus
 -- - Un missatge amb el següent format:
 -- "S'ha intentat esborrar la batalla " + <id_batalla> + " on l 'usuari " +
 -- <etiqueta_jugador_perdedor> + " va perdre " + <puntuació_perdedor> + " trofeus"
+
+
