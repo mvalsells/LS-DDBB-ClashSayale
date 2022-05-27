@@ -2,7 +2,7 @@
 -- Set 3 - Tingueu valor. Encara tenim el nostre clan. Sempre hi ha esperança.
 
 
--- Funció que donat un clan escolleix un nou leader aleatoriament dels
+-- Funció que donat un clan escolleix un nou leader aleatoriament segons els requists de l'enunciat
 CREATE OR REPLACE FUNCTION f_selNewLeader(VARCHAR)
 RETURNS void AS $$
 DECLARE
@@ -12,9 +12,7 @@ DECLARE
     randColeader VARCHAR;
     randMember VARCHAR;
     countColeader INTEGER;
-
 BEGIN
-
     SELECT count(id_forma_part) INTO countColeader
         FROM forma_part WHERE id_rol = coLeaderID AND tag_clan = $1;
 
@@ -66,31 +64,22 @@ CREATE TABLE logDeletes(
 CREATE OR REPLACE FUNCTION f_CopdEfecte()
 RETURNS trigger AS $$
 DECLARE
-    newestLeader INTEGER = (SELECT id_forma_part
-                                FROM forma_part
-                                WHERE tag_clan = OLD.tag_clan
-                                AND id_rol = (SELECT id_rol FROM rol WHERE nom = 'leader')
-                                ORDER BY data desc
-                                LIMIT 1);
+    newestLeader INTEGER = (SELECT id_forma_part FROM forma_part
+                                WHERE tag_clan = OLD.tag_clan AND id_rol = (SELECT id_rol FROM rol WHERE nom = 'leader')
+                                ORDER BY data DESC LIMIT 1);
     item INTEGER;
 BEGIN
     IF NEW.id_rol IS NULL
     THEN
-
         INSERT INTO logDeletes(tag_removed, tag_clan, id_rol, tag_leader, removed_date) VALUES (OLD.tag_jugador, OLD.tag_clan, OLD.id_rol, newestLeader, now());
-
-        IF ((SELECT data + interval '1 day' FROM forma_part WHERE id_forma_part = newestLeader)  > now())
-        THEN
-            UPDATE forma_part
+        UPDATE forma_part
             SET jugadors_eliminats = jugadors_eliminats + 1
             WHERE id_forma_part = newestLeader;
-
+        IF ((SELECT data + interval '1 day' FROM forma_part WHERE id_forma_part = newestLeader)  > now())
+        THEN
             IF ((SELECT jugadors_eliminats FROM forma_part WHERE id_forma_part = newestLeader) > 5)
             THEN
-            INSERT INTO dummylog VALUES ('more than 5',now());
-
                 -- Desfer canvis
-
                 -- Deleting logs older than 24h that aren't relevant and it is unnecessary storing them
                 DELETE FROM logDeletes
                 WHERE (removed_date - interval '24 hours') > now();
