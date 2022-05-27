@@ -46,7 +46,7 @@ UPDATE jugador
 
 SELECT jugador.tag_jugador, jugador.or_,jugador.gemmes from jugador  WHERE tag_jugador  like '#QV2PYL';
 
-DROP FUNCTION if exists suma_or_gemmes;
+DROP FUNCTION if exists suma_or_gemmes CASCADE;
 
 CREATE OR REPLACE FUNCTION suma_or_gemmes()
 RETURNS trigger as $$
@@ -60,7 +60,7 @@ BEGIN
             SET gemmes = jugador.gemmes + (SELECT b.gemmes from bundle as b where new.id_article = b.id_bundle)
             WHERE new.tag_jugador = jugador.tag_jugador;
 
-        UPDATE jugador
+        /*UPDATE jugador
             SET or_ = or_ + (SELECT apa.or_ from arena_pack_arena as apa join
                 arena a on apa.id_arena = a.id_arena
                 join arena_pack ap on apa.id_arena_pack = ap.id_arena_pack
@@ -81,7 +81,7 @@ BEGIN
                         GROUP BY j.tag_jugador)  <= a.nombre_max
                         and (a.titol LIKE '%Arena_L10 - Ultimate Champion%'
                         OR a.nombre_max < 32767 ))
-            WHERE tag_jugador = new.tag_jugador;
+            WHERE tag_jugador = new.tag_jugador;*/
 
     RETURN NULL;
 
@@ -98,25 +98,29 @@ EXECUTE FUNCTION suma_or_gemmes();
 
 -- BUNDLE
 INSERT INTO compren (tag_jugador, num_targeta, id_article, data_, descompte)
-VALUES ('#V0QCQUCL','0626997669324072',9, now(),0);
+VALUES ('#QV2PYL','0626997669324072',9, now(),0);
 
 -- PACK_ARENA
 INSERT INTO compren (tag_jugador, num_targeta, id_article, data_, descompte)
 VALUES ('#QV2PYL','0626966543536722',60,now(),0);
 
-SELECT jugador.tag_jugador, jugador.or_,jugador.gemmes from jugador  WHERE tag_jugador  like '#QV2PYL';
+SELECT *
+    from bundle
+where id_bundle = 9;
+
+SELECT  tag_jugador, jugador.or_, jugador.gemmes from jugador  WHERE tag_jugador  like '#QV2PYL';
 
 
 ---------------- AIXI FUNCIONA (No tocar)--------------------------------------------------
 INSERT INTO compren (tag_jugador, num_targeta, id_article, data_, descompte)
-VALUES ('#QV2PYL','0626966543536722',86,now(),0);
+VALUES ('#QV2PYL','0626966543536722',60,now(),0);
 
 SELECT apa.or_ from arena_pack_arena as apa join
     arena a on apa.id_arena = a.id_arena join arena_pack ap on apa.id_arena_pack = ap.id_arena_pack
     join article a2 on ap.id_arena_pack = a2.id_article join compren c on a2.id_article = c.id_article
     join jugador j2 on c.tag_jugador = j2.tag_jugador
-    where j2.tag_jugador like '#QV2PYL' and (SELECT(SUM(g.num_trofeus) + SUM(p.num_trofeus))
-        from jugador as j join guanya g on j.tag_jugador = g.tag_jugador
+    where a2.id_article = 60 and j2.tag_jugador like '#QV2PYL' and (SELECT(SUM(g.num_trofeus) + SUM(p.num_trofeus) )
+        as trofeus from jugador as j join guanya g on j.tag_jugador = g.tag_jugador
         join perd p on j.tag_jugador = p.tag_jugador
         WHERE j.tag_jugador like '#QV2PYL'
         GROUP BY j.tag_jugador)  >= a.nombre_min and (SELECT(SUM(g.num_trofeus) + SUM(p.num_trofeus))
@@ -137,6 +141,7 @@ SELECT *
 SELECT *
     from arena_pack
         where id_arena_pack = 60;
+
 -------------------------------------------------------------------------------------------
 
 
@@ -294,53 +299,54 @@ CREATE TABLE ranquing(
     PRIMARY KEY (id_ranquing)
 );
 
-DROP FUNCTION if exists actualitza_ranquing;
+DROP FUNCTION if exists actualitza_ranquing CASCADE;
 
 CREATE OR REPLACE FUNCTION actualitza_ranquing()
 RETURNS trigger as $$
-BEGIN
+    DECLARE temp_anterior VARCHAR (255) := (SELECT id_temporada from temporada where temporada.data_fi <> new.data_fi ORDER BY temporada.data_fi desc LIMIT 1);
+    BEGIN
         INSERT INTO ranquing (tag_jugador, arena, num_trofeus, id_temp)
-        SELECT j2.tag_jugador,a.id_arena, (SELECT(SELECT (CASE WHEN SUM(g.num_trofeus) IS NULL THEN 0 ELSE SUM(g.num_trofeus) END)
+        SELECT j2.tag_jugador,a.id_arena,(SELECT(SELECT (CASE WHEN SUM(g.num_trofeus) IS NULL THEN 0 ELSE SUM(g.num_trofeus) END)
                  from jugador as j join guanya g on j.tag_jugador = g.tag_jugador
                  join batalla on g.id_batalla = batalla.id_batalla
-                 WHERE batalla.data >= new.data_inici and batalla.data <= new.data_fi
+                 WHERE batalla.id_temporada = temp_anterior
                  and j.tag_jugador = j2.tag_jugador) + (SELECT (CASE WHEN SUM(p.num_trofeus) IS NULL THEN 0 ELSE SUM(p.num_trofeus) END)
                  from jugador as j join perd p on j.tag_jugador = p.tag_jugador
                  join batalla as b2 on p.id_batalla = b2.id_batalla
-                 WHERE b2.data >= new.data_inici and b2.data <= new.data_fi
+                 WHERE b2.id_temporada = temp_anterior
                  and j.tag_jugador = j2.tag_jugador)
                  from jugador as j3
                  where j3.tag_jugador = j2.tag_jugador
-                 GROUP BY j3.tag_jugador),new.id_temporada
+                 GROUP BY j3.tag_jugador),temp_anterior
         from jugador as j2
         join arena as a on
             (SELECT(SELECT (CASE WHEN SUM(g.num_trofeus) IS NULL THEN 0 ELSE SUM(g.num_trofeus) END)
-             from jugador as j join guanya g on j.tag_jugador = g.tag_jugador
-             join batalla on g.id_batalla = batalla.id_batalla
-             WHERE batalla.data >= new.data_inici and batalla.data <= new.data_fi
-             and j.tag_jugador = j2.tag_jugador) + (SELECT (CASE WHEN SUM(p.num_trofeus) IS NULL THEN 0 ELSE SUM(p.num_trofeus) END)
-             from jugador as j join perd p on j.tag_jugador = p.tag_jugador
-             join batalla as b2 on p.id_batalla = b2.id_batalla
-             WHERE b2.data >= new.data_inici and b2.data <= new.data_fi
-             and j.tag_jugador = j2.tag_jugador)
-             from jugador as j3
-             where j3.tag_jugador = j2.tag_jugador
-             GROUP BY j3.tag_jugador) >= a.nombre_min and (SELECT((SELECT (CASE WHEN SUM(g.num_trofeus) IS NULL THEN 0 ELSE SUM(g.num_trofeus) END)
+                 from jugador as j join guanya g on j.tag_jugador = g.tag_jugador
+                 join batalla on g.id_batalla = batalla.id_batalla
+                 WHERE batalla.id_temporada = temp_anterior
+                 and j.tag_jugador = j2.tag_jugador) + (SELECT (CASE WHEN SUM(p.num_trofeus) IS NULL THEN 0 ELSE SUM(p.num_trofeus) END)
+                 from jugador as j join perd p on j.tag_jugador = p.tag_jugador
+                 join batalla as b2 on p.id_batalla = b2.id_batalla
+                 WHERE b2.id_temporada = temp_anterior
+                 and j.tag_jugador = j2.tag_jugador)
+                 from jugador as j3
+                 where j3.tag_jugador = j2.tag_jugador
+                 GROUP BY j3.tag_jugador) >= a.nombre_min and (SELECT((SELECT (CASE WHEN SUM(g.num_trofeus) IS NULL THEN 0 ELSE SUM(g.num_trofeus) END)
                              from jugador as j join guanya g on j.tag_jugador = g.tag_jugador
                              join batalla on g.id_batalla = batalla.id_batalla
-                             WHERE batalla.data >= new.data_inici and batalla.data <= new.data_fi
+                             WHERE batalla.id_temporada = temp_anterior
                              and j.tag_jugador = j2.tag_jugador) + (SELECT (CASE WHEN SUM(p.num_trofeus) IS NULL THEN 0 ELSE SUM(p.num_trofeus) END)
                              from jugador as j join perd p on j.tag_jugador = p.tag_jugador
                              join batalla as b2 on p.id_batalla = b2.id_batalla
-                             WHERE b2.data >= new.data_inici and b2.data <= new.data_fi
+                             WHERE  b2.id_temporada = temp_anterior
                              and j.tag_jugador = j2.tag_jugador))
                              from jugador as j3
                              where j3.tag_jugador = j2.tag_jugador
                              GROUP BY j3.tag_jugador)  <= a.nombre_max
                         and (a.titol LIKE '%Arena_L10 - Ultimate Champion%'
-                        OR a.nombre_max < 32767 )
-        --join temporada as t on t.data_inici >= new.data_inici and t.data_fi <= new.data_fi
-        GROUP BY j2.tag_jugador,a.id_arena;
+                        OR a.nombre_max < 32767)
+        WHERE j2.tag_jugador IN  (SELECT tag_jugador from participen where id_temporada = temp_anterior)
+        GROUP BY j2.tag_jugador,a.id_arena,temp_anterior;
 
         RETURN NULL;
 END
@@ -352,44 +358,56 @@ FOR EACH ROW
 EXECUTE FUNCTION actualitza_ranquing();
 
 --Validació
-INSERT INTO batalla (data, durada)
-VALUES ('2028-01-02','03:52:00');
+INSERT INTO temporada (id_temporada, data_inici, data_fi)
+VALUES ('T20','2031-01-01','2031-08-20');
+INSERT INTO participen (tag_jugador, id_temporada)
+VALUES ('#QV2PYL','T19');
+INSERT INTO batalla (data, durada,id_temporada)
+VALUES ('2030-01-02','03:52:00','T19');
+
 SELECT *
 from batalla ORDER BY data DESC;
 INSERT INTO guanya (tag_jugador, id_batalla,num_trofeus,id_pila)
-VALUES ('#QV2PYL',9925,80,102);
+VALUES ('#QV2PYL',9924,80,102);
 INSERT INTO perd (tag_jugador, id_batalla, id_pila, num_trofeus)
-VALUES ('#8GLQ9G0RG',9925,1113,-67);
-INSERT INTO temporada (id_temporada, data_inici, data_fi)
-VALUES ('T16','2028-01-01','2028-08-20');
+VALUES ('#QV2PYL',9924,1113,-67);
 
-SELECT * from guanya where tag_jugador = '#QV2PYL' ;
-
-select * FROM PERD where tag_jugador = '#8GLQ9G0RG';
 SELECT *
-from jugador;
+from arena;
 
 SELECT *
 from ranquing;
+
+SELECT *
+from temporada;
+
+------------------------------------COMENTARIS (per validacio)----------------------------
+/* Indicar que ho he fet amb una temporada anterior pq no tenim suficient informació de la
+   temporada que afegim
+
+   Ordre validaci´:
+   1- afegim els inserts amb T11
+   2- executem trigger
+   3- afegum insert nomes a temporada t12
+   4- ranquin
+ */
 
 -------------------------- FUNCIONA AQUI (no tocar)------------------------
 (SELECT((SELECT (CASE WHEN SUM(g.num_trofeus) IS NULL THEN 0 ELSE SUM(g.num_trofeus) END)
     from jugador as j join guanya g on j.tag_jugador = g.tag_jugador
      join batalla on g.id_batalla = batalla.id_batalla
-    WHERE batalla.data >= '2026-01-01' and batalla.data <= '2026-08-20'
-    and j.tag_jugador = '#8GLQ9G0RG') +  (SELECT (CASE WHEN SUM(p.num_trofeus) IS NULL THEN 0 ELSE SUM(p.num_trofeus) END)
+    WHERE batalla.data >= '2028-01-01' and batalla.data <= '2028-08-20'
+    and j.tag_jugador = '#QV2PYL') +  (SELECT (CASE WHEN SUM(p.num_trofeus) IS NULL THEN 0 ELSE SUM(p.num_trofeus) END)
            from jugador as j join perd p on j.tag_jugador = p.tag_jugador
         join batalla as b2 on p.id_batalla = b2.id_batalla
-        WHERE b2.data >= '2026-01-01' and b2.data <= '2026-08-20'
-        and j.tag_jugador = '#8GLQ9G0RG'))
+        WHERE b2.data >= '2028-01-01' and b2.data <= '2028-08-20'
+        and j.tag_jugador = '#QV2PYL'))
                     from jugador as j
-                    where j.tag_jugador = '#8GLQ9G0RG'
+                    where j.tag_jugador = '#QV2PYL'
                     GROUP BY j.tag_jugador);
 
 
 
-SELECT * FROM batalla
-                    WHERE batalla.data >= '2029-01-01' and batalla.data <= '2030-08-20'
 
 
 
