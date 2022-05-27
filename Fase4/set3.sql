@@ -155,17 +155,25 @@ BEGIN
         ORDER BY data desc
         LIMIT 1;
 
+            INSERT INTO dummylog VALUES (CONCAT('Jug: ', NEW.tag_jugador, ' T: ', NEW.trofeus, ' Clan: ', currentClan), now());
 
-    IF (SELECT trofeus_minims FROM clan WHERE tag_clan = currentClan) < NEW.trofeus
+            INSERT INTO dummylog VALUES (CONCAT('min clan: ', (SELECT trofeus_minims FROM clan WHERE tag_clan = currentClan), ' T: ', NEW.trofeus ));
+
+
+    IF (SELECT trofeus_minims FROM clan WHERE tag_clan = currentClan) > NEW.trofeus
     THEN
+        INSERT INTO dummylog VALUES ('A elimnar', now());
         IF (SELECT id_rol FROM forma_part WHERE id_forma_part = idFormaPart) = (SELECT id_rol FROM rol WHERE nom = 'leader')
         THEN
-            SELECT f_selNewLeader(currentClan);
+                    INSERT INTO dummylog VALUES ('A escollir lider', now());
+
+            PERFORM f_selNewLeader(currentClan);
         end if;
         UPDATE forma_part
-        SET id_rol = NULL
+        SET id_rol = NULL, data = now()
         WHERE id_forma_part = idFormaPart;
     END IF;
+    RETURN NULL;
 END;
 $$ LANGUAGE plpgsql;
 
