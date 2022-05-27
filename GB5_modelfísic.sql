@@ -15,6 +15,7 @@ DROP TABLE IF EXISTS Pila CASCADE;
 DROP TABLE IF EXISTS Comparteixen CASCADE;
 DROP TABLE IF EXISTS Modifiquen CASCADE;
 DROP TABLE IF EXISTS Warnings CASCADE;
+DROP TABLE IF EXISTS OPCardBlackList CASCADE;
 
 -- Módul 2
 DROP TABLE IF EXISTS Jugador CASCADE;
@@ -60,6 +61,7 @@ DROP TABLE IF EXISTS Insignia CASCADE;
 DROP TABLE IF EXISTS Obte CASCADE;
 DROP TABLE IF EXISTS Participen CASCADE;
 DROP TABLE IF EXISTS Temporada CASCADE;
+DROP TABLE IF EXISTS batalla_val CASCADE;
 
 -- ----------------------------------------------------------------
 
@@ -606,4 +608,11 @@ CREATE TABLE Warnings (
     error_message VARCHAR(255),
     date DATE,
     username VARCHAR(255)
+);
+
+
+CREATE TABLE OPCardBlackList (
+	nom VARCHAR(255),
+	date DATE,
+	FOREIGN KEY (nom) REFERENCES Carta(nom)
 );
