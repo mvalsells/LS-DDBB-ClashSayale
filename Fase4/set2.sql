@@ -44,6 +44,10 @@ UPDATE jugador
             SET or_ = 0
             WHERE  or_ IS NULL;
 
+UPDATE jugador
+        SET gemmes = 0
+        where gemmes IS NULL;
+
 SELECT jugador.tag_jugador, jugador.or_,jugador.gemmes from jugador  WHERE tag_jugador  like '#QV2PYL';
 
 DROP FUNCTION if exists suma_or_gemmes CASCADE;
@@ -51,17 +55,22 @@ DROP FUNCTION if exists suma_or_gemmes CASCADE;
 CREATE OR REPLACE FUNCTION suma_or_gemmes()
 RETURNS trigger as $$
 BEGIN
-        UPDATE jugador
-            SET or_  = jugador.or_ + (SELECT b.or_ from bundle as b
+        if (SELECT id_bundle from bundle where new.id_article = id_bundle) = new.id_article then
+            UPDATE jugador
+                SET or_  = (CASE WHEN jugador.or_ IS NULL THEN 0 ELSE jugador.or_ END)  + (SELECT (CASE WHEN b.or_ IS NULL
+                            THEN 0 ELSE b.or_ END) from bundle as b
                             WHERE new.id_article = b.id_bundle)
             WHERE new.tag_jugador = jugador.tag_jugador;
 
-        UPDATE jugador
-            SET gemmes = jugador.gemmes + (SELECT b.gemmes from bundle as b where new.id_article = b.id_bundle)
+            UPDATE jugador
+                SET gemmes = (CASE WHEN jugador.gemmes IS NULL THEN 0 ELSE jugador.gemmes END) +
+                             (SELECT (CASE WHEN b.gemmes IS NULL THEN 0 ELSE b.gemmes END) from bundle as b where new.id_article = b.id_bundle)
             WHERE new.tag_jugador = jugador.tag_jugador;
+        end if;
 
-        /*UPDATE jugador
-            SET or_ = or_ + (SELECT apa.or_ from arena_pack_arena as apa join
+        IF (SELECT id_arena_pack from arena_pack where id_arena_pack = new.id_article) = new.id_article then
+        UPDATE jugador
+            SET or_ = (CASE WHEN or_ IS NULL THEN 0 ELSE or_ END) + (SELECT (CASE WHEN apa.or_  IS NULL THEN 0 ELSE apa.or_ END) from arena_pack_arena as apa join
                 arena a on apa.id_arena = a.id_arena
                 join arena_pack ap on apa.id_arena_pack = ap.id_arena_pack
                 join article a2 on ap.id_arena_pack = a2.id_article
@@ -80,8 +89,11 @@ BEGIN
                         WHERE j.tag_jugador = new.tag_jugador
                         GROUP BY j.tag_jugador)  <= a.nombre_max
                         and (a.titol LIKE '%Arena_L10 - Ultimate Champion%'
-                        OR a.nombre_max < 32767 ))
-            WHERE tag_jugador = new.tag_jugador;*/
+                        OR a.nombre_max < 32767 )
+                    GROUP BY j2.tag_jugador, apa.or_)
+            WHERE tag_jugador = new.tag_jugador;
+
+        end if;
 
     RETURN NULL;
 
@@ -141,6 +153,8 @@ SELECT *
 SELECT *
     from arena_pack
         where id_arena_pack = 60;
+
+SELECT *
 
 -------------------------------------------------------------------------------------------
 
